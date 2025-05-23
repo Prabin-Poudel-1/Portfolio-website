@@ -1003,7 +1003,7 @@ form textarea {
         height: 25%;
         display: block;
         margin: 25px auto;
-        border-radius: 8px 94px;
+        /* border-radius: 8px 94px; */
     }
     .home-content h1 {
         font-size: 28px;
