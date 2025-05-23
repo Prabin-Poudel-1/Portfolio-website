@@ -264,6 +264,10 @@ body.dark-mode {
     transform: translateY(-10px);
 }
 
+.dark-mode .home-image1 {
+    box-shadow: 0 15px 30px rgb(209, 219, 243);
+}
+
 .about-text h2 {
     font-size: 60px;
     color: #fff;
@@ -910,7 +914,6 @@ form textarea {
         height: 45%;
         display: block;
         margin: 25px auto;
-        /* border-radius: 8px 94px; */
     }
     .header {
         padding: 20px 5%;
@@ -950,7 +953,6 @@ form textarea {
         height: 45%;
         display: block;
         margin: 25px auto;
-        /* border-radius: 8px 94px; */
     }
     .navbar a {
         margin: 10px;
@@ -1003,7 +1005,6 @@ form textarea {
         height: 25%;
         display: block;
         margin: 25px auto;
-        /* border-radius: 8px 94px; */
     }
     .home-content h1 {
         font-size: 28px;
@@ -1210,7 +1211,7 @@ form textarea {
     .navbar {
         display: none;
         flex-direction: column;
-        background-color: #111;
+        background-color: transparent;
         position: absolute;
         top: 60px;
         left: 0;
