@@ -121,4 +121,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Something went wrong. Please try again.');
             });
     });
+    var thankYouMessage = document.getElementById('thankyou-message');
 });

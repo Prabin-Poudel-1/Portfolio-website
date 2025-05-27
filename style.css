@@ -157,7 +157,7 @@ body.dark-mode {
 .home-content h3 {
     font-size: 32px;
     font-weight: 700;
-    color: rgb(237, 246, 243);
+    color: rgb(33, 227, 163);
 }
 
 .home-content h1 {
@@ -172,11 +172,12 @@ body.dark-mode {
 
 .home-content h3 span {
     color: rgb(210, 241, 243);
-    color: rgb(8, 246, 166);
+    color: rgb(8, 246, 111);
 }
 
 .home-content p {
     font-size: 18px;
+    color: #fefefde0;
 }
 
 .home-sci a {
@@ -288,8 +289,8 @@ body.dark-mode {
 }
 
 .about-text p {
-    color: aliceblue;
-    font-size: 20px;
+    color: rgb(223, 220, 223);
+    font-size: 15px;
     line-height: 1.4;
     margin-bottom: 4rem;
     text-align: center;
@@ -1001,10 +1002,13 @@ form textarea {
 
 @media (max-width: 480px) {
     .home-image {
-        width: 35%;
-        height: 25%;
+        width: 70%;
+        height: 65%;
         display: block;
-        margin: 25px auto;
+    }
+    .home {
+        gap: 0;
+        margin-bottom: 55%;
     }
     .home-content h1 {
         font-size: 28px;
@@ -1056,6 +1060,10 @@ form textarea {
     .home-image1 {
         width: 50%;
         height: auto;
+    }
+    .home-image {
+        width: 50%;
+        height: 65%;
     }
 }
 
@@ -1209,9 +1217,12 @@ form textarea {
 
 @media (max-width: 480px) {
     .navbar {
-        display: none;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease, opacity 0.3s ease;
         flex-direction: column;
-        background-color: transparent;
+        background-color: #0e1c38;
         position: absolute;
         top: 60px;
         left: 0;
@@ -1221,7 +1232,8 @@ form textarea {
         z-index: 100;
     }
     .navbar.active {
-        display: flex;
+        max-height: 500px;
+        opacity: 1;
     }
     .menu-toggle {
         display: block;
