@@ -93,11 +93,11 @@ body.dark-mode {
 }
 
 .home-image:hover {
-    box-shadow: 0 15px 30px #0ef;
+    box-shadow: 0 15px 45px rgb(0, 60, 255);
 }
 
 .dark-mode .home-image {
-    box-shadow: 0 15px 30px rgb(209, 219, 243);
+    box-shadow: 0 15px 45px rgb(0, 60, 255);
 }
 
 .dark-mode .home-image:hover {
@@ -239,6 +239,7 @@ body.dark-mode {
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
     gap: 1.5rem;
+    margin: 1rem;
 }
 
 .dark-mode .btn-box:hover,
@@ -365,7 +366,6 @@ body.dark-mode {
     letter-spacing: 1px;
     text-decoration: none;
     font-weight: 600;
-    /* Removed: opacity: 0; animation: ...; */
     box-shadow: 0 0 5px #0ef, 0 0 25px #0ef;
 }
 
@@ -399,49 +399,14 @@ body.dark-mode {
     margin-bottom: 50px;
 }
 
-.bar {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.bar i {
-    font-size: 24px;
-    vertical-align: middle;
-    margin-bottom: -10px;
-}
-
-.Technical-bar .bar {
-    margin-top: 40px 0;
-}
-
-.Technical-bar .bar:first-child {
-    margin-top: 0;
-}
-
-.Technical-bar .bar:last-child {
-    margin-bottom: 0;
-}
-
-.Technical-bar .bar .info {
-    margin-bottom: 5px;
-}
-
-.Technical-bar .bar .info span {
-    font-size: 17px;
-    font-weight: 500;
-    animation: showText 0.5s 1s linear forwards;
-    opacity: 0;
-}
-
 .Technical-bar .bar .progress-line {
     position: relative;
     border-radius: 10px;
     width: 100%;
     height: 5px;
     background-color: #c23030;
-    animation: animate 1s cubic-bezier(1, 0, 0.5, 1) forwards;
-    transform: scaleX(0);
+    /* Animation is added by JS */
+    transform: scaleX(1);
     transform-origin: left;
 }
 
@@ -450,7 +415,6 @@ body.dark-mode {
     background-color: #0ef;
     position: absolute;
     border-radius: 10px;
-    transition: transform 1s cubic-bezier(1, 0, 0.5, 1);
     transform: scaleX(0);
     transform-origin: left;
 }
@@ -475,51 +439,21 @@ body.dark-mode {
     width: 50%
 }
 
-.progress-line span::after {
-    position: absolute;
-    padding: 1px 5px;
-    background-color: #000;
-    color: #fff;
-    font-size: 12px;
-    border-radius: 5px;
-    top: -28px;
-    right: -28px;
-    animation: showText 0.5s 1.5s linear forwards;
-    opacity: 0;
+@keyframes animate {
+    100% {
+        transform: scaleX(1);
+    }
 }
 
-.progress-line.html span::after {
-    content: "90%";
+@keyframes showText {
+    100% {
+        opacity: 1;
+    }
 }
 
-.progress-line.css span::after {
-    content: "80%";
-}
-
-.progress-line.JavaScript span::after {
-    content: "40%";
-}
-
-.progress-line.Python span::after {
-    content: "60%";
-}
-
-.progress-line.react span::after {
-    content: "50%";
-}
-
-.progress-line span::before {
-    content: "";
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-bottom-width: 0px;
-    border-right-width: 0px;
-    border-top-color: #000;
-    top: -10px;
-    right: 0;
-    animation: showText 0.5s 1.5s linear forwards;
+.Technical-bar .bar .info span {
+    font-size: 17px;
+    font-weight: 500;
     opacity: 0;
 }
 
@@ -837,9 +771,55 @@ form textarea {
     background-color: #0ef;
     position: absolute;
     border-radius: 10px;
-    animation: animate 1s 1s cubic-bezier(1, 0, 0.5, 1) forwards;
     transform: scaleX(0);
     transform-origin: left;
+}
+
+.progress-line span::after {
+    position: absolute;
+    top: -28px;
+    right: 0;
+    padding: 1px 5px;
+    background-color: #000;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 5px;
+    opacity: 0;
+    animation: showText 0.5s 1.5s linear forwards;
+}
+
+.progress-line.html span::after {
+    content: "90%";
+}
+
+.progress-line.css span::after {
+    content: "80%";
+}
+
+.progress-line.JavaScript span::after {
+    content: "40%";
+}
+
+.progress-line.Python span::after {
+    content: "60%";
+}
+
+.progress-line.react span::after {
+    content: "50%";
+}
+
+.progress-line span::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #000;
+    top: -8px;
+    right: 6px;
+    opacity: 0;
+    animation: showText 0.5s 1.5s linear forwards;
 }
 
 .last-text p {

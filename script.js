@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-
+    // Typed.js for typing text effect
     var typed = new Typed('.text', {
         strings: ["Web Developer", "Software Tester", "Code Enthusiast", "Computer Engineer"],
         typeSpeed: 100,
@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loop: true
     });
 
+    // Theme toggle
     const themeToggleBtn = document.getElementById('themeToggle');
 
     function setTheme(theme) {
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTheme(currentTheme === 'dark' ? 'light' : 'dark');
     });
 
-
+    // Icon hover effects
     function addTransform(e) {
         e.currentTarget.style.transform = 'scale(1.1) rotate(10deg)';
     }
@@ -50,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-
+    // Navbar toggle for mobile
     const menuToggle = document.querySelector(".menu-toggle");
     const navbar = document.querySelector(".navbar");
     if (menuToggle && navbar) {
@@ -67,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 menuToggle.setAttribute('aria-expanded', navbar.classList.contains('active'));
             }
         });
-
         document.querySelectorAll('.navbar a').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 480) {
@@ -78,48 +78,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
+    // === Animate skill bars ONLY when visible using Intersection Observer ===
     const techSection = document.querySelector('.container1');
-    const bars = document.querySelectorAll('.Technical-bar .progress-line span');
     let techAnimated = false;
-
-    function animateTechBars() {
-        if (techAnimated) return;
-        if (!techSection) return;
-        const sectionPos = techSection.getBoundingClientRect();
-        if (sectionPos.top < window.innerHeight && sectionPos.bottom > 0) {
-            bars.forEach(bar => {
-                bar.style.transform = 'scaleX(1)';
-            });
-            techAnimated = true;
-        }
+    if (techSection) {
+        const observer = new window.IntersectionObserver(
+            (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !techAnimated) {
+                        // Animate bars (span inside .progress-line)
+                        document.querySelectorAll('.Technical-bar .progress-line span').forEach(span => {
+                            span.style.animation = 'animate 1s 1s cubic-bezier(1,0,0.5,1) forwards';
+                        });
+                        // Animate percentage text
+                        document.querySelectorAll('.Technical-bar .bar .info span').forEach(span => {
+                            span.style.animation = 'showText 0.5s 1s linear forwards';
+                        });
+                        techAnimated = true;
+                        observer.disconnect(); // Only run once
+                    }
+                });
+            }, {
+                threshold: 0.3 // 30% visible
+            }
+        );
+        observer.observe(techSection);
     }
 
-    window.addEventListener('scroll', animateTechBars);
-    window.addEventListener('load', animateTechBars);
-});
-document.addEventListener('DOMContentLoaded', function() {
+    // Contact form submission (Google Apps Script)
     var form = document.getElementById('contact-form');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var data = new FormData(form);
-
-        fetch('https://script.google.com/macros/s/AKfycbwe5wykAIaNS_0YtlZNDwx2INqhQnizMzxueJp-MPLSyaux4LuSzjSlzk0IhMBW4_ZyZg/exec', {
-                method: 'POST',
-                body: data
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.result === "success") {
-                    form.reset();
-                    document.getElementById('thankyou-message').style.display = 'block';
-                } else {
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var data = new FormData(form);
+            fetch('https://script.google.com/macros/s/AKfycbwe5wykAIaNS_0YtlZNDwx2INqhQnizMzxueJp-MPLSyaux4LuSzjSlzk0IhMBW4_ZyZg/exec', {
+                    method: 'POST',
+                    body: data
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.result === "success") {
+                        form.reset();
+                        document.getElementById('thankyou-message').style.display = 'block';
+                    } else {
+                        alert('Something went wrong. Please try again.');
+                    }
+                })
+                .catch(error => {
                     alert('Something went wrong. Please try again.');
-                }
-            })
-            .catch(error => {
-                alert('Something went wrong. Please try again.');
-            });
-    });
-    var thankYouMessage = document.getElementById('thankyou-message');
+                });
+        });
+    }
 });
