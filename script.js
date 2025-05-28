@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Typed.js for typing text effect
+
     var typed = new Typed('.text', {
         strings: ["Web Developer", "Software Tester", "Code Enthusiast", "Computer Engineer"],
         typeSpeed: 100,
@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loop: true
     });
 
-    // Theme toggle
     const themeToggleBtn = document.getElementById('themeToggle');
 
     function setTheme(theme) {
@@ -30,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTheme(currentTheme === 'dark' ? 'light' : 'dark');
     });
 
-    // Icon hover effects
+
     function addTransform(e) {
         e.currentTarget.style.transform = 'scale(1.1) rotate(10deg)';
     }
@@ -51,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Navbar toggle for mobile
+
     const menuToggle = document.querySelector(".menu-toggle");
     const navbar = document.querySelector(".navbar");
     if (menuToggle && navbar) {
@@ -78,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // === Animate skill bars ONLY when visible using Intersection Observer ===
+
     const techSection = document.querySelector('.container1');
     let techAnimated = false;
     if (techSection) {
@@ -105,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(techSection);
     }
 
-    // Contact form submission (Google Apps Script)
     var form = document.getElementById('contact-form');
     if (form) {
         form.addEventListener('submit', function(e) {
