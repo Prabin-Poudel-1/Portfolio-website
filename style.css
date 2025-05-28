@@ -930,7 +930,7 @@ form textarea {
 
 @media (max-width: 768px) {
     .home-image {
-        width: 45%;
+        width: 65%;
         height: 45%;
         display: block;
         margin: 25px auto;
@@ -982,7 +982,7 @@ form textarea {
 
 @media (max-width: 480px) {
     .home-image {
-        width: 70%;
+        width: 90%;
         height: 65%;
         display: block;
     }
