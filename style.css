@@ -2,19 +2,19 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: #0ef;
+    color: rgb(11, 142, 142);
     font-family: 'Poppins', sans-serif;
     scroll-behavior: smooth;
 }
 
 body {
-    background: linear-gradient(13deg, #02141b8b, #060617, #022d40);
+    background: linear-gradient( to right, rgb(40, 40, 80), rgb(60, 60, 100), rgb(50, 100, 130), rgb(5, 5, 50));
     color: #f1f5f9;
     transition: background-color 0.3s, color 0.3s;
 }
 
 body.dark-mode {
-    background: linear-gradient(135deg, #155c7a8b, #222043, #11739d);
+    background: linear-gradient(to right, rgba(153, 220, 169, 0.742), rgba(157, 157, 198, 0.397), rgb(180, 213, 226), rgba(183, 225, 191, 0.66));
 }
 
 .header {
@@ -28,10 +28,11 @@ body.dark-mode {
     justify-content: space-between;
     align-items: center;
     z-index: 100;
+    background: linear-gradient(to right, rgba(39, 33, 80, 0.742), rgba(23, 23, 74, 0.397), rgb(1, 47, 65), rgb(1, 1, 59));
 }
 
 .dark-mode .header {
-    background: linear-gradient(135deg, #13546f, #396d7e, #0c455d);
+    background: linear-gradient(to right, rgba(153, 220, 169, 0.742), rgba(157, 157, 198, 0.397), rgb(180, 213, 226), rgba(183, 225, 191, 0.66));
 }
 
 .logo {
@@ -78,6 +79,11 @@ body.dark-mode {
     z-index: 1;
     margin: 100px 0;
     gap: 3rem;
+    background: linear-gradient( to right, rgb(29, 29, 68), rgb(41, 41, 81), rgb(19, 36, 77), rgb(2, 2, 38));
+}
+
+.dark-mode .home {
+    background: linear-gradient(to right, rgba(153, 220, 169, 0.742), rgba(157, 157, 198, 0.397), rgb(180, 213, 226), rgba(183, 225, 191, 0.66));
 }
 
 .home-image {
@@ -93,15 +99,15 @@ body.dark-mode {
 }
 
 .home-image:hover {
-    box-shadow: 0 15px 45px rgb(0, 60, 255);
+    box-shadow: 0 15px 45px rgb(211, 216, 233);
 }
 
 .dark-mode .home-image {
-    box-shadow: 0 15px 45px rgb(0, 60, 255);
+    box-shadow: 0 15px 45px rgb(73, 150, 214);
 }
 
 .dark-mode .home-image:hover {
-    box-shadow: 0 30px 45px rgb(209, 219, 243);
+    box-shadow: 0 30px 45px rgb(0, 0, 0);
 }
 
 .home-image::before {
@@ -276,7 +282,7 @@ body.dark-mode {
 }
 
 .about-text h2 span {
-    color: #0ef;
+    color: rgb(0, 183, 255);
 }
 
 .about-text h4 {
@@ -289,7 +295,7 @@ body.dark-mode {
 }
 
 .about-text p {
-    color: rgb(223, 220, 223);
+    color: rgb(219, 128, 210);
     font-size: 15px;
     line-height: 1.4;
     margin-bottom: 4rem;
@@ -311,7 +317,7 @@ body.dark-mode {
 }
 
 .sub-title span {
-    color: #0ef;
+    color: rgb(26, 149, 210);
 }
 
 .service-list {
@@ -319,7 +325,7 @@ body.dark-mode {
     grid-template-columns: repeat(auto-fit, minmax(259px, 1fr));
     gap: 40px;
     margin-top: 50px;
-    color: #0ef;
+    color: rgb(10, 58, 155);
 }
 
 .service-list div {
@@ -328,7 +334,7 @@ body.dark-mode {
     font-size: 13px;
     border-radius: 20px;
     transition: background 0.5s, transform 0.5s;
-    box-shadow: 1px 1px 20px #012290f7, 1px 1px 40px #0053b8f7;
+    box-shadow: 1px 1px 20px #03238d, 1px 1px 40px #0053b8f7;
 }
 
 .service-list div i {
@@ -345,7 +351,7 @@ body.dark-mode {
 
 .service-list div a {
     text-decoration: none;
-    color: #000000;
+    color: #4c7199;
     font-size: 12px;
     margin-top: 20px;
     display: inline-block;
@@ -361,7 +367,7 @@ body.dark-mode {
     background: #0ef;
     border-radius: 40px;
     font-size: 16px;
-    color: #081b29;
+    color: #3d698b;
     letter-spacing: 1px;
     text-decoration: none;
     font-weight: 600;
