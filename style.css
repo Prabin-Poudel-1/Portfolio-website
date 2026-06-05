@@ -7,14 +7,28 @@
     scroll-behavior: smooth;
 }
 
+
+
 body {
-    background: linear-gradient( to right, rgb(40, 40, 80), rgb(60, 60, 100), rgb(50, 100, 130), rgb(5, 5, 50));
-    color: #f1f5f9;
+    background: linear-gradient( to right, rgba(115, 115, 136, 0.223), rgba(79, 79, 113, 0.286), rgba(50, 99, 130, 0.185), rgba(18, 18, 101, 0.202));
+    color: #00030700;
     transition: background-color 0.3s, color 0.3s;
 }
 
+#tsparticles {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background: #000; /* black background like your design */
+}
+
+
+
 body.dark-mode {
-    background: linear-gradient(to right, rgba(153, 220, 169, 0.742), rgba(157, 157, 198, 0.397), rgb(180, 213, 226), rgba(183, 225, 191, 0.66));
+    background: linear-gradient(to right, rgba(153, 220, 169, 0.044), rgba(157, 157, 198, 0.045), rgba(180, 213, 226, 0.15), rgba(183, 225, 191, 0.045));
 }
 
 .header {
@@ -28,7 +42,7 @@ body.dark-mode {
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    background: linear-gradient(to right, rgba(39, 33, 80, 0.742), rgba(23, 23, 74, 0.397), rgb(1, 47, 65), rgb(1, 1, 59));
+    background: linear-gradient(to right, rgba(39, 33, 80, 0.245), rgba(23, 23, 74, 0.146), rgba(1, 47, 65, 0.359), rgba(1, 1, 59, 0.233));
 }
 
 .dark-mode .header {
@@ -79,11 +93,11 @@ body.dark-mode {
     z-index: 1;
     margin: 100px 0;
     gap: 3rem;
-    background: linear-gradient( to right, rgb(29, 29, 68), rgb(41, 41, 81), rgb(19, 36, 77), rgb(2, 2, 38));
+    background: linear-gradient( to right, rgba(29, 29, 68, 0.467), rgba(41, 41, 81, 0.456), rgba(19, 36, 77, 0.112), rgba(2, 2, 38, 0.239));
 }
 
 .dark-mode .home {
-    background: linear-gradient(to right, rgba(153, 220, 169, 0.742), rgba(157, 157, 198, 0.397), rgb(180, 213, 226), rgba(183, 225, 191, 0.66));
+    background: linear-gradient(to right, rgba(153, 220, 169, 0.317), rgba(157, 157, 198, 0.181), rgba(180, 213, 226, 0.21), rgba(183, 225, 191, 0.202));
 }
 
 .home-image {

@@ -8,7 +8,34 @@ document.addEventListener('DOMContentLoaded', () => {
         loop: true
     });
 
-    const themeToggleBtn = document.getElementById('themeToggle');
+    
+// tsParticles background
+tsParticles.load("tsparticles", {
+    particles: {
+        number: {
+            value: 70
+        },
+        color: {
+            value: "#00ff66"
+        },
+        links: {
+            enable: true,
+            color: "#00ff66",
+            distance: 150
+        },
+        move: {
+            enable: true,
+            speed: 1
+        },
+        size: {
+            value: 2
+        }
+    },
+    background: {
+        color: "#000"
+    }
+});
+const themeToggleBtn = document.getElementById('themeToggle');
 
     function setTheme(theme) {
         if (theme === 'dark') {
