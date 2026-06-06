@@ -46,7 +46,7 @@ body.dark-mode {
 }
 
 .dark-mode .header {
-    background: linear-gradient(to right, rgba(153, 220, 169, 0.742), rgba(157, 157, 198, 0.397), rgb(180, 213, 226), rgba(183, 225, 191, 0.66));
+    background: linear-gradient(to right, rgba(153, 220, 169, 0.213), rgba(157, 157, 198, 0.267), rgba(180, 213, 226, 0.293), rgba(183, 225, 191, 0.274));
 }
 
 .logo {
