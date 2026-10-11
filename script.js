@@ -105,32 +105,6 @@ const themeToggleBtn = document.getElementById('themeToggle');
     }
 
 
-    const techSection = document.querySelector('.container1');
-    let techAnimated = false;
-    if (techSection) {
-        const observer = new window.IntersectionObserver(
-            (entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !techAnimated) {
-                        // Animate bars (span inside .progress-line)
-                        document.querySelectorAll('.Technical-bar .progress-line span').forEach(span => {
-                            span.style.animation = 'animate 1s 1s cubic-bezier(1,0,0.5,1) forwards';
-                        });
-                        // Animate percentage text
-                        document.querySelectorAll('.Technical-bar .bar .info span').forEach(span => {
-                            span.style.animation = 'showText 0.5s 1s linear forwards';
-                        });
-                        techAnimated = true;
-                        observer.disconnect(); // Only run once
-                    }
-                });
-            }, {
-                threshold: 0.3 // 30% visible
-            }
-        );
-        observer.observe(techSection);
-    }
-
     var form = document.getElementById('contact-form');
     if (form) {
         form.addEventListener('submit', function(e) {
@@ -154,4 +128,26 @@ const themeToggleBtn = document.getElementById('themeToggle');
                 });
         });
     }
+});
+
+// Keep project interactions independent of optional animation libraries above.
+document.addEventListener('DOMContentLoaded', () => {
+    const motion = window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+    document.querySelectorAll('.project-card').forEach(card => {
+        const reset = () => {
+            card.style.removeProperty('--tilt-x');
+            card.style.removeProperty('--tilt-y');
+        };
+        card.addEventListener('pointermove', event => {
+            if (!motion.matches || event.pointerType === 'touch') return;
+            const rect = card.getBoundingClientRect();
+            const x = Math.max(-0.5, Math.min(0.5, (event.clientX - rect.left) / rect.width - 0.5));
+            const y = Math.max(-0.5, Math.min(0.5, (event.clientY - rect.top) / rect.height - 0.5));
+            card.style.setProperty('--tilt-x', `${-y * 5}deg`);
+            card.style.setProperty('--tilt-y', `${x * 5}deg`);
+        });
+        card.addEventListener('pointerleave', reset);
+        card.addEventListener('pointercancel', reset);
+        motion.addEventListener('change', reset);
+    });
 });

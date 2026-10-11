@@ -1245,3 +1245,81 @@ form textarea {
         display: block;
     }
 }
+
+/* Illustrated project cards with hover reveal and pointer tilt. */
+.projects-section { max-width: 1280px; margin: 100px auto; padding: 40px 5%; scroll-margin-top: 100px; }
+.projects-heading { margin-bottom: 40px; }
+.projects-heading .projects-eyebrow { color: #0ef; font-size: 12px; font-weight: 700; letter-spacing: 3px; margin-bottom: 12px; }
+.projects-heading h2 { color: #fff; font-size: clamp(32px, 5vw, 54px); margin-bottom: 14px; }
+.projects-heading h2 span { color: #0ef; }
+.projects-heading > p:last-child { color: #c2d1df; line-height: 1.7; max-width: 680px; }
+.projects-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
+.project-card { min-width: 0; display: flex; flex-direction: column; background: #101e30; border: 1px solid #30475c; border-radius: 18px; overflow: hidden; transform: perspective(1400px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transition: transform .22s ease-out, border-color .3s, box-shadow .3s; }
+.project-visual { position: relative; overflow: hidden; aspect-ratio: 16 / 9; background: #182c45; }
+.project-visual img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .65s ease; }
+.project-number, .project-art-label { position: absolute; z-index: 2; color: #fff; background: #081522d9; border: 1px solid #ffffff38; border-radius: 5px; padding: 5px 9px; font-size: 10px; letter-spacing: 1px; }
+.project-number { top: 16px; left: 16px; }
+.project-art-label { top: 16px; right: 16px; }
+.project-overlay { position: absolute; inset: 0; padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; background: linear-gradient(transparent 10%, #081b29f5); opacity: 0; transform: translateY(30%); transition: opacity .4s, transform .4s; }
+.project-overlay p { color: #fff; font-size: clamp(20px, 2.3vw, 29px); font-weight: 700; line-height: 1.3; max-width: 360px; }
+.project-overlay span { color: #82edf2; font-size: 12px; }
+.project-card:focus-within { border-color: #0ef; box-shadow: 0 12px 35px #00eeff20; }
+.project-card:focus-within .project-overlay { opacity: 1; transform: translateY(0); }
+.project-details { flex: 1; display: flex; flex-direction: column; padding: 28px; }
+.project-details .project-category { color: #7dd9d0; font-size: 11px; line-height: 1.7; margin-bottom: 10px; }
+.project-details h3 { color: #f1f6ff; font-size: 25px; line-height: 1.3; margin-bottom: 14px; }
+.project-details > p { color: #c2d1df; font-size: 14px; line-height: 1.8; }
+.project-features { list-style: none; display: grid; gap: 16px; margin: 24px 0; padding: 22px 0; border-top: 1px solid #30475c; border-bottom: 1px solid #30475c; }
+.project-features li { display: grid; gap: 4px; }
+.project-features strong { color: #e1faff; font-size: 13px; }
+.project-features span { color: #b9cbd9; font-size: 13px; line-height: 1.7; }
+.project-details .project-stack-label { margin-top: auto; color: #85afc0; font-size: 10px; letter-spacing: 2px; font-weight: 700; }
+.project-tags { display: flex; flex-wrap: wrap; list-style: none; gap: 7px; padding: 12px 0 24px; }
+.project-tags li { color: #cfdee9; background: #213448; border: 1px solid #3b5166; border-radius: 6px; padding: 5px 8px; font-size: 11px; }
+.project-link { display: flex; justify-content: space-between; align-items: center; min-height: 44px; color: #0ef; border-top: 1px solid #30475c; padding-top: 16px; font-size: 14px; font-weight: 600; text-decoration: none; }
+.project-link span { color: inherit; font-size: 22px; }
+.project-link:hover { color: #fff; text-decoration: underline; }
+.project-link:focus-visible { outline: 2px solid #0ef; outline-offset: 5px; border-radius: 3px; }
+@media (hover: hover) and (pointer: fine) {
+    .project-card:hover { border-color: #0ef; box-shadow: 0 18px 45px #00eeff25; }
+    .project-card:hover .project-visual img { transform: scale(1.09) rotate(1.5deg); }
+    .project-card:hover .project-overlay { opacity: 1; transform: translateY(0); }
+}
+@media (hover: none) { .project-overlay { opacity: 1; transform: none; } }
+@media (max-width: 650px) {
+    .projects-section { margin: 60px auto; padding: 30px 5%; }
+    .projects-grid { grid-template-columns: 1fr; gap: 28px; }
+    .project-details { padding: 23px; }
+    .project-overlay { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .project-card, .project-visual img, .project-overlay { transition: none; transform: none !important; }
+}
+
+
+/* Skills are demonstrated through projects, without percentage ratings. */
+.skills-section { max-width: 1280px; margin: 80px auto; padding: 40px 5%; scroll-margin-top: 100px; }
+.skills-heading { margin-bottom: 30px; }
+.skills-eyebrow { color: #0ef; font-size: 12px; font-weight: 700; letter-spacing: 3px; margin-bottom: 12px; }
+.skills-heading h2 { color: #fff; font-size: clamp(30px, 4vw, 48px); line-height: 1.2; margin-bottom: 16px; }
+.skills-heading h2 span { color: #0ef; }
+.skills-heading > p:last-child { color: #c2d1df; font-size: 15px; line-height: 1.7; }
+.skills-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.skill-group { background: #101e30; border: 1px solid #30475c; border-radius: 14px; padding: 24px; min-width: 0; }
+.skill-group h3 { color: #f1f6ff; font-size: 18px; margin-bottom: 18px; }
+.skill-badges { display: flex; flex-wrap: wrap; gap: 9px; list-style: none; }
+.skill-badges li { color: #d5e6f1; background: #213448; border: 1px solid #3b5166; border-radius: 7px; padding: 7px 12px; font-size: 13px; }
+.skills-evidence { margin-top: 32px; }
+.skills-evidence > h3 { color: #f1f6ff; font-size: 18px; margin-bottom: 16px; }
+.skills-projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+.skills-projects a { display: flex; flex-direction: column; gap: 7px; padding: 16px 0; border-bottom: 1px solid #30475c; text-decoration: none; }
+.skills-projects strong { color: #86e5e4; font-size: 14px; }
+.skills-projects span { color: #c2d1df; font-size: 13px; line-height: 1.6; }
+.skills-projects a:hover strong { color: #fff; text-decoration: underline; }
+.skills-projects a:focus-visible { outline: 2px solid #0ef; outline-offset: 4px; border-radius: 4px; }
+.project-card[id] { scroll-margin-top: 100px; }
+@media (max-width: 650px) {
+    .skills-section { margin: 50px auto; padding: 30px 5%; }
+    .skills-grid, .skills-projects { grid-template-columns: 1fr; }
+    .skill-group { padding: 22px; }
+}
