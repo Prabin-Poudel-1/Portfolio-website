@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Chitwan Care | Engineering Case Study | Prabin Poudel</title>
+    <meta
+      name="description"
+      content="AI-Assisted Waste Detection & Environmental Reporting. Architecture, implementation decisions, verification, and limitations."
+    />
+    <link
+      rel="canonical"
+      href="https://www.poudelprabin.com.np/chitwan-care.html"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Chitwan Care | Engineering Case Study | Prabin Poudel"
+    />
+    <meta
+      property="og:description"
+      content="AI-Assisted Waste Detection & Environmental Reporting. Architecture, implementation decisions, verification, and limitations."
+    />
+    <meta
+      property="og:url"
+      content="https://www.poudelprabin.com.np/chitwan-care.html"
+    />
+    <meta
+      property="og:image"
+      content="https://www.poudelprabin.com.np/assets/social-preview.jpg"
+    />
+    <meta
+      property="og:image:alt"
+      content="Concept artwork illustrating Rescuer Sathi offline SOS"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css?v=20261011c" />
+    <script src="script.js?v=20261011c" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="header">
+      <div class="nav-wrap">
+        <a class="logo" href="index.html#home"
+          >Prabin Poudel<span aria-hidden="true">.</span></a
+        >
+        <nav id="navigation" class="navbar" aria-label="Main navigation">
+          <a href="index.html#portfolio">Projects</a
+          ><a href="index.html#expertise">Expertise</a
+          ><a href="index.html#skill">Skills</a
+          ><a href="index.html#about">About</a
+          ><a href="index.html#contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <button
+            id="themeToggle"
+            type="button"
+            aria-label="Switch to light mode"
+          >
+            Light mode</button
+          ><button
+            class="menu-toggle"
+            type="button"
+            aria-controls="navigation"
+            aria-expanded="false"
+          >
+            Menu
+          </button>
+        </div>
+      </div>
+    </header>
+    <main id="main" class="case-main section-wrap">
+      <a class="text-link" href="index.html#portfolio">← All projects</a>
+      <header class="case-heading">
+        <p class="eyebrow">Engineering case study</p>
+        <h1>Chitwan Care</h1>
+        <p class="case-subtitle">
+          AI-Assisted Waste Detection &amp; Environmental Reporting
+        </p>
+        <p>
+          An Android environmental reporting application that connects
+          waste-image analysis with a location-aware review and cleanup
+          workflow.
+        </p>
+        <ul class="tags">
+          <li>Flutter</li>
+          <li>Dart</li>
+          <li>LiteRT</li>
+          <li>Spring Boot</li>
+          <li>Java</li>
+          <li>PostgreSQL / Neon</li>
+          <li>Docker</li>
+          <li>JWT / BCrypt</li>
+          <li>Flyway</li>
+        </ul>
+        <a
+          class="button primary"
+          href="https://github.com/Prabin-Poudel-1/waste-photo-type"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View repository ↗<span class="sr-only">
+            (opens in a new tab)</span
+          ></a
+        >
+      </header>
+      <figure class="case-art">
+        <img
+          src="assets/projects/chitwan-care.webp"
+          width="1100"
+          height="733"
+          alt="Concept illustration for Chitwan Care, not an app screenshot"
+        />
+        <figcaption>
+          Concept artwork retained from the portfolio. This is not an
+          application screenshot.
+        </figcaption>
+      </figure>
+      <nav class="case-nav" aria-label="Case study sections">
+        <a href="#problem">Problem</a><a href="#architecture">Architecture</a
+        ><a href="#engineering">Engineering</a
+        ><a href="#screenshots">Screenshots</a
+        ><a href="#verification">Verification</a>
+      </nav>
+      <section id="problem">
+        <p class="eyebrow">01 / Context</p>
+        <h2>The problem</h2>
+        <p>
+          A photo of waste is more useful when it includes location, context,
+          ownership, and follow-up. This project brings tourist reports,
+          administrator review, and department cleanup evidence into one
+          workflow.
+        </p>
+      </section>
+      <section id="architecture">
+        <p class="eyebrow">02 / System design</p>
+        <h2>How the pieces connect</h2>
+        <ol class="architecture">
+          <li>Flutter camera / gallery</li>
+          <li>On-device LiteRT detection</li>
+          <li>GPS + report draft</li>
+          <li>Spring Boot + JWT API</li>
+          <li>Neon PostgreSQL + private-image access</li>
+          <li>Admin → department → evidence</li>
+        </ol>
+        <p class="small">
+          Simplified data flow. Each step represents a responsibility, not a
+          guaranteed delivery path.
+        </p>
+      </section>
+      <section id="engineering">
+        <p class="eyebrow">03 / Implementation</p>
+        <h2>Engineering challenges &amp; solutions</h2>
+        <div class="challenge-grid">
+          <article>
+            <h3>Turning a photo into a useful report</h3>
+            <p>
+              Combine camera/gallery input, model confidence and bounding boxes,
+              GPS, tourist-spot association, description, and severity.
+            </p>
+          </article>
+          <article>
+            <h3>Keeping model claims accurate</h3>
+            <p>
+              Android uses a bundled five-class LiteRT detector: glass, metal,
+              paper, plastic, and trash. The submission repository does not
+              train a custom model. Browser mock results are a separate
+              development mode.
+            </p>
+          </article>
+          <article>
+            <h3>Making follow-up traceable</h3>
+            <p>
+              Admin verification and manual department assignment lead to
+              cleanup evidence and tourist report history/status updates.
+            </p>
+          </article>
+          <article>
+            <h3>Protecting reports and images</h3>
+            <p>
+              JWT authentication, BCrypt passwords, ownership checks, and
+              private-image access accompany the Spring Boot API.
+            </p>
+          </article>
+        </div>
+        <h3 class="subhead">Additional implemented workflows</h3>
+        <ul class="feature-list">
+          <li>
+            Capture or select a waste image and review on-device detection
+            results.
+          </li>
+          <li>Save GPS-linked reports associated with tourist spots.</li>
+          <li>
+            Review reports, assign departments, and track cleanup evidence.
+          </li>
+          <li>
+            View tourist report history and status, plus administrative
+            summaries.
+          </li>
+        </ul>
+      </section>
+      <section id="screenshots">
+        <p class="eyebrow">04 / Application walkthrough</p>
+        <h2>Application screenshots</h2>
+        <p>
+          Real application screenshots are not yet available in this portfolio.
+        </p>
+        <p class="small">
+          Planned views: Waste detection, report submission, tourist reports,
+          admin dashboard, and department cleanup workflow.
+        </p>
+      </section>
+      <section id="verification">
+        <p class="eyebrow">05 / Evidence &amp; boundaries</p>
+        <h2>Testing and verification</h2>
+        <p>
+          Tested on a physical Android phone: camera and location permissions,
+          the report-to-cleanup workflow, and detector evaluation using
+          representative local images. The application connects to a deployed
+          backend with Neon-hosted PostgreSQL; login and reporting do not
+          require a laptop-hosted backend.
+        </p>
+        <p class="small">
+          Deployment and device-testing update supplied by the project
+          developer, October 2026. This supersedes the older README’s
+          local-setup and restoration-testing notes. Evaluation metrics and the
+          image set are not published here.
+        </p>
+        <p>
+          Historical Phase 1 documents also record Flutter/backend checks
+          against simulated fixtures; those records describe an earlier project
+          stage.
+        </p>
+        <div class="source-links">
+          <a
+            class=""
+            href="https://github.com/Prabin-Poudel-1/waste-photo-type/blob/main/README.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            >README ↗<span class="sr-only"> (opens in a new tab)</span></a
+          ><a
+            class=""
+            href="https://github.com/Prabin-Poudel-1/waste-photo-type/blob/main/docs/VERIFICATION.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Verification record ↗<span class="sr-only">
+              (opens in a new tab)</span
+            ></a
+          >
+        </div>
+        <div class="note">
+          <h3>Limitations</h3>
+          <p>
+            On-device inference works locally. Login, report synchronization,
+            and maps require network access to the deployed services. Department
+            assignment is manual. The bundled model is integrated, not claimed
+            as custom-trained. Published detector accuracy metrics and broader
+            device coverage remain next steps.
+          </p>
+        </div>
+        <h3>Next steps</h3>
+        <p>
+          Document the completed device test matrix and detector evaluation
+          results, add application screenshots, and broaden regression coverage
+          for the deployed report-to-cleanup workflow.
+        </p>
+      </section>
+      <div class="case-end">
+        <a class="button" href="index.html#portfolio">← Back to projects</a
+        ><a class="button primary" href="index.html#contact">Let’s connect</a>
+      </div>
+    </main>
+    <footer class="footer">
+      <div>
+        <a class="logo" href="index.html#home">Prabin Poudel<span>.</span></a>
+        <p>Computer Engineering Student · Bharatpur, Nepal</p>
+      </div>
+      <div class="footer-links">
+        <a
+          class=""
+          href="https://github.com/Prabin-Poudel-1"
+          target="_blank"
+          rel="noopener noreferrer"
+          >GitHub<span class="sr-only"> (opens in a new tab)</span></a
+        ><a
+          class=""
+          href="https://www.linkedin.com/in/prabin-poudel-556180329"
+          target="_blank"
+          rel="noopener noreferrer"
+          >LinkedIn<span class="sr-only"> (opens in a new tab)</span></a
+        ><a
+          class=""
+          href="https://instagram.com/pra_.veen._005"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Instagram<span class="sr-only"> (opens in a new tab)</span></a
+        ><a href="mailto:prabinpoudel702@gmail.com">Email</a>
+      </div>
+      <p class="copyright">© <span data-year>2026</span> Prabin Poudel</p>
+    </footer>
+  </body>
+</html>

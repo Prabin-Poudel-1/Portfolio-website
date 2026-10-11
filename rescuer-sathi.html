@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Rescuer Sathi | Engineering Case Study | Prabin Poudel</title>
+    <meta
+      name="description"
+      content="Offline-First Emergency Assistance & Rescue Coordination. Architecture, implementation decisions, verification, and limitations."
+    />
+    <link
+      rel="canonical"
+      href="https://www.poudelprabin.com.np/rescuer-sathi.html"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Rescuer Sathi | Engineering Case Study | Prabin Poudel"
+    />
+    <meta
+      property="og:description"
+      content="Offline-First Emergency Assistance & Rescue Coordination. Architecture, implementation decisions, verification, and limitations."
+    />
+    <meta
+      property="og:url"
+      content="https://www.poudelprabin.com.np/rescuer-sathi.html"
+    />
+    <meta
+      property="og:image"
+      content="https://www.poudelprabin.com.np/assets/social-preview.jpg"
+    />
+    <meta
+      property="og:image:alt"
+      content="Concept artwork illustrating Rescuer Sathi offline SOS"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css?v=20261011c" />
+    <script src="script.js?v=20261011c" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="header">
+      <div class="nav-wrap">
+        <a class="logo" href="index.html#home"
+          >Prabin Poudel<span aria-hidden="true">.</span></a
+        >
+        <nav id="navigation" class="navbar" aria-label="Main navigation">
+          <a href="index.html#portfolio">Projects</a
+          ><a href="index.html#expertise">Expertise</a
+          ><a href="index.html#skill">Skills</a
+          ><a href="index.html#about">About</a
+          ><a href="index.html#contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <button
+            id="themeToggle"
+            type="button"
+            aria-label="Switch to light mode"
+          >
+            Light mode</button
+          ><button
+            class="menu-toggle"
+            type="button"
+            aria-controls="navigation"
+            aria-expanded="false"
+          >
+            Menu
+          </button>
+        </div>
+      </div>
+    </header>
+    <main id="main" class="case-main section-wrap">
+      <a class="text-link" href="index.html#portfolio">← All projects</a>
+      <header class="case-heading">
+        <p class="eyebrow">Engineering case study</p>
+        <h1>Rescuer Sathi</h1>
+        <p class="case-subtitle">
+          Offline-First Emergency Assistance &amp; Rescue Coordination
+        </p>
+        <p>
+          An Android emergency-assistance engineering prototype built around
+          durable requests, controlled information sharing, and a verified
+          responder workflow.
+        </p>
+        <ul class="tags">
+          <li>Flutter</li>
+          <li>Dart</li>
+          <li>Kotlin</li>
+          <li>Spring Boot</li>
+          <li>Java</li>
+          <li>PostgreSQL</li>
+          <li>Docker</li>
+          <li>Google Nearby Connections</li>
+          <li>TensorFlow Lite</li>
+        </ul>
+        <a
+          class="button primary"
+          href="https://github.com/Prabin-Poudel-1/rescuer-sathi"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View repository ↗<span class="sr-only">
+            (opens in a new tab)</span
+          ></a
+        >
+      </header>
+      <div class="project-proof">
+        <span class="proof-dot" aria-hidden="true"></span> Tested on physical
+        Android devices <a href="#screenshots">See the application ↓</a>
+      </div>
+      <nav class="case-nav" aria-label="Case study sections">
+        <a href="#problem">Problem</a><a href="#architecture">Architecture</a
+        ><a href="#engineering">Engineering</a
+        ><a href="#screenshots">Screenshots</a
+        ><a href="#verification">Verification</a>
+      </nav>
+      <section id="problem">
+        <p class="eyebrow">01 / Context</p>
+        <h2>The problem</h2>
+        <p>
+          Intermittent connectivity makes it difficult to coordinate assistance.
+          The engineering goal is to retain requests locally, retry delivery,
+          and keep responders informed without treating an offline queue as
+          proof that help has arrived.
+        </p>
+      </section>
+      <section id="architecture">
+        <p class="eyebrow">02 / System design</p>
+        <h2>How the pieces connect</h2>
+        <ol class="architecture">
+          <li>Flutter / Android client</li>
+          <li>Encrypted SQLite SOS queue</li>
+          <li>Internet API or Nearby relay</li>
+          <li>Spring Boot + JWT</li>
+          <li>PostgreSQL + Flyway</li>
+        </ol>
+        <p class="small">
+          Simplified data flow. Each step represents a responsibility, not a
+          guaranteed delivery path.
+        </p>
+      </section>
+      <section id="engineering">
+        <p class="eyebrow">03 / Implementation</p>
+        <h2>Engineering challenges &amp; solutions</h2>
+        <div class="challenge-grid">
+          <article>
+            <h3>Retaining an SOS through disruption</h3>
+            <p>
+              Persist the encrypted request before transmission. Retry using one
+              incident UUID to reduce duplicate incidents after reconnecting.
+            </p>
+          </article>
+          <article>
+            <h3>Relay without exposing medical records</h3>
+            <p>
+              Nearby devices carry encrypted envelopes through store-and-forward
+              relay. Delivery to another phone is distinct from backend
+              acknowledgement.
+            </p>
+          </article>
+          <article>
+            <h3>Sharing only what a responder needs</h3>
+            <p>
+              Consent-based medical snapshots and assigned-rescuer authorization
+              limit access to sensitive incident information.
+            </p>
+          </article>
+          <article>
+            <h3>Running AI on a phone</h3>
+            <p>
+              Three trained models support injury detection, injury
+              classification, and burn-severity classification. TFLite
+              preprocessing and inference run away from the UI thread; symptoms
+              remain separate from model predictions.
+            </p>
+          </article>
+        </div>
+        <h3 class="subhead">Additional implemented workflows</h3>
+        <ul class="feature-list">
+          <li>
+            Rescuer availability, matching, assignment, and rescue-status
+            workflow.
+          </li>
+          <li>
+            Guardian Mode uses fall/crash heuristics with cancellation
+            countdowns; developer simulations are explicitly labeled.
+          </li>
+          <li>
+            On-device injury assessment, emergency maps, and a helpline
+            directory supplement the SOS flow.
+          </li>
+          <li>
+            Locally persisted assessments can attach to an SOS with retry;
+            photos are processed on-device.
+          </li>
+        </ul>
+      </section>
+      <section id="screenshots">
+        <p class="eyebrow">04 / Application walkthrough</p>
+        <h2>Application screenshots</h2>
+        <p>
+          Three views captured from the application running on a physical
+          Android phone. Open any image to inspect it at full size.
+        </p>
+        <div class="screenshot-gallery">
+          <figure>
+            <a
+              class="device-frame"
+              href="assets/screenshots/rescuer-dashboard.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open nearby emergencies on the rescuer dashboard at full size (new tab)"
+              ><img
+                src="assets/screenshots/rescuer-dashboard.jpg"
+                width="720"
+                height="1612"
+                loading="lazy"
+                alt="Nearby emergencies on the rescuer dashboard"
+            /></a>
+            <figcaption>
+              <strong>01 / Discover</strong>A nearby SOS awaits a responder.
+            </figcaption>
+          </figure>
+          <figure>
+            <a
+              class="device-frame"
+              href="assets/screenshots/rescue-map.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open accepted rescue with responder and incident locations on a map at full size (new tab)"
+              ><img
+                src="assets/screenshots/rescue-map.jpg"
+                width="714"
+                height="1599"
+                loading="lazy"
+                alt="Accepted rescue with responder and incident locations on a map"
+            /></a>
+            <figcaption>
+              <strong>02 / Respond</strong>An accepted rescue connects the
+              responder to the incident.
+            </figcaption>
+          </figure>
+          <figure>
+            <a
+              class="device-frame"
+              href="assets/screenshots/guardian-mode.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open guardian mode activity settings and completed journey history at full size (new tab)"
+              ><img
+                src="assets/screenshots/guardian-mode.jpg"
+                width="714"
+                height="1599"
+                loading="lazy"
+                alt="Guardian Mode activity settings and completed journey history"
+            /></a>
+            <figcaption>
+              <strong>03 / Monitor</strong>Journey monitoring with explicit
+              experimental-detection guidance.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+      <section id="verification">
+        <p class="eyebrow">05 / Evidence &amp; boundaries</p>
+        <h2>Testing and verification</h2>
+        <p>
+          Physical-device testing has covered multi-phone relay and measured
+          power behavior. The application screenshots above show the rescuer
+          dashboard, accepted-rescue map, and Guardian Mode on an Android phone.
+          Quantitative battery results and relay test conditions are not
+          published here.
+        </p>
+        <p class="small">
+          Testing update supplied by the project developer, October 2026. The
+          screenshots illustrate the UI; they do not independently measure relay
+          delivery or battery endurance.
+        </p>
+        <p>
+          The repository’s historical Phase 1 verification records four backend
+          integration tests, five Flutter tests, a debug Android build, and an
+          emulator authentication-flow test. Later README notes describe focused
+          injury, privacy, maps, and SOS-attachment checks. These records cover
+          specific phases; they do not establish end-to-end validation of every
+          current capability.
+        </p>
+        <div class="source-links">
+          <a
+            class=""
+            href="https://github.com/Prabin-Poudel-1/rescuer-sathi/blob/main/README.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            >README ↗<span class="sr-only"> (opens in a new tab)</span></a
+          ><a
+            class=""
+            href="https://github.com/Prabin-Poudel-1/rescuer-sathi/blob/main/docs/VERIFICATION.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Verification record ↗<span class="sr-only">
+              (opens in a new tab)</span
+            ></a
+          >
+        </div>
+        <div class="note">
+          <h3>Limitations</h3>
+          <p>
+            Experimental prototype, not a certified rescue service. Delivery and
+            rescue are not guaranteed. Device-specific sensor behavior and wider
+            field conditions remain areas for further validation. Injury
+            predictions have no clinical accuracy validation. Satellite
+            transport is not implemented; labeled previews are simulations.
+          </p>
+        </div>
+        <h3>Next steps</h3>
+        <p>
+          Publish the completed relay and power-test methodology and
+          measurements, expand regression coverage across Android devices, and
+          continue production security hardening.
+        </p>
+      </section>
+      <div class="case-end">
+        <a class="button" href="index.html#portfolio">← Back to projects</a
+        ><a class="button primary" href="index.html#contact">Let’s connect</a>
+      </div>
+    </main>
+    <footer class="footer">
+      <div>
+        <a class="logo" href="index.html#home">Prabin Poudel<span>.</span></a>
+        <p>Computer Engineering Student · Bharatpur, Nepal</p>
+      </div>
+      <div class="footer-links">
+        <a
+          class=""
+          href="https://github.com/Prabin-Poudel-1"
+          target="_blank"
+          rel="noopener noreferrer"
+          >GitHub<span class="sr-only"> (opens in a new tab)</span></a
+        ><a
+          class=""
+          href="https://www.linkedin.com/in/prabin-poudel-556180329"
+          target="_blank"
+          rel="noopener noreferrer"
+          >LinkedIn<span class="sr-only"> (opens in a new tab)</span></a
+        ><a
+          class=""
+          href="https://instagram.com/pra_.veen._005"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Instagram<span class="sr-only"> (opens in a new tab)</span></a
+        ><a href="mailto:prabinpoudel702@gmail.com">Email</a>
+      </div>
+      <p class="copyright">© <span data-year>2026</span> Prabin Poudel</p>
+    </footer>
+  </body>
+</html>
