@@ -115,39 +115,108 @@ document.addEventListener("DOMContentLoaded", () => {
       section.focus({ preventScroll: true });
     }),
   );
+  const running = new Set();
+  const play = (element, frames, options = {}) => {
+    if (motion.matches || !element.animate) return;
+    const animation = element.animate(frames, {
+      duration: 420,
+      easing: "cubic-bezier(.2,.7,.2,1)",
+      ...options,
+    });
+    running.add(animation);
+    animation.finished
+      .then(() => running.delete(animation))
+      .catch(() => running.delete(animation));
+  };
+  const enter = (element, delay = 0) =>
+    play(
+      element,
+      [
+        { opacity: 0.35, transform: "translateY(14px)" },
+        { opacity: 1, transform: "translateY(0)" },
+      ],
+      { delay, fill: "backwards" },
+    );
+  const hero = document.querySelector(".home");
+  if (hero && hero.getBoundingClientRect().bottom > 0) {
+    hero
+      .querySelectorAll(".home-content > *, .hero-portrait")
+      .forEach((item, i) => enter(item, Math.min(i * 45, 270)));
+  }
+  const showFlow = (stage) => {
+    // An illustrative sequence, never a simulated security verdict.
+    stage.querySelectorAll(".flow-node").forEach((node, i) =>
+      play(
+        node,
+        [
+          { borderColor: getComputedStyle(node).borderColor },
+          {
+            borderColor: getComputedStyle(
+              document.documentElement,
+            ).getPropertyValue("--accent"),
+            offset: 0.5,
+          },
+          { borderColor: getComputedStyle(node).borderColor },
+        ],
+        { duration: 450, delay: i * 160 },
+      ),
+    );
+  };
+  document.querySelectorAll(".replay-flow").forEach((button) => {
+    button.hidden = false;
+    button.addEventListener("click", () => {
+      running.forEach((animation) => animation.cancel());
+      showFlow(button.closest(".architecture-stage"));
+      button
+        .closest(".architecture-stage")
+        .querySelector(".flow-status").textContent = motion.matches
+        ? "Reduced motion enabled. Read the static authorization workflow above."
+        : "Illustrating the authorization sequence. Only an allowed request may execute.";
+    });
+  });
   if ("IntersectionObserver" in window) {
-    const running = new Set();
     const reveal = new IntersectionObserver(
       (entries) => {
         entries.forEach(({ target, isIntersecting }) => {
           if (!isIntersecting) return;
           reveal.unobserve(target);
-          if (motion.matches || target.matches(":focus-within")) return;
-          const animation = target.animate(
-            [
-              { opacity: 0.6, transform: "translateY(10px)" },
-              { opacity: 1, transform: "translateY(0)" },
-            ],
-            { duration: 360, easing: "cubic-bezier(.2,.7,.2,1)" },
-          );
-          running.add(animation);
-          animation.finished
-            .then(() => running.delete(animation))
-            .catch(() => running.delete(animation));
+          if (target.matches(":focus-within")) return;
+          if (target.matches(".architecture-stage")) showFlow(target);
+          else enter(target, Number(target.dataset.revealDelay || 0));
         });
       },
       { threshold: 0.08 },
     );
     document
-      .querySelectorAll("main > section, .case-main > section")
-      .forEach((section) => {
-        if (section.getBoundingClientRect().top >= window.innerHeight)
-          reveal.observe(section);
+      .querySelectorAll(".projects-grid, .expertise-grid, .skills-grid")
+      .forEach((group) => {
+        [...group.children].forEach((item, i) => {
+          item.dataset.revealDelay = (i % 3) * 70;
+        });
       });
-    motion.addEventListener("change", () => {
-      if (motion.matches) running.forEach((animation) => animation.cancel());
-    });
+    document
+      .querySelectorAll(
+        ".section-heading, .project-card, .expertise-card, .skill-group, .about > div, .contact > div, .contact > form, .case-main section > h2, .case-main section > p, .challenge-grid > article, .screenshot-gallery figure, .architecture-stage",
+      )
+      .forEach((item) => reveal.observe(item));
   }
+  motion.addEventListener("change", () => {
+    if (motion.matches) running.forEach((animation) => animation.cancel());
+  });
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+  document.querySelectorAll(".project-card").forEach((card) => {
+    let frame = 0;
+    card.addEventListener("pointermove", (event) => {
+      if (!finePointer.matches || motion.matches) return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const box = card.getBoundingClientRect();
+        card.style.setProperty("--pointer-x", `${event.clientX - box.left}px`);
+        card.style.setProperty("--pointer-y", `${event.clientY - box.top}px`);
+      });
+    });
+    card.addEventListener("pointerleave", () => cancelAnimationFrame(frame));
+  });
   const gallery = [
     ...document.querySelectorAll(".screenshot-gallery .device-frame"),
   ];
@@ -231,35 +300,4 @@ document.addEventListener("DOMContentLoaded", () => {
       opener?.focus({ preventScroll: true });
     });
   }
-  const form = document.getElementById("contact-form");
-  if (!form) return;
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!form.reportValidity()) return;
-    const button = form.querySelector('[type="submit"]');
-    if (button.disabled) return;
-    const status = document.getElementById("form-status");
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
-    button.disabled = true;
-    status.textContent = "Sending your message…";
-    try {
-      const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbwe5wykAIaNS_0YtlZNDwx2INqhQnizMzxueJp-MPLSyaux4LuSzjSlzk0IhMBW4_ZyZg/exec",
-        { method: "POST", body: new FormData(form), signal: controller.signal },
-      );
-      if (!response.ok) throw new Error("Request failed");
-      const result = await response.json();
-      if (result.result !== "success")
-        throw new Error("Message was not accepted");
-      form.reset();
-      status.textContent = "Thank you! Your message has been sent.";
-    } catch (_) {
-      status.textContent =
-        "Could not confirm delivery. Your message is still here. Please try again or email prabinpoudel702@gmail.com.";
-    } finally {
-      clearTimeout(timeout);
-      button.disabled = false;
-    }
-  });
 });

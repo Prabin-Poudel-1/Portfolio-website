@@ -1,3 +1,36 @@
+User verification: The owner confirmed the Web3Forms contact form is working after testing it locally. Publication was subsequently authorized.
+
+## Web3Forms update — 14 October 2026
+
+The owner supplied a Web3Forms access key. The frontend now enables sending through `https://api.web3forms.com/submit`, adds the public routing key to FormData, and requires an HTTP-success response with `success: true` before resetting the form. Existing timeout, validation, duplicate protection, honeypot, and email fallback remain. The recipient is controlled by the email associated with the key in Web3Forms; confirm it there if needed. The key is intended for browser use, not an account password.
+
+No real email was sent during implementation. End-to-end delivery remains untested. The earlier disabled Apps Script status below is historical and no longer describes the active frontend provider. No DNS, Cloudflare routing, CV, commit, push, or deployment changes were made.
+
+---
+
+# Latest update — 14 October 2026
+
+Sentinel AI now leads five preserved engineering projects. Added `sentinel-ai.html`, an original SVG architecture illustration, and a responsive semantic diagram with SVG connectors and an optional replay animation. The case study cites README/security documentation and successful GitHub regression/build runs; candidate builds are not presented as published installers or proof of native Windows filesystem isolation.
+
+Reused native Web Animations and the existing IntersectionObserver for staggered hero, project, expertise, skill, and case-study entrances. Added a restrained one-time technical grid entrance and fine-pointer card highlighting. No dependencies, framework changes, or continuous decorative animations. Reduced-motion users receive static content; animation failure never leaves essential content hidden.
+
+Updated public email links to `contact@poudelprabin.com.np` and added accessible copy feedback. Extracted form handling into `contact.js` and public configuration into `contact-config.js`. **Form sending is disabled pending verified deployment:** the existing Apps Script endpoint returned 403 on a read-only check. See [CONTACT_SETUP.md](CONTACT_SETUP.md) for precise deployment, response, CORS, spam-control, and optional Formspree setup steps. No test emails sent. Cloudflare configuration unchanged.
+
+Modified: `index.html`, `style.css`, `script.js`, both existing case-study pages (email/cache references), and this document. Added: `sentinel-ai.html`, `assets/projects/sentinel-ai.svg`, `contact.js`, `contact-config.js`, `CONTACT_SETUP.md`. No CV or CNAME modifications. Nothing committed, pushed, or deployed in this update.
+
+Preview:
+```sh
+cd /Users/prabinpoudel/Documents/GitHub/Portfolio-website
+python3 -m http.server 8765 --bind 127.0.0.1
+```
+Open http://127.0.0.1:8765/ or http://127.0.0.1:8765/sentinel-ai.html. Reuse the existing server if port 8765 is occupied.
+
+Verification: JavaScript syntax and formatting checks passed; static checks covered four pages, local links/assets, unique IDs, SVG validity, and unchanged CV/CNAME hashes. Eleven mocked contact scenarios passed without sending email. Native entrance timing and reduced-motion skip were tested in an isolated harness. Browser checks covered homepage and Sentinel at 320/375/768/1024/1440px, the new case-study link, mobile/light and desktop/dark diagram layouts, replay feedback, copy-email confirmation, and Menu/Escape. No browser console errors were observed. No full accessibility audit, Lighthouse run, live form delivery test, or OS-level reduced-motion test was performed.
+
+The notes below describe earlier updates. The current contact status above supersedes earlier descriptions of an enabled form.
+
+---
+
 # Portfolio upgrade handoff — 11 October 2026
 
 Repository: `/Users/prabinpoudel/Documents/GitHub/Portfolio-website`
