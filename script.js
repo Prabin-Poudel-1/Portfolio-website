@@ -140,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const hero = document.querySelector(".home");
   if (hero && hero.getBoundingClientRect().bottom > 0) {
     hero
+  
       .querySelectorAll(".home-content > *, .hero-portrait")
       .forEach((item, i) => enter(item, Math.min(i * 45, 270)));
   }
