@@ -3,6 +3,14 @@ export function About() {
   return (
     <section className="section-wrap about" id="about">
       <div>
+        <img
+          className="about-portrait"
+          src="assets/portrait.webp"
+          width="640"
+          height="640"
+          loading="lazy"
+          alt="Prabin Poudel beside a lake"
+        />
         <p className="eyebrow">A little about me</p>
         <h2>
           Curious about systems.

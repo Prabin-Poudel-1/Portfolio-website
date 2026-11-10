@@ -5,9 +5,9 @@ export function Projects() {
       <div className="section-heading">
         <p className="eyebrow">Selected work / 05 projects</p>
         <h2>
-          Real problems.
+          Selected systems.
           <br />
-          <span className="accent">Thoughtful engineering.</span>
+          <span className="accent">Built with intention.</span>
         </h2>
         <p>
           Explore the decisions, tradeoffs, and implementation behind my

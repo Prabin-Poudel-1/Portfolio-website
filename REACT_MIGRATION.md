@@ -55,3 +55,16 @@ Phase 3 remains: labeled engineering demos, lab, expanded case studies, performa
 ## Reference research
 
 Read Jiro (https://jiro.build/), Design Spells (https://designspells.com/), Josh W. Comeau (https://www.joshwcomeau.com/) and Hoverstat (https://www.hoverstat.es/). Direction: clear editorial hierarchy, intentional interaction feedback, explanatory engineering visuals. No assets/code copied. Codrops returned 403, Awwwards timed out, Godly redirected to an inaccessible destination; no repeated research.
+
+## Phase 1 visual correction — 2026-11-10
+
+The first checkpoint carried forward the portrait-led hero, split project cards, boxed skills and repeated section rhythm. This correction replaces that composition while retaining the React architecture.
+
+- Hero: editorial statement, mixed serif/sans hierarchy, five-domain interactive SVG network, project inspector, small identity signature and social strip. Satellite intelligence is explicitly an interest, not a claimed verified project.
+- Projects: full-width numbered visual spreads, below-image technical summaries, restrained project accents, paired device imagery and smaller secondary projects.
+- Expertise: numbered capability index alongside an editorial heading. Skills: searchable technology directory. About: portrait with a personal editorial narrative.
+- Files: Hero.tsx, SystemDiagram.tsx, Projects.tsx, About.tsx, main.tsx, main.css, new composition.css, this report. No dependencies added; CV, contact implementation, routing, domain and case-study content unchanged.
+- Revisited Connor Hohlen (https://connorhohlen.com/), Jiro, Design Spells and Josh Comeau for engineering-oriented presentation, meaningful interactive explanation and typographic hierarchy. No layouts/assets copied. Codrops still returned 403 and Awwwards timed out.
+- Compared the master snapshot in a separate local server against the rebuilt page. Captured original and redesigned desktop screenshots and a 375px light-theme mobile screenshot. Inspected desktop hero, project spread, expertise and skills. Mobile node selection, menu opening/Escape dismissal, theme persistence and skill filtering verified. No console errors observed; no horizontal overflow measured at 320/375px; no broken loaded images observed. No new real email sent.
+- TypeScript/build, static references, byte-preservation checks, five contact mocks and diff whitespace checks pass. Cross-browser/physical-device and Lighthouse verification remain outside this correction. Existing reduced-motion protections retained.
+- Phase 2 was not started. Work remains on feat/react-portfolio-phase-1, preserving 9b2ff65. Nothing pushed or deployed.
