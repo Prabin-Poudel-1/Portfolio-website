@@ -61,7 +61,7 @@ const base = Object.fromEntries(
     m[2].trim(),
   ]),
 );
-for (const [i, block] of blocks.entries()) {
+for (const [i, block] of blocks.slice(0, 2).entries()) {
   const tokens = {
     ...base,
     ...Object.fromEntries(

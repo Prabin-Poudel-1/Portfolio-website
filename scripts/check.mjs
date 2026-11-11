@@ -21,20 +21,24 @@ for (const name of [
       actual
         .toString("utf8")
         .replace(
+          /^    <link rel="preload" href="\/assets\/fonts\/(?:spacegrotesk|manrope)-latin\.woff2" as="font" type="font\/woff2" crossorigin \/>\n/gm,
+          "",
+        )
+        .replace(
           '    <link rel="stylesheet" href="theme.css?v=20261111" />\n',
           "",
         ),
     );
   assert.deepEqual(
     actual,
-    execFileSync("git", ["show", "master:" + name], { maxBuffer: 10000000 }),
+    execFileSync("git", ["show", "382d0cb:" + name], { maxBuffer: 10000000 }),
     name + " preserved",
   );
 }
 assert(html.includes("Trained") || html.includes("Model training"));
 assert(html.includes("<main"));
 console.log(
-  "PASS: static HTML, local assets, original CV/domain bytes and case-study content preservation (only shared stylesheet added)",
+  "PASS: static HTML, local assets, original CV/domain bytes and case-study content preservation (only shared stylesheet/font preloads added)",
 );
 const source = readFileSync("src/utils/contact.js", "utf8").replace(
   "export function",

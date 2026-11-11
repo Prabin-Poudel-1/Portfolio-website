@@ -358,7 +358,7 @@ export default function Globe() {
           <button
             ref={marker}
             className="globe-marker"
-            aria-label="About my location in Bharatpur, Nepal"
+            aria-label="Nepal: country and location information"
             aria-expanded={info}
             onClick={() => setInfo(true)}
             onKeyDown={(e) => {
@@ -385,10 +385,17 @@ export default function Globe() {
               redraw();
             }}
           >
-            <span aria-hidden="true" />
+            <span className="country-pin" aria-hidden="true" />
+            <span className="country-leader" aria-hidden="true" />
+            <span className="country-label" aria-hidden="true">
+              Nepal
+            </span>
             <span className={"location-tooltip " + (info ? "shown" : "")}>
-              Bharatpur, Nepal
-              <small>Regional marker · not a precise position</small>
+              Nepal
+              <small>
+                Based in Bharatpur, Chitwan. Country marker, not my precise
+                location.
+              </small>
             </span>
           </button>
         )}

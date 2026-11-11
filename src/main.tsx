@@ -18,5 +18,5 @@ import "./styles/interactions.css";
 
 import "./styles/demos.css";
 
-import "../theme.css";
 import "./styles/journey.css";
+import "../theme.css";

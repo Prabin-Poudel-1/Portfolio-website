@@ -431,3 +431,148 @@ select {
     transform: none;
   }
 }
+/* Self-hosted variable fonts; metric-adjusted local fallbacks reduce reflow. */
+@font-face {
+  font-family: "Portfolio Display";
+  src: url("/assets/fonts/spacegrotesk-latin.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Portfolio Body";
+  src: url("/assets/fonts/manrope-latin.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Display Fallback";
+  src: local("Arial");
+  size-adjust: 93.72%;
+  ascent-override: 104.99%;
+  descent-override: 31.16%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Body Fallback";
+  src: local("Arial");
+  size-adjust: 104.14%;
+  ascent-override: 102.37%;
+  descent-override: 28.81%;
+  line-gap-override: 0%;
+}
+:root {
+  --font-display: "Portfolio Display", "Display Fallback", sans-serif;
+  --font-body: "Portfolio Body", "Body Fallback", sans-serif;
+}
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.75;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+.home-content h1 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5.6vw, 82px);
+  font-weight: 700;
+  letter-spacing: -0.065em;
+  line-height: 1.04;
+}
+.home-content h1 em {
+  font-family: inherit;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: -0.065em;
+}
+.home-content .hero-intro {
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.8;
+  max-width: 36rem;
+}
+.section-heading h2,
+.case-main section h2 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+.cinema-copy h3 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: clamp(31px, 3.7vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.cinema-copy .scene-subtitle {
+  font-size: 17px;
+  line-height: 1.5;
+}
+.case-heading h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+.case-subtitle {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.about .about-story h2 {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 600;
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+.location-card h3,
+.location-card h3 em {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+.demo-panel h3,
+.demo-panel h4,
+.command-title h2 {
+  font-family: var(--font-display);
+  font-weight: 650;
+}
+.skill-group h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.eyebrow,
+.hero-role,
+.map-label,
+.node-name,
+.cinema-meta,
+.journey-guide,
+code,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+@media (max-width: 480px) {
+  .home-content h1 {
+    font-size: clamp(36px, 10.8vw, 49px);
+  }
+  .cinema-copy h3 {
+    font-size: 32px;
+  }
+  .home-content .hero-intro {
+    font-size: 14px;
+  }
+  .location-card h3 {
+    font-size: 30px;
+  }
+}
