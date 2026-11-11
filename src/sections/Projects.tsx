@@ -205,6 +205,11 @@ export function Projects() {
                   ↗
                 </a>
               )}
+              {item.live && (
+                <a href={item.live} target="_blank" rel="noopener noreferrer">
+                  Live Sentinel AI ↗
+                </a>
+              )}
               {item.repo && (
                 <a href={item.repo} target="_blank" rel="noopener noreferrer">
                   {item.id === "rakshak"

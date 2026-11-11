@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import { SignalJourney } from "./components/SignalJourney";
 import { Header } from "./components/Header";
 import { NotFound } from "./components/NotFound";
 import { InteractionEffects } from "./components/InteractionEffects";
@@ -47,10 +48,12 @@ function Home() {
     <>
       <Hero />
       <Projects />
-      <Expertise />
-      <Skills />
-      <About />
-      <Contact />
+      <SignalJourney>
+        <Skills />
+        <Expertise />
+        <About />
+        <Contact />
+      </SignalJourney>
     </>
   );
 }

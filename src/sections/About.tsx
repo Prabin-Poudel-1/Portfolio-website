@@ -1,8 +1,9 @@
 import React from "react";
+import { LocationCard } from "../components/LocationCard";
 export function About() {
   return (
     <section className="section-wrap about" id="about">
-      <div>
+      <div className="about-story">
         <img
           className="about-portrait"
           src="assets/portrait.webp"
@@ -44,6 +45,7 @@ export function About() {
           Download my CV ↗
         </a>
       </div>
+      <LocationCard />
     </section>
   );
 }

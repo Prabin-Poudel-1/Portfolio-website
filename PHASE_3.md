@@ -72,3 +72,7 @@ npm run preview -- --port 4173
 Open http://127.0.0.1:4173/ and choose **Explore interactive demo** in the project gallery. For source development use `npm run dev`.
 
 The final Phase 3 checkpoint is the commit containing this report; obtain its exact hash with `git log -1 --format=%h -- PHASE_3.md`. The completion message records that hash. Deploy only built `dist/` after explicit approval; no publication was performed.
+
+## Final visual correction
+
+The subsequent correction preserves this checkpoint and all demonstrations. See `FINAL_CORRECTION.md` for the unified palette, Sentinel preservation check, interactive geographic globe, scroll-linked signal, latest measurements and validation. Its case-study preservation check allows only the explicitly added shared stylesheet link; the original technical content remains unchanged.

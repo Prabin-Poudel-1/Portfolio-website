@@ -23,7 +23,7 @@ for (const file of [
 }
 const sizes = readdirSync("dist/assets")
   .filter((x) =>
-    /^(index-.*\.(js|css)|(?:Relay|Geospatial|Authorization|Previews)-.*\.js)$/.test(
+    /^(index-.*\.(js|css)|(?:Relay|Geospatial|Authorization|Previews|Globe)-.*\.js)$/.test(
       x,
     ),
   )
@@ -50,18 +50,43 @@ function lum(hex) {
     .map((x) => (x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
   return v[0] * 0.2126 + v[1] * 0.7152 + v[2] * 0.0722;
 }
-for (const [fg, bg] of [
-  ["ecf3f4", "101f2a"],
-  ["afc3cb", "101f2a"],
-  ["83dfd0", "101f2a"],
-  ["122e36", "f2f6f4"],
-  ["445f68", "f2f6f4"],
-  ["07685b", "f2f6f4"],
-]) {
-  const values = [lum(fg), lum(bg)].sort((a, b) => b - a);
-  const ratio = (values[0] + 0.05) / (values[1] + 0.05);
-  assert(ratio >= 4.5);
-  console.log(`Contrast #${fg}/#${bg}: ${ratio.toFixed(2)}:1`);
+
+const theme = readFileSync("theme.css", "utf8");
+const blocks = [
+  ...theme.matchAll(/:root(?:\[data-theme="light"\])?\s*\{([^}]+)\}/g),
+];
+const base = Object.fromEntries(
+  [...blocks[0][1].matchAll(/(--[\w-]+):\s*([^;]+);/g)].map((m) => [
+    m[1],
+    m[2].trim(),
+  ]),
+);
+for (const [i, block] of blocks.entries()) {
+  const tokens = {
+    ...base,
+    ...Object.fromEntries(
+      [...block[1].matchAll(/(--[\w-]+):\s*([^;]+);/g)].map((m) => [
+        m[1],
+        m[2].trim(),
+      ]),
+    ),
+  };
+  const color = (key) => {
+    let v = tokens[key];
+    while (v?.startsWith("var(")) v = tokens[v.slice(4, -1)];
+    return v?.replace("#", "");
+  };
+  for (const [fg, bg] of [
+    ["--text", "--bg"],
+    ["--muted", "--surface"],
+    ["--accent", "--surface"],
+    ["--accent-ink", "--accent"],
+  ]) {
+    const values = [lum(color(fg)), lum(color(bg))].sort((a, b) => b - a),
+      ratio = (values[0] + 0.05) / (values[1] + 0.05);
+    assert(ratio >= 4.5, `${fg}/${bg} contrast`);
+    console.log(`${i ? "Light" : "Dark"} ${fg}/${bg}: ${ratio.toFixed(2)}:1`);
+  }
 }
 console.log(
   "PASS: static routes/assets, lazy chunks, initial JS budget and essential demo text contrast. Not a Lighthouse or full WCAG audit.",

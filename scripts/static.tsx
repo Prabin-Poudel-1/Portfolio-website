@@ -9,6 +9,7 @@ for (const file of [
   "cv.pdf",
   "CNAME",
   "style.css",
+  "theme.css",
   "script.js",
   "contact.js",
   "contact-config.js",

@@ -1,6 +1,7 @@
 export const projects = [
   {
     id: "sentinel-ai",
+    live: "https://sentinel.poudelprabin.com.np",
     name: "Sentinel AI",
     category: "AI security / systems",
     subtitle: "Your agent can propose. Only policy can permit.",

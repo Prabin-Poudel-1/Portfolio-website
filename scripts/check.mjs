@@ -14,16 +14,27 @@ for (const name of [
   "sentinel-ai.html",
   "rescuer-sathi.html",
   "chitwan-care.html",
-])
+]) {
+  let actual = readFileSync("dist/" + name);
+  if (name.endsWith(".html"))
+    actual = Buffer.from(
+      actual
+        .toString("utf8")
+        .replace(
+          '    <link rel="stylesheet" href="theme.css?v=20261111" />\n',
+          "",
+        ),
+    );
   assert.deepEqual(
-    readFileSync("dist/" + name),
+    actual,
     execFileSync("git", ["show", "master:" + name], { maxBuffer: 10000000 }),
     name + " preserved",
   );
+}
 assert(html.includes("Trained") || html.includes("Model training"));
 assert(html.includes("<main"));
 console.log(
-  "PASS: static HTML, local assets, original CV/domain/case-study byte preservation",
+  "PASS: static HTML, local assets, original CV/domain bytes and case-study content preservation (only shared stylesheet added)",
 );
 const source = readFileSync("src/utils/contact.js", "utf8").replace(
   "export function",
