@@ -32,12 +32,19 @@ export function InteractionEffects() {
         overwrite: true,
       });
     };
+    const hover = (e: PointerEvent) => {
+      if (!fine.matches || reduced.matches || e.pointerType !== "mouse") return;
+      const action = (e.target as Element).closest(".scene-track button, .domain-node, .network-core");
+      if (action && (!e.relatedTarget || !action.contains(e.relatedTarget as Node))) playSound("hover");
+    };
     const success = () => playSound("success");
+    document.addEventListener("pointerover", hover);
     document.addEventListener("pointermove", move);
     document.addEventListener("pointerleave", reset);
     window.addEventListener("portfolio:success", success);
     return () => {
       reset();
+      document.removeEventListener("pointerover", hover);
       document.removeEventListener("pointermove", move);
       document.removeEventListener("pointerleave", reset);
       window.removeEventListener("portfolio:success", success);

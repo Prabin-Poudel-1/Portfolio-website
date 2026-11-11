@@ -2,6 +2,7 @@
 let enabled = false,
   context,
   last = 0,
+  lastHover = 0,
   voice,
   volume = 0.55;
 export function soundEnabled() {
@@ -49,6 +50,9 @@ export function playSound(kind = "select") {
     performance.now() - last < 140
   )
     return;
+  // Hover may reuse an unlocked context, but must never unlock audio or interrupt a cue.
+  if (kind === "hover" && (!context || context.state !== "running" || voice || performance.now() - lastHover < 600)) return;
+  if (kind === "hover") lastHover = performance.now();
   try {
     const Audio = window.AudioContext || window.webkitAudioContext;
     if (!Audio) return;
@@ -58,6 +62,7 @@ export function playSound(kind = "select") {
     last = performance.now();
     voice?.stop();
     const tones = {
+      hover: [146.83, 130.81, 0.08],
       select: [180, 156, 0.16],
       project: [132, 98, 0.26],
       open: [164.81, 220, 0.22],
@@ -80,7 +85,7 @@ export function playSound(kind = "select") {
       );
       gain.gain.setValueAtTime(0.00001, now);
       gain.gain.exponentialRampToValueAtTime(
-        (index ? 0.011 : 0.035) * volume,
+        (index ? 0.011 : 0.035) * volume * (kind === "hover" ? .28 : 1),
         now + 0.018,
       );
       gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);

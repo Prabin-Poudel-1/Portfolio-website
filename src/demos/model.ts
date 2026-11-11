@@ -94,3 +94,12 @@ export function swipeDirection(dx: number, dy: number) {
       : -1
     : 0;
 }
+
+// Deliberately synthetic signal values, not radar measurements or predictions.
+export function syntheticSignal(row: number, col: number, after: boolean) {
+  const base = 20 + ((row * 17 + col * 11) % 61);
+  return Math.max(0, Math.min(100, base + (after ? ((row + col) % 3 - 1) * 18 : 0)));
+}
+export function qualityMasked(row: number, col: number) {
+  return (row * 12 + col) % 13 === 0;
+}

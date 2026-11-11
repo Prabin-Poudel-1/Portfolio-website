@@ -617,3 +617,11 @@
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
   .custom-cursor { display: none !important; }
 }
+
+/* Keep cursor context legible without adding movement or another pointer. */
+.cursor-label:empty { opacity: 0; }
+.cursor-label { transition: opacity 160ms ease; }
+.cinema-image img { transition: filter 220ms ease; }
+@media (hover: hover) and (pointer: fine) {
+  .cinema-image:hover img { filter: contrast(1.025); }
+}
