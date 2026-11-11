@@ -24,7 +24,15 @@ for (const [file, url] of [
 ])
   writeFileSync(
     "dist/" + file,
-    shell.replace(
+    (file === "404.html"
+      ? shell
+          .replace(
+            /<title>[\s\S]*?<\/title>/,
+            '<title>Page not found | Prabin Poudel</title><meta name="robots" content="noindex" />',
+          )
+          .replace(/<link rel="canonical"[^>]*>/, "")
+      : shell
+    ).replace(
       "<!--app-->",
       renderToString(
         <StaticRouter location={url}>
@@ -33,3 +41,25 @@ for (const [file, url] of [
       ),
     ),
   );
+
+const publicRoutes = [
+  "",
+  "sentinel-ai.html",
+  "rescuer-sathi.html",
+  "chitwan-care.html",
+];
+writeFileSync(
+  "dist/sitemap.xml",
+  '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
+    publicRoutes
+      .map(
+        (route) =>
+          `<url><loc>https://www.poudelprabin.com.np/${route}</loc></url>`,
+      )
+      .join("") +
+    "</urlset>",
+);
+writeFileSync(
+  "dist/robots.txt",
+  "User-agent: *\nAllow: /\nSitemap: https://www.poudelprabin.com.np/sitemap.xml\n",
+);

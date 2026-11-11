@@ -2,10 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { projects } from "../data/projects";
 import { ProjectArchive } from "./ProjectArchive";
+import { DemoPanel } from "../components/DemoPanel";
+import { swipeDirection } from "../demos/model";
 import { playSound } from "../utils/sound.js";
 export function Projects() {
   const [index, setIndex] = useState(0),
     [enhanced, setEnhanced] = useState(false);
+  const [demo, setDemo] = useState(false);
+  const demoTrigger = useRef<HTMLButtonElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const start = useRef<{ x: number; y: number } | null>(null);
   const direction = useRef(1);
@@ -92,7 +96,12 @@ export function Projects() {
         aria-label="Featured engineering projects"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.target instanceof HTMLAnchorElement) return;
+          if (
+            e.target instanceof HTMLAnchorElement ||
+            e.target instanceof HTMLInputElement ||
+            e.target instanceof HTMLSelectElement
+          )
+            return;
           if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
             e.preventDefault();
             select(index + (e.key === "ArrowRight" ? 1 : -1));
@@ -115,8 +124,8 @@ export function Projects() {
           const t = e.changedTouches[0],
             dx = t.clientX - start.current.x,
             dy = t.clientY - start.current.y;
-          if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.5)
-            select(index + (dx < 0 ? 1 : -1));
+          const offset = swipeDirection(dx, dy);
+          if (offset) select(index + offset);
           start.current = null;
         }}
       >
@@ -169,6 +178,18 @@ export function Projects() {
               ))}
             </ul>
             <div className="scene-actions">
+              <button
+                ref={demoTrigger}
+                className="button primary"
+                aria-expanded={demo}
+                aria-controls="project-demo"
+                onClick={() => {
+                  setDemo(!demo);
+                  playSound(demo ? "close" : "open");
+                }}
+              >
+                {demo ? "Close demonstration" : "Explore interactive demo"}
+              </button>
               {item.url && (
                 <a
                   className="button primary"
@@ -231,10 +252,25 @@ export function Projects() {
           Project {index + 1} of 7: {item.name}
         </p>
       </div>
+      <noscript>
+        <p>
+          Interactive demonstrations require JavaScript. The project
+          documentation below remains available.
+        </p>
+      </noscript>
       <p className="gallery-hint">
         Choose a number · Use arrow keys · Swipe on mobile{" "}
         <span>No autoplay. Explore at your pace.</span>
       </p>
+      {demo && (
+        <DemoPanel
+          id={item.id}
+          onClose={() => {
+            setDemo(false);
+            demoTrigger.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
       <details className="project-index" open={enhanced ? undefined : true}>
         <summary onClick={() => playSound("open")}>
           Browse project documentation{" "}

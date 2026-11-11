@@ -15,3 +15,5 @@ else createRoot(root).render(app);
 import "./styles/composition.css";
 
 import "./styles/interactions.css";
+
+import "./styles/demos.css";
