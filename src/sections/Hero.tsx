@@ -1,5 +1,6 @@
 import React from "react";
 import { SystemDiagram } from "../components/SystemDiagram";
+import { HeroInterests } from "../components/HeroInterests";
 export function Hero() {
   return (
     <section className="home section-wrap" id="home">
@@ -19,6 +20,7 @@ export function Hero() {
           <br />
           what’s next<span className="accent">.</span>
         </h1>
+        <HeroInterests />
         <p className="hero-intro">
           I build secure software, offline-first applications, and AI-assisted
           systems. Curious about the connections. Careful about the boundaries.
