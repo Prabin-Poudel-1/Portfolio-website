@@ -197,7 +197,7 @@
   width: 100%;
   aspect-ratio: 1;
   opacity: 0;
-  touch-action: pan-y;
+  touch-action: none; /* Keep two-axis dragging on the globe; page scroll works outside. */
   cursor: grab;
   border-radius: 50%;
   transition: opacity 0.25s;

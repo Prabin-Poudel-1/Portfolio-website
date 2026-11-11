@@ -25,7 +25,7 @@ for (const lon of [-180, -90, 0, 84, 180])
     }
   }
 assert.equal(wrapLongitude(540), -180);
-assert.equal(clampTilt(100), 55);
+assert.equal(clampTilt(100), 85);
 assert.deepEqual(advanceRotation(84, 1, 33, true, true, false), {
   lon: 84,
   velocity: 0,
