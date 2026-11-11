@@ -6,6 +6,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import { engineeringNotes } from "../data/engineeringNotes";
 import { projects } from "../data/projects";
 import { playSound } from "../utils/sound.js";
 
@@ -98,6 +99,7 @@ export function DemoPanel({
           )}
         </Suspense>
       </DemoBoundary>
+      {engineeringNotes[id] && <details className="engineering-notes"><summary>Engineering notes · constraints, decisions & evidence</summary><div>{engineeringNotes[id].map(note=><article key={note.label}><h4>{note.label}</h4><p>{note.text}</p></article>)}</div></details>}
     </section>
   );
 }

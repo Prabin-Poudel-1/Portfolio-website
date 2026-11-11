@@ -2,7 +2,7 @@ export const interests = [
   "Software Engineering",
   "AI & Machine Learning",
   "Cybersecurity",
-  "Full-Stack Development",
+  "Secure Full-Stack Systems",
   "Building Real-World Solutions",
 ] as const;
 
@@ -32,7 +32,7 @@ export function createTypewriter(
       erasing = false;
       delay = 400;
     } else {
-      delay = erasing ? 32 : text[count - 1] === " " ? 140 : 58 + (count % 4) * 13;
+      delay = erasing ? 32 : text[count - 1] === " " ? 140 : 66 + (count % 3) * 8;
     }
     queue();
   };

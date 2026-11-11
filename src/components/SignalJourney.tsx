@@ -28,7 +28,12 @@ export function SignalJourney({ children }: { children: ReactNode }) {
     let total = 1,
       positions: number[] = [],
       triggers: ScrollTrigger[] = [],
-      resizeFrame = 0;
+      resizeFrame = 0,
+      lastHeight = 0,
+      alive = true;
+    let samples: { y: number; distance: number }[] = [];
+    let progressValue: number | undefined;
+    const guideLinks = Array.from(element.querySelectorAll<HTMLAnchorElement>(".journey-guide a"));
     function layout() {
       const box = element!.getBoundingClientRect();
       positions = sections.map(
@@ -45,7 +50,11 @@ export function SignalJourney({ children }: { children: ReactNode }) {
       nodes.forEach((n, i) => n.setAttribute("cy", String(positions[i])));
       total = fill.getTotalLength();
       fill.style.strokeDasharray = String(total);
-      draw();
+      samples = Array.from({length: 129}, (_, i) => {
+        const distance = total * i / 128;
+        return {distance, y: fill.getPointAtLength(distance).y};
+      });
+      draw(progressValue);
     }
     function draw(progress?: number) {
       if (staticMotion) {
@@ -54,7 +63,7 @@ export function SignalJourney({ children }: { children: ReactNode }) {
         nodes.forEach((n) => n.classList.add("connected"));
         return;
       }
-      const top = element!.getBoundingClientRect().top;
+      const top = progress === undefined ? element!.getBoundingClientRect().top : 0;
       const y = Math.max(
         positions[0] || 0,
         Math.min(
@@ -64,19 +73,21 @@ export function SignalJourney({ children }: { children: ReactNode }) {
             : positions[0] + progress * (positions.at(-1)! - positions[0]),
         ),
       );
-      let low = 0,
-        high = total;
-      for (let i = 0; i < 14; i++) {
-        const middle = (low + high) / 2;
-        if (fill.getPointAtLength(middle).y < y) low = middle;
-        else high = middle;
+      let low = 0, high = samples.length - 1;
+      while (high - low > 1) {
+        const mid = (low + high) >> 1;
+        if (samples[mid].y < y) low = mid; else high = mid;
       }
-      const distance = (low + high) / 2,
-        point = fill.getPointAtLength(distance);
+      const a = samples[low], b = samples[high];
+      const fraction = Math.max(0, Math.min(1, (y - a.y) / Math.max(.001, b.y - a.y)));
+      const distance = a.distance + (b.distance - a.distance) * fraction;
+      const point = fill.getPointAtLength(distance);
       fill.style.strokeDashoffset = String(total - distance);
       head.setAttribute("cx", String(point.x));
       head.setAttribute("cy", String(point.y));
       graphic!.dataset.progress = (distance / total).toFixed(3);
+      const current = Math.max(0, positions.reduce((index, position, i) => y >= position - 1 ? i : index, 0));
+      guideLinks.forEach((link, i) => { if(i === current) link.setAttribute("aria-current", "step"); else link.removeAttribute("aria-current"); });
       sections.forEach((s, i) => {
         const reached = y >= positions[i] - 1;
         s.dataset.signal = reached ? "connected" : "pending";
@@ -91,7 +102,7 @@ export function SignalJourney({ children }: { children: ReactNode }) {
       const tween = gsap.to(progress, {
         value: 1,
         ease: "none",
-        onUpdate: () => draw(progress.value),
+        onUpdate: () => { progressValue = progress.value; draw(progress.value); },
         scrollTrigger: {
           trigger: element,
           start: () => `top+=${positions[0]} center`,
@@ -123,7 +134,10 @@ export function SignalJourney({ children }: { children: ReactNode }) {
       nodes.forEach((n) => n.classList.add("connected"));
       return () => {};
     });
-    const observer = new ResizeObserver(() => {
+    const observer = new ResizeObserver(([entry]) => {
+      const height = entry.contentRect.height;
+      if (Math.abs(height - lastHeight) < 1) return;
+      lastHeight = height;
       cancelAnimationFrame(resizeFrame);
       resizeFrame = requestAnimationFrame(() => {
         layout();
@@ -131,7 +145,9 @@ export function SignalJourney({ children }: { children: ReactNode }) {
       });
     });
     observer.observe(element);
+    void document.fonts.ready.then(() => { if (alive) { layout(); ScrollTrigger.refresh(); } });
     return () => {
+      alive = false;
       cancelAnimationFrame(resizeFrame);
       observer.disconnect();
       media.revert();

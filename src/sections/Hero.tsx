@@ -14,21 +14,22 @@ export function Hero() {
       <div className="home-content">
         <p className="hero-role">Computer Engineering Student & Developer</p>
         <h1>
-          Connecting ideas.
+          I build for
           <br />
-          <em>Engineering</em>
+          <em>when things</em>
           <br />
-          what’s next<span className="accent">.</span>
+          go wrong<span className="accent">.</span>
         </h1>
         <HeroInterests />
         <p className="hero-intro">
-          I build secure software, offline-first applications, and AI-assisted
-          systems. Curious about the connections. Careful about the boundaries.
+          Offline networks. Secure AI agents. Satellite intelligence. I build
+          software for unpredictable conditions—and make its limits explicit.
         </p>
         <div className="hero-actions">
           <a className="button primary" href="#portfolio">
             Explore my work ↗
           </a>
+          <a className="text-link hero-lab-link" href="/?demo=rescuer-sathi#portfolio">Try the Signal Lost Lab ↗</a>
           <a
             className="button"
             href="cv.pdf?v=20261014-ai"

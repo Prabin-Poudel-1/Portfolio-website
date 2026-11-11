@@ -21,7 +21,7 @@ export function Projects() {
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
       const timeline = gsap.timeline({
-        defaults: { ease: "power2.out", duration: 0.42 },
+        defaults: { ease: "power3.out", duration: 0.44 },
       });
       timeline
         .fromTo(
@@ -70,6 +70,9 @@ export function Projects() {
         setIndex(next);
       }
     };
+    const requestedDemo = new URLSearchParams(window.location.search).get("demo");
+    const requestedIndex = projects.findIndex(p => p.id === requestedDemo);
+    if (requestedIndex >= 0) { setIndex(requestedIndex); setDemo(true); }
     window.addEventListener("portfolio:project", choose);
     return () => window.removeEventListener("portfolio:project", choose);
   }, []);
@@ -119,6 +122,7 @@ export function Projects() {
           const t = e.touches[0];
           start.current = { x: t.clientX, y: t.clientY };
         }}
+        onTouchCancel={() => { start.current = null; }}
         onTouchEnd={(e) => {
           if (!start.current) return;
           const t = e.changedTouches[0],
@@ -269,6 +273,7 @@ export function Projects() {
       </p>
       {demo && (
         <DemoPanel
+          key={item.id}
           id={item.id}
           onClose={() => {
             setDemo(false);

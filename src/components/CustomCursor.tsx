@@ -19,6 +19,7 @@ export function CustomCursor() {
     let x = 0, y = 0, rx = 0, ry = 0, shown = false, down = false;
     let frame = 0, lastFrame = 0, released = 0, speed = 0;
     let points: Point[] = [];
+    let hoverLabel = "";
     const native = "input, textarea, select, [contenteditable]:not([contenteditable='false']), iframe, video";
     const enabled = () => fine.matches && !reduced.matches;
     const position = (el: HTMLElement, px: number, py: number) => {
@@ -40,7 +41,8 @@ export function CustomCursor() {
       ctx.clearRect(0, 0, size, size);
       if (down) points = points.filter(p => now - p.time < 170);
       const fade = down ? 1 : Math.max(0, 1 - (now - released) / 250);
-      if (points.length < 2 || fade <= 0) { points = []; return false; }
+      if (fade <= 0) { points = []; return false; }
+      if (points.length < 2) return false;
       const head = points[points.length - 1];
       canvas.style.transform = `translate3d(${head.x - size / 2}px, ${head.y - size / 2}px, 0)`;
       // A short bounded path, not particles or a blurred full-screen surface.
@@ -89,9 +91,11 @@ export function CustomCursor() {
       position(dot, x, y);
       position(label, x, y);
       const action = el.closest("a, button, [role='button'], summary");
-      const drag = down || (!action && !!el.closest(".globe-canvas, .cinema"));
+      const drag = !action && !!el.closest(".globe-canvas, .cinema");
       const play = action && /demo|play|start|replay|simulation/i.test(action.getAttribute("aria-label") || action.textContent || "");
-      label.textContent = drag ? "DRAG" : play ? "PLAY" : action?.matches("a") ? "VIEW" : "";
+      hoverLabel = drag ? "DRAG" : play ? "PLAY" : action?.matches("a") ? "VIEW" : "";
+      const nextLabel = down ? "DRAG" : hoverLabel;
+      if (label.textContent !== nextLabel) label.textContent = nextLabel;
       root.dataset.hover = String(!!action || drag);
       if (down && e.buttons !== 1) release();
       if (down) {
@@ -122,7 +126,7 @@ export function CustomCursor() {
       down = false;
       released = performance.now();
       root.dataset.dragging = "false";
-      if (label.textContent === "DRAG") label.textContent = "";
+      label.textContent = hoverLabel;
       request();
     };
     const leave = (e: PointerEvent) => { if (!e.relatedTarget) clear(); };

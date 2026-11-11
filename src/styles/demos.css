@@ -515,3 +515,82 @@
     font-size: 11px;
   }
 }
+
+/* Signal Lost Lab: a network canvas with an adjacent operating console. */
+.lab-intro { max-width: 740px; margin-bottom: 28px; }
+.lab-intro h4 { font-size: clamp(30px, 4.3vw, 54px); letter-spacing: -.05em; margin-block: 12px 18px; }
+.lab-presets { display: flex; gap: 10px; flex-wrap: wrap; }
+.lab-presets button { display: flex; gap: 16px; align-items: center; text-align: left; }
+.lab-presets button span { font: 10px ui-monospace, monospace; color: var(--demo-accent); }
+.lab-workbench { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr); gap: 28px; margin-top: 30px; align-items: start; }
+.lab-network, .lab-console { min-width: 0; }
+.lab-mobile-key { display: none; }
+.lab-network { border: 1px solid var(--border); border-radius: 14px; padding: clamp(14px, 2vw, 24px); background: var(--bg); }
+.lab-network .demo-topline { flex-wrap: wrap; line-height: 1.8; }
+.lab-network .relay-wire.lit { animation: none; opacity: .45; stroke-width: 1.2; }
+.lab-network .relay-wire.waiting { stroke: var(--muted); opacity: .3; }
+.lab-network .node-offline { opacity: .5; }
+.relay-packet { fill: none; stroke: var(--demo-accent); stroke-width: 5; stroke-linecap: round; stroke-dasharray: .04 .96; animation: lab-packet 800ms ease-in-out both; }
+@keyframes lab-packet { from { stroke-dashoffset: .04; opacity: 0; } 15% { opacity: 1; } 80% { opacity: 1; } to { stroke-dashoffset: -1; opacity: 0; } }
+.queue-strip { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); margin: 20px 0 0; padding: 16px 0; border-block: 1px solid var(--border); gap: 12px; }
+.queue-strip dt { font: 10px ui-monospace, monospace; color: var(--muted); line-height: 1.6; }
+.queue-strip dd { font: 26px var(--font-display); margin: 10px 0 0; }
+.queue-strip dd small { display: block; font: 10px var(--font-body); }
+.lab-console h5 { font: 600 16px var(--font-display); margin: 0 0 16px; }
+.lab-console h5 span { display: block; font: 10px ui-monospace, monospace; margin-top: 8px; color: var(--muted); }
+.lab-console .demo-check { justify-content: flex-start; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.lab-console .demo-check small { display: block; }
+.lab-events { list-style: none; padding: 0; margin: 0; max-height: 330px; overflow: auto; scrollbar-width: thin; overscroll-behavior: contain; }
+.lab-events li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.6; }
+.lab-events code { color: var(--accent); font-size: 10px; }
+.lab-events [data-kind="wait"] code::after { content: "↺"; display: block; font-size: 15px; }
+.lab-events [data-kind="success"] code::after { content: "✓"; display: block; font-size: 15px; }
+.stage-guide-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stage-guide-buttons button { font-size: 12px; text-align: left; }
+.auth-presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
+.auth-presets button { font-size: 12px; }
+.demo-panel .audit-list { list-style: none; padding: 0; max-height: 310px; overflow: auto; overscroll-behavior: contain; }
+.audit-list li { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.audit-list code, .audit-list strong, .audit-list small { display: block; }
+.audit-list code { color: var(--accent); font-size: 10px; }
+.audit-list strong { font-size: 13px; margin: 7px 0; }
+.audit-list p { font-size: 12px; margin-bottom: 0; }
+.geo-metadata { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px; font: 11px ui-monospace, monospace; }
+.geo-metadata small { grid-column: 1/-1; }
+.demo-panel .geo-grid .quality-masked { background: repeating-linear-gradient(135deg, var(--surface) 0 4px, var(--muted) 4px 5px) !important; }
+.evidence-comparison { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; border-block: 1px solid var(--border); padding: 18px 0; }
+.evidence-comparison dt { font-size: 10px; color: var(--muted); }
+.evidence-comparison dd { font: 22px var(--font-display); margin: 8px 0 0; overflow-wrap: anywhere; }
+.engineering-notes { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 32px !important; }
+.engineering-notes > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px 36px; padding-top: 12px; }
+.engineering-notes article h4 { font-size: 16px; margin: 8px 0; letter-spacing: -.02em; }
+.engineering-notes article p { font-size: 13px; margin: 0; }
+@media (max-width: 900px) {
+  .lab-workbench { grid-template-columns: 1fr; }
+  .lab-console { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  .lab-console h5, .lab-events { grid-column: 1/-1; }
+}
+@media (max-width: 520px) {
+  .lab-console, .stage-guide-buttons, .engineering-notes > div { grid-template-columns: 1fr; }
+  .lab-presets { display: grid; grid-template-columns: 1fr; }
+  .lab-network { padding: 12px; }
+  .queue-strip { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .lab-network .demo-controls button { flex: 1 1 100%; }
+  .lab-network .demo-readout { padding: 16px; }
+  .lab-network .relay-map { display: block; min-width: 0; }
+  .lab-network .relay-map text { font-size: 24px; }
+  .lab-network .relay-map .node-label { display: none; }
+  .lab-mobile-key { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0; margin: 0 0 20px; list-style: none; font-size: 12px; }
+  .lab-mobile-key span { color: var(--accent); font: 11px var(--font-mono); margin-right: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .relay-packet { animation: none; stroke-dasharray: none; stroke-width: 2; opacity: .7; }
+}
+.responder-status { display: grid; gap: 7px; margin-top: 18px; padding: 16px; background: var(--surface); border-radius: 8px; }
+.responder-status > span { font: 9px ui-monospace, monospace; color: var(--accent); letter-spacing: .08em; }
+.responder-status strong { font-size: 14px; }
+@media (max-width: 520px) {
+  .lab-intro h4 { font-size: 28px; }
+  .lab-intro p:not(.eyebrow) { font-size: 14px; }
+  .demo-header p:not(.eyebrow) { font-size: 12px; }
+}

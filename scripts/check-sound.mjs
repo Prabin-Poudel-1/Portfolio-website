@@ -67,7 +67,9 @@ const run = (s) => vm.runInContext(s, context);
 run("restoreSound();playSound()");
 assert.equal(count, 0);
 assert.equal(run("soundVolume()"), 0.55);
-run('setSound(true);playSound("project");playSound("project")');
+run('setSound(true);playSound("hover")');
+assert.equal(count, 0, "Hover cannot unlock audio");
+run('playSound("project");playSound("project")');
 assert.equal(count, 2);
 assert.equal(stored.get("portfolio-sound"), "on");
 assert(frequencies.includes(98));
@@ -125,3 +127,13 @@ assert(
   ),
 );
 console.log("PASS reduced-motion source guards (not browser emulation).");
+
+clock += 800;
+run('playSound("hover")');
+assert.equal(count,16,"Hover must not interrupt an existing cue");
+run('setVolume(.5);playSound("hover")');
+assert.equal(count,18);
+clock += 200;
+run('setVolume(.5);playSound("hover")');
+assert.equal(count,18,"Hover has its own quiet interval");
+console.log("PASS: hover stays quiet until audio is unlocked, does not interrupt a cue, and is independently throttled.");
