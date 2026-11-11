@@ -23,3 +23,9 @@ npm run preview -- --port 4173
 ```
 
 Open http://127.0.0.1:4173/ . To validate manually, enable sound and adjust its level, rotate the globe through the back hemisphere, navigate all projects and case studies, and test the contact form with an authorized real message.
+
+## Hero typewriter follow-up
+
+A memoized `HeroInterests` component adds five rotating interests after the hero heading. A single cancellable timer provides varied typing cadence, a 2.6-second reading pause, and faster erasure. The existing hero entrance owns its initial reveal. Invisible grid siblings reserve the largest phrase footprint; accessible text remains stable. Reduced motion uses a static phrase, and visitors can pause manually. Hidden tabs and offscreen content pause work without losing the current position.
+
+`check-typewriter.ts` verifies all phrases, looping, cadence, pause/resume and disposal, plus static output/accessibility guards. Build, TypeScript, preservation/contact/sound and production checks pass. Browser testing verified animation, keyboard pause/resume, dark desktop (1440px), light mobile (320px), equal phrase-container height across changes, no horizontal overflow and no console errors. Reduced-motion behavior was reviewed/tested through source guards, not browser emulation.
