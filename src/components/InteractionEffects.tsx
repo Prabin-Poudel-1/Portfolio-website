@@ -1,3 +1,4 @@
+import { CustomCursor } from "./CustomCursor";
 import { useEffect } from "react";
 import { gsap } from "gsap";
 import { playSound } from "../utils/sound.js";
@@ -42,5 +43,5 @@ export function InteractionEffects() {
       window.removeEventListener("portfolio:success", success);
     };
   }, []);
-  return null;
+  return <CustomCursor />;
 }
