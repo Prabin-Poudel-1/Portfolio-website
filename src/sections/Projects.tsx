@@ -1,258 +1,262 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { projects } from "../data/projects";
+import { ProjectArchive } from "./ProjectArchive";
+import { playSound } from "../utils/sound.js";
 export function Projects() {
+  const [index, setIndex] = useState(0),
+    [enhanced, setEnhanced] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const start = useRef<{ x: number; y: number } | null>(null);
+  const direction = useRef(1);
+  const item = projects[index];
+  useEffect(() => setEnhanced(true), []);
+  useEffect(() => {
+    if (!root.current) return;
+    const element = root.current;
+    const media = gsap.matchMedia();
+    media.add("(prefers-reduced-motion: no-preference)", () => {
+      const timeline = gsap.timeline({
+        defaults: { ease: "power2.out", duration: 0.42 },
+      });
+      timeline
+        .fromTo(
+          element.querySelector(".cinema-image"),
+          { opacity: 0.35, x: direction.current * 28, scale: 1.025 },
+          { opacity: 1, x: 0, scale: 1 },
+          0,
+        )
+        .fromTo(
+          element.querySelectorAll(".cinema-copy > *"),
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, stagger: 0.035 },
+          0.04,
+        )
+        .fromTo(
+          element.querySelector(".cinema-counter"),
+          { y: direction.current * 12, opacity: 0 },
+          { y: 0, opacity: 1 },
+          0,
+        );
+      return () => {
+        timeline.kill();
+        gsap.set(
+          element.querySelectorAll(
+            ".cinema-image,.cinema-copy > *,.cinema-counter",
+          ),
+          { clearProps: "all" },
+        );
+      };
+    });
+    return () => media.revert();
+  }, [index]);
+  function select(next: number) {
+    const normalized = (next + projects.length) % projects.length;
+    if (normalized === index) return;
+    direction.current = next > index ? 1 : -1;
+    setIndex(normalized);
+    playSound("project");
+  }
+  useEffect(() => {
+    const choose = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      const next = projects.findIndex((p) => p.id === id);
+      if (next >= 0) {
+        direction.current = 1;
+        setIndex(next);
+      }
+    };
+    window.addEventListener("portfolio:project", choose);
+    return () => window.removeEventListener("portfolio:project", choose);
+  }, []);
   return (
-    <section className="section-wrap" id="portfolio">
+    <section className="section-wrap cinema-section" id="portfolio">
       <div className="section-heading">
-        <p className="eyebrow">Selected work / 05 projects</p>
+        <p className="eyebrow">Selected work / 07 perspectives</p>
         <h2>
-          Selected systems.
+          Systems in focus.
           <br />
-          <span className="accent">Built with intention.</span>
+          <span className="accent">Explore the connections.</span>
         </h2>
         <p>
-          Explore the decisions, tradeoffs, and implementation behind my
-          projects.
+          From independent AI authorization to offline emergency communication.
+          Select a project to look closer.
         </p>
       </div>
-      <div className="projects-grid">
-        <article
-          className="project-card featured sentinel-feature"
-          id="project-sentinel-ai"
+      <div
+        ref={root}
+        className="cinema"
+        style={{ "--scene": item.color } as React.CSSProperties}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Featured engineering projects"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.target instanceof HTMLAnchorElement) return;
+          if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+            e.preventDefault();
+            select(index + (e.key === "ArrowRight" ? 1 : -1));
+          }
+          if (e.key === "Home") {
+            e.preventDefault();
+            select(0);
+          }
+          if (e.key === "End") {
+            e.preventDefault();
+            select(projects.length - 1);
+          }
+        }}
+        onTouchStart={(e) => {
+          const t = e.touches[0];
+          start.current = { x: t.clientX, y: t.clientY };
+        }}
+        onTouchEnd={(e) => {
+          if (!start.current) return;
+          const t = e.changedTouches[0],
+            dx = t.clientX - start.current.x,
+            dy = t.clientY - start.current.y;
+          if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.5)
+            select(index + (dx < 0 ? 1 : -1));
+          start.current = null;
+        }}
+      >
+        <div className="cinema-meta">
+          <span>ENGINEERING COLLECTION</span>
+          <span className="cinema-counter">
+            {String(index + 1).padStart(2, "0")} <i>/ 07</i>
+          </span>
+          <span>{item.category}</span>
+        </div>
+        <div
+          className={"cinema-stage scene-" + item.id}
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${index + 1} of 7: ${item.name}`}
         >
-          <div className="project-visual">
-            <img
-              src="assets/projects/sentinel-ai.svg"
-              width="960"
-              height="600"
-              loading="lazy"
-              alt="Sentinel AI concept diagram of an independent authorization boundary"
-            />
-            <span className="art-label">Architecture illustration</span>
+          <div className="cinema-image">
+            {item.image ? (
+              <img
+                key={item.image}
+                src={item.image}
+                alt={item.alt}
+                width={item.id === "rescuer-sathi" ? 720 : 1100}
+                height={item.id === "rescuer-sathi" ? 1612 : 733}
+                loading="lazy"
+              />
+            ) : (
+              <div className="type-cover">
+                <span aria-hidden="true">
+                  {item.id === "rakshak" ? "↗" : "UTC"}
+                </span>
+                <strong>{item.name}</strong>
+                <small>
+                  {item.id === "rakshak"
+                    ? "NARAYANI / EXPERIMENTAL EVIDENCE"
+                    : "COMMUNITY / EVENTS / IDEAS"}
+                </small>
+              </div>
+            )}
+            <span className="media-caption">{item.label}</span>
           </div>
-          <div className="project-details">
-            <p className="eyebrow">01 / AI Security · Systems Engineering</p>
-            <h3>
-              Sentinel AI <span className="project-alias">/ SentinelOS</span>
-            </h3>
-            <p className="project-subtitle">
-              Your agent can propose. Only policy can permit.
-            </p>
-            <p>
-              A local-first Rust security gateway that checks supported agent
-              actions against trusted contracts, Cedar policies, and human
-              approvals before execution.
-            </p>
-            <p className="project-highlight">
-              Open-source research · Release candidate
-            </p>
+          <div className="cinema-copy">
+            <p className="eyebrow">{item.category}</p>
+            <h3>{item.name}</h3>
+            <p className="scene-subtitle">{item.subtitle}</p>
+            <p>{item.description}</p>
             <ul className="tags">
-              <li>Rust</li>
-              <li>Python</li>
-              <li>Cedar Policy</li>
-              <li>Wasmtime</li>
-              <li>SQLite</li>
+              {item.stack.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
             </ul>
-            <div className="project-actions">
-              <a className="button primary" href="sentinel-ai.html">
-                View case study ↗
-              </a>
-              <a
-                className="text-link"
-                href="https://github.com/Prabin-Poudel-1/sentinel-si"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub ↗
-              </a>
-              <a
-                className="text-link"
-                href="https://sentinel.poudelprabin.com.np"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Project website ↗
-              </a>
+            <div className="scene-actions">
+              {item.url && (
+                <a
+                  className="button primary"
+                  href={item.url}
+                  {...(item.url.startsWith("https")
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                  onClick={() => playSound("open")}
+                >
+                  {item.url.endsWith(".html")
+                    ? "Read case study"
+                    : "Visit website"}{" "}
+                  ↗
+                </a>
+              )}
+              {item.repo && (
+                <a href={item.repo} target="_blank" rel="noopener noreferrer">
+                  {item.id === "rakshak"
+                    ? "Private repository ↗"
+                    : "GitHub ↗"}
+                </a>
+              )}
+              {!item.url && !item.repo && (
+                <a href="#contact">Ask about this project ↗</a>
+              )}
             </div>
           </div>
-        </article>
-        <article className="project-card featured" id="project-rescuer-sathi">
-          <div
-            className="project-visual app-preview"
-            aria-label="Rescuer Sathi application screenshots"
+        </div>
+        <div className="cinema-controls">
+          <button
+            type="button"
+            aria-label="Previous project"
+            onClick={() => select(index - 1)}
           >
-            <img
-              src="assets/screenshots/rescuer-dashboard.jpg"
-              width="720"
-              height="1612"
-              loading="lazy"
-              alt="Rescuer dashboard showing a nearby SOS"
-            />
-            <img
-              src="assets/screenshots/rescue-map.jpg"
-              width="714"
-              height="1599"
-              loading="lazy"
-              alt="Accepted rescue and location map"
-            />
-            <span className="art-label">Actual Android app</span>
-          </div>
-          <div className="project-details">
-            <p className="eyebrow">02 / Android engineering prototype</p>
-            <h3>Rescuer Sathi</h3>
-            <p className="project-subtitle">
-              Offline-First Emergency Assistance &amp; Rescue Coordination
-            </p>
-            <p>
-              When connectivity drops, an emergency request should remain
-              available. This Android prototype persists SOS requests locally
-              and coordinates verified responders.
-            </p>
-            <p className="project-highlight">
-              Physical-device relay testing · Three on-device AI models
-            </p>
-            <ul className="tags">
-              <li>Flutter</li>
-              <li>Spring Boot</li>
-              <li>PostgreSQL</li>
-              <li>TFLite</li>
-            </ul>
-            <div className="project-actions">
-              <a className="button" href="rescuer-sathi.html">
-                View case study <span aria-hidden="true">↗</span>
-              </a>
-              <a
-                className="text-link"
-                href="https://github.com/Prabin-Poudel-1/rescuer-sathi"
-                target="_blank"
-                rel="noopener noreferrer"
+            ←
+          </button>
+          <div className="scene-track">
+            {projects.map((p, i) => (
+              <button
+                type="button"
+                key={p.id}
+                aria-label={`Show ${p.name}`}
+                aria-pressed={i === index}
+                onClick={() => select(i)}
               >
-                GitHub ↗<span className="sr-only">(opens in a new tab)</span>
-              </a>
-            </div>
+                <span>{String(i + 1).padStart(2, "0")}</span>
+                <i />
+              </button>
+            ))}
           </div>
-        </article>
-        <article className="project-card featured" id="project-chitwan-care">
-          <div className="project-visual">
-            <img
-              src="assets/projects/chitwan-care.webp"
-              width="1100"
-              height="733"
-              loading="lazy"
-              alt="Concept illustration for Chitwan Care; not an application screenshot"
-            />
-            <span className="art-label">Concept artwork</span>
-          </div>
-          <div className="project-details">
-            <p className="eyebrow">03 / Environmental reporting</p>
-            <h3>Chitwan Care</h3>
-            <p className="project-subtitle">
-              AI-Assisted Waste Detection &amp; Environmental Reporting
-            </p>
-            <p>
-              Connect a waste photo to a cleanup workflow: on-device detection,
-              location-linked reports, administrator review, and department
-              follow-up.
-            </p>
-            <p className="project-highlight">
-              Tested on Android · Deployed backend + Neon
-            </p>
-            <ul className="tags">
-              <li>Flutter</li>
-              <li>Spring Boot</li>
-              <li>PostgreSQL</li>
-              <li>LiteRT</li>
-            </ul>
-            <div className="project-actions">
-              <a className="button" href="chitwan-care.html">
-                View case study <span aria-hidden="true">↗</span>
-              </a>
-              <a
-                className="text-link"
-                href="https://github.com/Prabin-Poudel-1/waste-photo-type"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub ↗<span className="sr-only">(opens in a new tab)</span>
-              </a>
-            </div>
-          </div>
-        </article>
-        <article className="project-card compact" id="project-smart-university">
-          <div className="project-visual">
-            <img
-              src="assets/projects/smart-university.webp"
-              width="1100"
-              height="733"
-              loading="lazy"
-              alt="Concept illustration for Smart University Management System; not an application screenshot"
-            />
-            <span className="art-label">Concept artwork</span>
-          </div>
-          <div className="project-details">
-            <p className="eyebrow">04 / Web application</p>
-            <h3>Smart University Management System</h3>
-            <p className="project-subtitle">A connected campus workspace</p>
-            <p>
-              Student, teacher, course, enrollment, and notice management with
-              student ID cards and PDF generation.
-            </p>
-            <ul className="tags">
-              <li>Java</li>
-              <li>Spring Boot</li>
-              <li>PostgreSQL</li>
-              <li>PDFBox</li>
-            </ul>
-            <div className="project-actions">
-              <a
-                className="text-link"
-                href="https://github.com/Prabin-Poudel-1/Smart-University-managemnt-Sytem"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub ↗<span className="sr-only">(opens in a new tab)</span>
-              </a>
-            </div>
-          </div>
-        </article>
-        <article className="project-card compact" id="project-chitwan-plus">
-          <div className="project-visual">
-            <img
-              src="assets/projects/chitwan-plus.webp"
-              width="1100"
-              height="733"
-              loading="lazy"
-              alt="Concept illustration for Chitwan Plus; not an application screenshot"
-            />
-            <span className="art-label">Concept artwork</span>
-          </div>
-          <div className="project-details">
-            <p className="eyebrow">05 / Travel planning prototype</p>
-            <h3>Chitwan Plus</h3>
-            <p className="project-subtitle">Interest-led travel planning</p>
-            <p>
-              A Bharatpur Pulse prototype that balances interests, budget, and
-              time, with maps, replacement itinerary previews, and Gemini trip
-              assistance.
-            </p>
-            <ul className="tags">
-              <li>React</li>
-              <li>TypeScript</li>
-              <li>Leaflet</li>
-              <li>Spring Boot</li>
-            </ul>
-            <div className="project-actions">
-              <a
-                className="text-link"
-                href="https://github.com/Prabin-Poudel-1/prototype"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub ↗<span className="sr-only">(opens in a new tab)</span>
-              </a>
-            </div>
-          </div>
-        </article>
+          <button
+            type="button"
+            aria-label="Next project"
+            onClick={() => select(index + 1)}
+          >
+            →
+          </button>
+        </div>
+        <p className="sr-only" role="status">
+          Project {index + 1} of 7: {item.name}
+        </p>
       </div>
+      <p className="gallery-hint">
+        Choose a number · Use arrow keys · Swipe on mobile{" "}
+        <span>No autoplay. Explore at your pace.</span>
+      </p>
+      <details className="project-index" open={enhanced ? undefined : true}>
+        <summary onClick={() => playSound("open")}>
+          Browse project documentation{" "}
+          <span>Technical detail, sources, and project boundaries ↗</span>
+        </summary>
+        <ProjectArchive />
+        <div className="pending-projects">
+          {projects
+            .filter((p) => p.id === "rakshak" || p.id === "united-tech-club")
+            .map((p) => (
+              <article id={"project-" + p.id} key={p.id}>
+                <h3>{p.name}</h3>
+                <p>{p.description}</p>
+                {p.url && (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer">
+                    Visit website ↗
+                  </a>
+                )}
+              </article>
+            ))}
+        </div>
+      </details>
     </section>
   );
 }

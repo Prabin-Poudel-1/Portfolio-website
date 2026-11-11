@@ -11,6 +11,7 @@ export function mountContact() {
         try {
           await navigator.clipboard.writeText(email);
           feedback.textContent = "Email address copied.";
+          window.dispatchEvent(new Event("portfolio:success"));
         } catch (_) {
           feedback.textContent = `Copy unavailable. Select the address above, or use the email link.`;
         }
@@ -108,6 +109,7 @@ export function mountContact() {
         if (!accepted) throw new Error("No acceptance confirmation");
         lastAccepted = Date.now();
         form.reset();
+        window.dispatchEvent(new Event("portfolio:success"));
         status.textContent =
           "Thank you—your message was accepted. I’ll reply by email.";
       } catch (error) {

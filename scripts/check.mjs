@@ -68,7 +68,13 @@ for (const scenario of [
         return time;
       },
     },
+    Event: class {
+      constructor(type) {
+        this.type = type;
+      }
+    },
     window: {
+      dispatchEvent() {},
       PORTFOLIO_CONTACT: {
         enabled: true,
         provider: "web3forms",

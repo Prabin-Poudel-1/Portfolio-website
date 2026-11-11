@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { SoundToggle } from "./SoundToggle";
+import { CommandPalette } from "./CommandPalette";
+import { playSound } from "../utils/sound.js";
 const links = [
   ["portfolio", "Projects"],
   ["expertise", "Expertise"],
@@ -45,6 +48,7 @@ export function Header() {
     };
   }, []);
   function changeTheme() {
+    playSound("select");
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     document.documentElement.dataset.theme = next;
@@ -76,6 +80,8 @@ export function Header() {
           ))}
         </nav>
         <div className="nav-actions">
+          <CommandPalette />
+          <SoundToggle />
           <button
             type="button"
             onClick={changeTheme}
@@ -90,7 +96,10 @@ export function Header() {
             className="menu-toggle"
             aria-expanded={open}
             aria-controls="navigation"
-            onClick={() => setOpen(!open)}
+            onClick={() => {
+              setOpen(!open);
+              playSound(open ? "close" : "open");
+            }}
           >
             Menu {open ? "−" : "+"}
           </button>

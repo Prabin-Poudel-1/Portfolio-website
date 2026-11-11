@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Header } from "./components/Header";
+import { NotFound } from "./components/NotFound";
+import { InteractionEffects } from "./components/InteractionEffects";
 import { Footer } from "./components/Footer";
 import { Hero } from "./sections/Hero";
 import { Projects } from "./sections/Projects";
@@ -25,7 +27,7 @@ function Home() {
         clearProps: "all",
       });
       gsap.utils
-        .toArray<HTMLElement>(".project-card,.expertise-card")
+        .toArray<HTMLElement>(".expertise-card,.section-heading")
         .forEach((el) =>
           gsap.from(el, {
             y: 24,
@@ -59,22 +61,12 @@ export function App() {
         Skip to content
       </a>
       <Header />
+      <InteractionEffects />
       <main id="main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/index.html" element={<Home />} />
-          <Route
-            path="*"
-            element={
-              <section className="section-wrap">
-                <p className="eyebrow">404 / disconnected route</p>
-                <h1>This path ends here.</h1>
-                <a className="button primary" href="/">
-                  Return home ↗
-                </a>
-              </section>
-            }
-          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

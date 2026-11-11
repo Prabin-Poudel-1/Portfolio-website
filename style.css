@@ -1527,3 +1527,10 @@ form[aria-busy="true"] .send-spinner {
     transform: none !important;
   }
 }
+
+/* Progressive cross-document transitions; unsupported browsers navigate normally. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}

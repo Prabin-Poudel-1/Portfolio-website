@@ -13,3 +13,5 @@ if (root.querySelector("main")) hydrateRoot(root, app);
 else createRoot(root).render(app);
 
 import "./styles/composition.css";
+
+import "./styles/interactions.css";
