@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  frontRing,
   project,
   wrapLongitude,
   clampTilt,
   advanceRotation,
+  NEPAL,
   type Coordinate,
 } from "../utils/globeMath";
+import { createLandRenderer } from "../utils/globeRaster";
 export default function Globe() {
   const canvas = useRef<HTMLCanvasElement>(null),
     marker = useRef<HTMLButtonElement>(null);
@@ -14,6 +15,10 @@ export default function Globe() {
     lon: 84,
     tilt: 20,
     velocity: 0,
+    tiltVelocity: 0,
+    pointer: -1,
+    movedAt: 0,
+    locate: null as null | { lon: number; tilt: number; elapsed: number },
     drag: false,
     hold: false,
     auto: true,
@@ -42,6 +47,7 @@ export default function Globe() {
       previous = 0,
       rings: Coordinate[][] = [],
       size = 440;
+    let renderLand: ReturnType<typeof createLandRenderer> | undefined;
     let colors = {
       ocean: "#171922",
       land: "#aab5d4",
@@ -65,7 +71,7 @@ export default function Globe() {
     }
     function draw() {
       if (!ctx) return;
-      const dpr = Math.min(devicePixelRatio || 1, 1.6);
+      const dpr = surface!.width / size; // Match the allocated backing store after zoom/DPR changes.
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, size, size);
       const c = size / 2,
@@ -85,10 +91,18 @@ export default function Globe() {
       ctx.strokeStyle = colors.line;
       ctx.lineWidth = 0.6;
       ctx.globalAlpha = 0.45;
-      const line = (coords: Coordinate[]) => {
+      const line = (coords: Coordinate[], coastline = false) => {
         ctx.beginPath();
         let pen = false;
-        for (const point of coords) {
+        for (let i = 0; i < coords.length; i++) {
+          const point = coords[i], previousPoint = coords[i - 1];
+          // GeoJSON closes polar rings along the dateline. Those edges are not coastlines.
+          if (coastline && previousPoint &&
+              ((Math.abs(point[0]) >= 179.99 && Math.abs(previousPoint[0]) >= 179.99) ||
+               Math.abs(point[1]) >= 89.99 || Math.abs(previousPoint[1]) >= 89.99)) {
+            pen = false;
+            continue;
+          }
           const [x, y, z] = project(point, state.lon, state.tilt);
           if (z < 0) {
             pen = false;
@@ -116,18 +130,10 @@ export default function Globe() {
       ctx.fillStyle = colors.land;
       ctx.strokeStyle = colors.line;
       ctx.lineWidth = 0.6;
-      for (const ring of rings) {
-        const points = frontRing(
-          ring.map((p) => project(p, state.lon, state.tilt)),
-        );
-        if (points.length < 3) continue;
-        ctx.beginPath();
-        points.forEach(([x, y], i) =>
-          i ? ctx.lineTo(x * r, -y * r) : ctx.moveTo(x * r, -y * r),
-        );
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+      if (renderLand) {
+        ctx.drawImage(renderLand(state.lon, state.tilt, colors.land), -r, -r, r * 2, r * 2);
+        // Coastlines are open front-facing segments; never close across the horizon.
+        for (const ring of rings) line(ring, true);
       }
       const shade = ctx.createLinearGradient(-r, -r, r, r);
       shade.addColorStop(0, "#ffffff18");
@@ -146,7 +152,7 @@ export default function Globe() {
       ctx.ellipse(0, 0, r * 1.13, r * 0.28, -0.28, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
-      const [mx, my, mz] = project([84, 28], state.lon, state.tilt);
+      const [mx, my, mz] = project(NEPAL, state.lon, state.tilt);
       if (marker.current) {
         marker.current.style.left = `${50 + mx * 41}%`;
         marker.current.style.top = `${50 - my * 41}%`;
@@ -164,21 +170,26 @@ export default function Globe() {
         return;
       }
       previous = time;
-      const motionStep = advanceRotation(
-        state.lon,
-        state.velocity,
-        dt,
-        state.auto,
-        reducedMotion,
-        state.drag || state.hold,
-      );
-      state.lon = motionStep.lon;
-      state.velocity = motionStep.velocity;
+      if (state.locate) {
+        state.locate.elapsed += dt;
+        const t = reducedMotion ? 1 : Math.min(1, state.locate.elapsed / 750);
+        const ease = t * t * (3 - 2 * t);
+        state.lon = wrapLongitude(state.locate.lon + wrapLongitude(NEPAL[0] - state.locate.lon) * ease);
+        state.tilt = state.locate.tilt + (NEPAL[1] - state.locate.tilt) * ease;
+        if (t === 1) state.locate = null;
+      } else {
+        const motionStep = advanceRotation(state.lon, state.velocity, dt, state.auto, reducedMotion, state.drag || state.hold);
+        const tiltStep = advanceRotation(state.tilt, state.tiltVelocity, dt, false, reducedMotion, state.drag || state.hold);
+        state.lon = motionStep.lon;
+        state.velocity = motionStep.velocity;
+        state.tilt = clampTilt(tiltStep.lon);
+        state.tiltVelocity = Math.abs(state.tilt) >= 85 ? 0 : tiltStep.velocity;
+      }
       draw();
       state.dirty = false;
       if (
-        state.drag ||
-        (!reducedMotion && !state.hold && (state.auto || state.velocity !== 0))
+        state.locate || state.drag ||
+        (!reducedMotion && !state.hold && (state.auto || state.velocity !== 0 || state.tiltVelocity !== 0))
       )
         frame = requestAnimationFrame(tick);
     }
@@ -190,6 +201,7 @@ export default function Globe() {
       reducedMotion = motion.matches;
       setReduced(reducedMotion);
       state.velocity = 0;
+      state.tiltVelocity = 0;
       state.dirty = true;
       wake();
     };
@@ -229,6 +241,7 @@ export default function Globe() {
         frame = 0;
         state.drag = false;
         state.velocity = 0;
+        state.tiltVelocity = 0;
       } else {
         previous = 0;
         wake();
@@ -249,6 +262,7 @@ export default function Globe() {
       .then((data) => {
         if (!alive) return;
         rings = data;
+        renderLand = createLandRenderer(rings, matchMedia("(pointer: coarse)").matches ? 256 : 384);
         setReady(true);
         wake();
       })
@@ -273,6 +287,14 @@ export default function Globe() {
   function rotate(amount: number) {
     engine.current.lon = wrapLongitude(engine.current.lon + amount);
     engine.current.velocity = 0;
+    engine.current.tiltVelocity = 0;
+    engine.current.locate = null;
+    redraw();
+  }
+  function locateNepal() {
+    const s = engine.current;
+    s.velocity = s.tiltVelocity = 0;
+    s.locate = { lon: s.lon, tilt: s.tilt, elapsed: 0 };
     redraw();
   }
   return (
@@ -296,38 +318,53 @@ export default function Globe() {
             role="img"
             tabIndex={0}
             onPointerDown={(e) => {
+              if (!e.isPrimary || e.button !== 0) return;
               const s = engine.current;
               s.drag = true;
-              s.velocity = 0;
+              s.pointer = e.pointerId;
+              s.locate = null;
+              s.velocity = s.tiltVelocity = 0;
               s.x = e.clientX;
               s.y = e.clientY;
+              s.movedAt = performance.now();
               e.currentTarget.setPointerCapture(e.pointerId);
               redraw();
             }}
             onPointerMove={(e) => {
               const s = engine.current;
-              if (!s.drag) return;
-              const dx = e.clientX - s.x;
-              s.lon = wrapLongitude(s.lon - dx * 0.35);
-              s.tilt = clampTilt(s.tilt + (e.clientY - s.y) * 0.2);
-              s.velocity = reduced ? 0 : -dx * 0.045;
+              if (!s.drag || s.pointer !== e.pointerId) return;
+              const now = performance.now(), dt = Math.max(8, now - s.movedAt);
+              const dx = e.clientX - s.x, dy = e.clientY - s.y;
+              s.lon = wrapLongitude(s.lon - dx * .35);
+              s.tilt = clampTilt(s.tilt + dy * .25);
+              s.velocity = reduced ? 0 : Math.max(-4, Math.min(4, -dx * .35 * 16 / dt));
+              s.tiltVelocity = reduced ? 0 : Math.max(-2, Math.min(2, dy * .25 * 16 / dt));
               s.x = e.clientX;
               s.y = e.clientY;
+              s.movedAt = now;
               redraw();
             }}
             onPointerUp={(e) => {
-              engine.current.drag = false;
-              if (e.currentTarget.hasPointerCapture(e.pointerId))
-                e.currentTarget.releasePointerCapture(e.pointerId);
+              const s = engine.current;
+              if (s.pointer !== e.pointerId) return;
+              s.drag = false;
+              s.pointer = -1;
+              // Holding still before release must not fling using an old sample.
+              if (performance.now() - s.movedAt > 90) s.velocity = s.tiltVelocity = 0;
+              if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
               redraw();
             }}
             onPointerCancel={() => {
-              engine.current.drag = false;
-              engine.current.velocity = 0;
+              const s = engine.current;
+              s.drag = false;
+              s.pointer = -1;
+              s.velocity = s.tiltVelocity = 0;
               redraw();
             }}
             onLostPointerCapture={() => {
+              if (!engine.current.drag) return;
               engine.current.drag = false;
+              engine.current.velocity = engine.current.tiltVelocity = 0;
               redraw();
             }}
             onKeyDown={(e) => {
@@ -342,12 +379,12 @@ export default function Globe() {
               ) {
                 e.preventDefault();
                 if (e.key === "Home") {
-                  engine.current.lon = 84;
-                  engine.current.tilt = 20;
-                } else if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                  engine.current.tilt = clampTilt(
-                    engine.current.tilt + (e.key === "ArrowUp" ? 5 : -5),
-                  );
+                  locateNepal();
+                } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                  engine.current.locate = null;
+                  engine.current.velocity = engine.current.tiltVelocity = 0;
+                  engine.current.tilt = clampTilt(engine.current.tilt + (e.key === "ArrowUp" ? 5 : -5));
+                }
                 else rotate(e.key === "ArrowRight" ? 10 : -10);
                 redraw();
               }
@@ -414,7 +451,8 @@ export default function Globe() {
           <button
             onClick={() => {
               engine.current.auto = paused;
-              engine.current.velocity = 0;
+              engine.current.velocity = engine.current.tiltVelocity = 0;
+              engine.current.locate = null;
               setPaused(!paused);
               redraw();
             }}
@@ -431,12 +469,7 @@ export default function Globe() {
             →
           </button>
           <button
-            onClick={() => {
-              engine.current.lon = 84;
-              engine.current.tilt = 20;
-              engine.current.velocity = 0;
-              redraw();
-            }}
+            onClick={locateNepal}
           >
             Locate Nepal
           </button>
@@ -445,7 +478,7 @@ export default function Globe() {
       <p className="globe-help">
         {failed
           ? "Static map preview. Interactive rendering is unavailable."
-          : "Drag to explore · arrow keys to rotate · vertical page scrolling stays available."}
+          : "Drag to explore · arrow keys to rotate · scroll outside the globe to move the page."}
       </p>
     </div>
   );

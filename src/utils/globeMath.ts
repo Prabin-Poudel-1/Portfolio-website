@@ -39,7 +39,7 @@ export function wrapLongitude(value: number) {
   return ((((value + 180) % 360) + 360) % 360) - 180;
 }
 export function clampTilt(value: number) {
-  return Math.max(-55, Math.min(55, value));
+  return Math.max(-85, Math.min(85, value));
 }
 
 export function advanceRotation(
@@ -52,9 +52,14 @@ export function advanceRotation(
 ) {
   if (reduced) return { lon, velocity: 0 };
   if (interacting) return { lon, velocity };
-  const nextVelocity = Math.abs(velocity * 0.91) < 0.001 ? 0 : velocity * 0.91;
+  const decay = Math.exp(-dt / 180);
+  const nextVelocity = Math.abs(velocity * decay) < 0.001 ? 0 : velocity * decay;
   return {
-    lon: wrapLongitude(lon + (velocity * dt) / 16 + (auto ? dt * 0.0025 : 0)),
+    lon: wrapLongitude(lon + velocity * (180 / 16) * (1 - decay) +
+      (auto ? dt * 0.0025 * Math.max(0, 1 - Math.abs(velocity) / .3) : 0)),
     velocity: nextVelocity,
   };
 }
+
+// Geographic country marker, not the owner's precise position.
+export const NEPAL: Coordinate = [84, 28];
