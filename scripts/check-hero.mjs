@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 const css = readFileSync('theme.css', 'utf8');
-for (const token of ['--ink-0: #0F1420', '--text: #E8ECF3', '--accent: #60A5FA', '--paper-0: #F7F6F2', '--paper-1: #FFFFFF', '--text: #12171F', '--editorial: #B45309', '--accent: #15803D', '--particle: #60A5FA', '--particle: #1D4ED8']) assert(css.includes(token), token);
+for (const token of ['--ink-0: #0F1420', '--text: #E8ECF3', '--accent: #60A5FA', '--paper-0: #F7F6F2', '--paper-1: #FFFFFF', '--text: #12171F', '--editorial: #B45309', '--accent: #15803D', '--particle: #60A5FA', '--particle: #B45309']) assert(css.includes(token), token);
 const listeners = new Map(), frames = new Map();
 let id = 0, intersection, motionChange, disconnected = false, draws = 0;
 const reduced = { matches: false, addEventListener: (_, fn) => { motionChange = fn; }, removeEventListener: () => { motionChange = undefined; } };

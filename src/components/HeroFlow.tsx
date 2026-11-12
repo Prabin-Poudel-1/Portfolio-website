@@ -36,7 +36,8 @@ export function HeroFlow({ paused }: { paused: boolean }) {
       ratio = Math.min(devicePixelRatio || 1, 1.75);
       canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      const count = width < 700 ? 40 : Math.min(115, Math.round(width * height / 12500));
+      const baseCount = width < 700 ? 40 : Math.min(115, Math.round(width * height / 12500));
+      const count = Math.round(baseCount * 2.5);
       particles = Array.from({ length: count }, () => { const p = spawn(); p.age = Math.random() * p.life; return p; });
       colors();
     };
