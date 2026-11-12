@@ -1,6 +1,6 @@
 /* Phase 2: a user-controlled exhibition. No autoplay or pinned scrolling. */
 .cinema {
-  --scene: #b9e7bb;
+  --scene: var(--accent);
   background: #101b21;
   color: #eef1ed;
   border: 1px solid #34464c;
@@ -582,7 +582,7 @@
 @property --scene {
   syntax: "<color>";
   inherits: true;
-  initial-value: #b9e7bb;
+  initial-value: #C6F432;
 }
 .cinema {
   transition:

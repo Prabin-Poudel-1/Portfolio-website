@@ -1,22 +1,6 @@
 /* Phase 1 composition: project atlas and editorial case-study spreads. */
-:root {
-  --bg: #101c22;
-  --surface: #19282e;
-  --text: #edf0e8;
-  --muted: #a9babd;
-  --accent: #b9e7bb;
-  --border: #34464c;
-  --grid: rgba(150, 180, 180, 0.09);
-}
-:root[data-theme="light"] {
-  --bg: #f3f1e7;
-  --surface: #e7e9de;
-  --text: #1c3438;
-  --muted: #506568;
-  --accent: #326a47;
-  --border: #b8c7be;
-  --grid: rgba(30, 70, 60, 0.08);
-}
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
 .header {
   border: 0;
   background: var(--bg);

@@ -78,7 +78,7 @@ clock += 200;
 run('playSound("success")');
 assert.equal(count, 4);
 assert(stopped >= 6);
-assert(Math.max(...peaks) <= 0.035 * 0.55);
+assert(Math.max(...peaks) <= 0.035 * 3 * 0.55);
 run("setVolume(0);playSound()");
 assert.equal(count, 4);
 assert.equal(stored.get("portfolio-volume"), "0");
@@ -108,11 +108,13 @@ for (const kind of [
   run(`playSound('${kind}')`);
 }
 assert.equal(count, 16);
-assert(Math.max(...peaks) <= 0.035);
+assert(Math.max(...peaks) <= 0.035 * 3);
 assert(Math.min(...frequencies) >= 98);
 assert(Math.max(...frequencies) <= 588);
-// Two sine layers sum to at most .046 full-scale (default .0253), well below clipping.
-assert(0.035 + 0.011 < 0.05);
+// 3× envelopes, proportional saved volume, and worst-case release overlap headroom.
+assert(peaks.includes(0.035 * 3 * .55));
+assert(peaks.includes(0.011 * 3 * .55));
+assert((0.035 + 0.011) * 3 * 2 < .28);
 console.log(
   "PASS sound: default mute, two-layer bass, frequency/gain bounds, throttle/release, preferences, volume clamp/zero, hidden suppression and suspension. Acoustic listening not performed.",
 );

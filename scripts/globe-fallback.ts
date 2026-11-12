@@ -62,7 +62,7 @@ for (let row = 0; row < 360; row++) {
 const [x, y] = project(NEPAL, 84, 28);
 writeFileSync(
   "assets/geo/globe-fallback.svg",
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440"><defs><radialGradient id="o"><stop stop-color="#373e5a"/><stop offset="1" stop-color="#11131c"/></radialGradient><linearGradient id="s" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient></defs><circle cx="220" cy="220" r="180" fill="url(#o)"/><path d="${d}" fill="none" stroke="#aab5d4" stroke-width="1"/><circle cx="220" cy="220" r="180" fill="url(#s)" stroke="#535d7d"/><circle cx="${220 + x * 180}" cy="${220 - y * 180}" r="4" fill="#d6d3ff"/></svg>`,
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440"><defs><radialGradient id="o"><stop stop-color="#555E51"/><stop offset="1" stop-color="#0B0B0F"/></radialGradient><linearGradient id="s" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient></defs><circle cx="220" cy="220" r="180" fill="url(#o)"/><path d="${d}" fill="none" stroke="#B9C1AB" stroke-width="1"/><circle cx="220" cy="220" r="180" fill="url(#s)" stroke="#555E51"/><circle cx="${220 + x * 180}" cy="${220 - y * 180}" r="4" fill="#C6F432"/></svg>`,
 );
 console.log(
   "Generated globe fallback from the existing Natural Earth coverage without horizon chords.",

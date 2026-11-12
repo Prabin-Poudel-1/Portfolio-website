@@ -20,6 +20,9 @@ export function CustomCursor() {
     let frame = 0, lastFrame = 0, released = 0, speed = 0;
     let points: Point[] = [];
     let hoverLabel = "";
+    let tailColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    const themeObserver = new MutationObserver(() => { tailColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(); });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     const native = "input, textarea, select, [contenteditable]:not([contenteditable='false']), iframe, video";
     const enabled = () => fine.matches && !reduced.matches;
     const position = (el: HTMLElement, px: number, py: number) => {
@@ -57,7 +60,8 @@ export function CustomCursor() {
         const age = Math.max(0, 1 - ((down ? now : released) - a.time) / 170);
         const alpha = fade * age * taper * (.45 + Math.min(speed, 2.5) * .15);
         for (const [width, opacity] of [[7, .1], [3, .3], [1.2, .85]]) {
-          ctx.strokeStyle = `rgba(185,173,255,${alpha * opacity})`;
+          ctx.strokeStyle = tailColor;
+          ctx.globalAlpha = alpha * opacity;
           ctx.lineWidth = width * (.45 + taper * .55);
           ctx.beginPath();
           ctx.moveTo(a.x - head.x + size / 2, a.y - head.y + size / 2);
@@ -65,6 +69,7 @@ export function CustomCursor() {
           ctx.stroke();
         }
       }
+      ctx.globalAlpha = 1;
       return down || fade > 0;
     };
     const tick = (now: number) => {
@@ -144,6 +149,7 @@ export function CustomCursor() {
     reduced.addEventListener("change", clear);
     return () => {
       clear();
+      themeObserver.disconnect();
       document.removeEventListener("pointermove", move, true);
       document.removeEventListener("pointerdown", press, true);
       document.removeEventListener("pointerup", release, true);

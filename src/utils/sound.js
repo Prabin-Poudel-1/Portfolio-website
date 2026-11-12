@@ -1,4 +1,7 @@
-// Original, restrained two-layer synthesis. No music, samples or scroll audio.
+// Original two-layer synthesis, 3× amplitude with bounded headroom.
+// At max volume: .105 + .033 = .138 peak. One replacing release tail
+// can briefly overlap: <= .276 combined (< -11 dBFS); no limiter needed.
+// Slider stays linear; no music, samples or automatic motion audio.
 let enabled = false,
   context,
   last = 0,
@@ -85,7 +88,7 @@ export function playSound(kind = "select") {
       );
       gain.gain.setValueAtTime(0.00001, now);
       gain.gain.exponentialRampToValueAtTime(
-        (index ? 0.011 : 0.035) * volume * (kind === "hover" ? .28 : 1),
+        (index ? 0.011 : 0.035) * 3 * volume * (kind === "hover" ? .28 : 1),
         now + 0.018,
       );
       gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);

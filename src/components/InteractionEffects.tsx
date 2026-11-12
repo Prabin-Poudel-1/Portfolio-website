@@ -34,7 +34,7 @@ export function InteractionEffects() {
     };
     const hover = (e: PointerEvent) => {
       if (!fine.matches || reduced.matches || e.pointerType !== "mouse") return;
-      const action = (e.target as Element).closest(".scene-track button, .domain-node, .network-core");
+      const action = (e.target as Element).closest(".scene-track button, .network-core");
       if (action && (!e.relatedTarget || !action.contains(e.relatedTarget as Node))) playSound("hover");
     };
     const success = () => playSound("success");
