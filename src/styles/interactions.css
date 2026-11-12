@@ -582,7 +582,7 @@
 @property --scene {
   syntax: "<color>";
   inherits: true;
-  initial-value: #C6F432;
+  initial-value: #60A5FA;
 }
 .cinema {
   transition:

@@ -1,16 +1,16 @@
 :root {
   color-scheme: dark;
-  --bg: #0B0B0F;
-  --panel: #17171C;
-  --panel-2: #222228;
-  --text: #F5F5F7;
-  --muted: #B8B8C0;
-  --accent: #C6F432;
-  --accent-ink: #0B0B0F;
-  --line: #3A3A43;
-  --header: #0B0B0Ff2;
+  --bg: #0F1420;
+  --panel: #171F2E;
+  --panel-2: #222D40;
+  --text: #E8ECF3;
+  --muted: #AFBCD0;
+  --accent: #60A5FA;
+  --accent-ink: #0F1420;
+  --line: #35445B;
+  --header: #0F1420f2;
   --shadow: 0 14px 40px #0002;
-  --control: #80808B;
+  --control: #7D91AD;
   --radius-sm: 8px;
   --radius-md: 14px;
   --space-1: 8px;
@@ -1219,7 +1219,7 @@ section[tabindex="-1"]:focus {
   overscroll-behavior: contain;
 }
 .image-dialog::backdrop {
-  background: #0B0B0Fd9;
+  background: #0F1420d9;
 }
 .image-dialog[open] {
   display: grid;

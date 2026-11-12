@@ -1,6 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { animateHero } from '../utils/heroMotion';
 
+// 22 samples / 21 segments: 40% longer than the previous 15-segment trail.
+const TRAIL_POINTS = 22;
+const FADE_GROUPS = 7;
+const SEGMENTS_PER_GROUP = 3;
+
 type Particle = { x: number; y: number; vx: number; vy: number; age: number; life: number; amber: boolean; trail: Float32Array; head: number; filled: number };
 
 /** Decorative, hero-contained flow; no React updates, pointer capture or external assets. */
@@ -11,19 +16,19 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
     let width = 1, height = 1, ratio = 1, particles: Particle[] = [];
-    let accent = '#C6F432', editorial = accent;
+    let accent = '#60A5FA', editorial = accent;
     let bounds = hero.getBoundingClientRect();
     const pointer = { x: -1000, y: -1000, vx: 0, vy: 0, speed: 0, at: 0, inside: false };
     const colors = () => {
       const style = getComputedStyle(hero);
-      accent = style.getPropertyValue('--accent').trim();
+      accent = style.getPropertyValue('--particle').trim();
       editorial = style.getPropertyValue('--editorial').trim();
       ctx.clearRect(0, 0, width, height);
     };
     const spawn = (p?: Particle): Particle => Object.assign(p || {}, {
       x: Math.random() * width, y: Math.random() * height,
       vx: 0, vy: 0, age: 0, life: 10 + Math.random() * 12, amber: Math.random() < .12,
-      trail: p?.trail || new Float32Array(32), head: 0, filled: 0,
+      trail: p?.trail || new Float32Array(TRAIL_POINTS * 2), head: 0, filled: 0,
     }) as Particle;
     const resize = () => {
       bounds = hero.getBoundingClientRect();
@@ -52,7 +57,7 @@ export function HeroFlow({ paused }: { paused: boolean }) {
       if (ratio !== Math.min(devicePixelRatio || 1, 1.75)) resize();
       // Redraw bounded trails: alpha decay on an 8-bit canvas otherwise leaves persistent ghosts.
       ctx.clearRect(0, 0, width, height);
-      ctx.lineCap = 'round'; ctx.lineWidth = .85;
+      ctx.lineCap = 'round'; ctx.lineWidth = 1.3;
       pointer.speed *= Math.exp(-dt * 3.5);
       pointer.vx *= Math.exp(-dt * 3.5); pointer.vy *= Math.exp(-dt * 3.5);
       for (const p of particles) {
@@ -69,18 +74,18 @@ export function HeroFlow({ paused }: { paused: boolean }) {
         p.vx += (vx - p.vx) * ease; p.vy += (vy - p.vy) * ease;
         p.x += p.vx * dt; p.y += p.vy * dt;
         const envelope = Math.min(1, p.age / 1.3, (p.life - p.age) / 1.5);
-        p.head = (p.head + 1) % 16;
+        p.head = (p.head + 1) % TRAIL_POINTS;
         p.trail[p.head * 2] = p.x; p.trail[p.head * 2 + 1] = p.y;
-        p.filled = Math.min(16, p.filled + 1);
+        p.filled = Math.min(TRAIL_POINTS, p.filled + 1);
         ctx.strokeStyle = p.amber ? editorial : accent;
-        // Three tapered segments, fixed storage and no per-frame allocation.
-        for (let group = 0; group < 3; group++) {
-          ctx.globalAlpha = envelope * Math.min(.65, .36 + influence * pointer.speed * .2) * (1 - group / 3);
+        // Seven gradual fade steps, fixed storage and no per-frame allocation.
+        for (let group = 0; group < FADE_GROUPS; group++) {
+          ctx.globalAlpha = envelope * Math.min(.75, .60 + influence * pointer.speed * .2) * (1 - group / FADE_GROUPS);
           ctx.beginPath();
-          const first = group * 5;
+          const first = group * SEGMENTS_PER_GROUP;
           if (first >= p.filled - 1) continue;
-          for (let k = first; k <= Math.min(first + 5, p.filled - 1); k++) {
-            const index = ((p.head - k + 16) % 16) * 2;
+          for (let k = first; k <= Math.min(first + SEGMENTS_PER_GROUP, p.filled - 1); k++) {
+            const index = ((p.head - k + TRAIL_POINTS) % TRAIL_POINTS) * 2;
             if (k === first) ctx.moveTo(p.trail[index], p.trail[index + 1]);
             else ctx.lineTo(p.trail[index], p.trail[index + 1]);
           }
