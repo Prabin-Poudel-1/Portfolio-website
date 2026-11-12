@@ -25,7 +25,7 @@ for (const name of [
           "",
         )
         .replace(
-          '    <link rel="stylesheet" href="theme.css?v=20261111" />\n',
+          '    <link rel="stylesheet" href="theme.css?v=20261112" />\n',
           "",
         ),
     );
