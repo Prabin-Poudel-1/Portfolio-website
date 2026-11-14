@@ -141,10 +141,10 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       pointer.speed *= Math.exp(-dt * 4.5);
 
       const mobile = width < 700;
-      // Shift toward the gap between the heading and engineering diagram.
-      // The foreground layer ensures the cloud isn't swallowed by that panel.
-      const centerX = width * (mobile ? .52 : .53);
-      const centerY = height * (mobile ? .47 : .52);
+      // Position the cloud to the right of the hero headline; keep the original
+      // smoke density, illumination, cursor swirl, and overall visual treatment.
+      const centerX = width * (mobile ? .54 : .59);
+      const centerY = height * (mobile ? .42 : .50);
       const spreadX = Math.min(width * (mobile ? .45 : .34), 460);
       const spreadY = Math.min(height * .42, 340);
       const settle = 1 - Math.exp(-dt * (pointer.inside ? 8 : 3.5));
