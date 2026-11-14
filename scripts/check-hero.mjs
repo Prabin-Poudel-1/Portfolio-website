@@ -4,9 +4,9 @@ import vm from 'node:vm';
 import ts from 'typescript';
 const css = readFileSync('theme.css', 'utf8');
 for (const token of [
-  '--ink-0: #0D1117',
-  '--ink-1: #111827',
-  '--text: #F6F1E8',
+  '--ink-0: #090A10',
+  '--ink-1: #12141D',
+  '--text: #EEF0F7',
   '--paper-0: #FFFFFF',
   '--paper-1: #FFFFFF',
   '--bg: #FFFFFF',
@@ -47,4 +47,20 @@ assert(!css.includes('.hero-flow'), 'Remove obsolete luminous canvas styling');
 const diagram=readFileSync('src/components/SystemDiagram.tsx','utf8');
 assert(diagram.includes('cycle >= 6'));
 assert(!diagram.slice(diagram.indexOf('const stop'),diagram.indexOf('const node')).includes('playSound'));
-console.log('PASS: UTC-inspired white/slate/blue light theme, system typography, dark palette, hero loop lifecycle, reduced-motion cleanup and no luminous renderer.');
+assert(!diagram.includes('FIELD NOTES / CONNECTED SYSTEMS'));
+assert(!diagram.includes('SELECT A NODE TO EXPLORE'));
+assert(!diagram.includes('<circle cx="48" cy="48" r="35"'));
+const projectPage = readFileSync('src/sections/Projects.tsx', 'utf8');
+const composition = readFileSync('src/styles/composition.css', 'utf8');
+const interactionStyle = readFileSync('src/styles/interactions.css', 'utf8');
+const cursor = readFileSync('src/components/CustomCursor.tsx', 'utf8');
+assert(!hero.includes('Try the Signal Lost Lab'));
+assert(!projectPage.includes('Technical detail, sources, and project boundaries'));
+assert(!projectPage.includes('From independent AI authorization to offline emergency communication.'));
+assert(projectPage.includes('Browse project documentation'));
+assert(interactionStyle.includes('.project-index > summary::after'));
+assert(!composition.includes('background-size: 28px 28px'));
+assert(cursor.includes('className="cursor-aura"'));
+assert(cursor.includes('const glowEase = 1 - Math.exp(-step / 115)'));
+assert(interactionStyle.includes(':root:not([data-theme="light"]) .custom-cursor[data-visible="true"] .cursor-aura'));
+console.log('PASS: simplified portfolio copy, button-style documentation, grid-free nodes, updated dark theme and smooth dark-only cursor aura.');
