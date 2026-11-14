@@ -58,6 +58,21 @@ assert(goldSmoke.includes('function makeMistSprite(color: string)'), 'Original a
 assert(goldSmoke.includes("let mist = makeMistSprite('#A78B63')"), 'Original golden amber base restored');
 assert(goldSmoke.includes("let brightGold = makeMistSprite('#FFE2A0')"), 'Original bright golden core restored');
 assert(goldSmoke.includes('ctx.drawImage(brightGold,'), 'Original near-pointer golden illumination restored');
+
+assert(goldSmoke.includes('const FORM_SECONDS = 14;'), 'Morph pacing is 14 seconds per shape');
+assert(goldSmoke.includes('const FORM_HOLD = 8;'), 'Shapes hold before transitions');
+assert(goldSmoke.includes('const FORM_COUNT = 4;'), 'Four forms are available');
+assert(goldSmoke.includes('const smoothstep5 = (t: number)'), 'Quintic easing avoids abrupt transitions');
+assert(goldSmoke.includes('if (form === 0)'), 'Original nebula remains as the starting shape');
+assert(goldSmoke.includes('if (form === 1)'), 'Infinity loop formation exists');
+assert(goldSmoke.includes('if (form === 2)'), 'Spiral-arm formation exists');
+assert(goldSmoke.includes('const petals = .55 + .35 * Math.cos(5 * angle'), 'Bloom formation exists');
+assert(goldSmoke.includes('const blend = smoothstep5(transition);'), 'Transition uses smooth interpolation');
+assert(goldSmoke.includes('const [fromX, fromY] = particleForm(current'), 'Stable particle identities used for morph');
+assert(goldSmoke.includes('const [toX, toY] = particleForm(next'), 'Particles interpolate into the next form');
+assert(goldSmoke.includes('shapeX += (toX - fromX) * blend'), 'Morphing is continuous');
+assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'), 'Cursor swirl preserved during morph');
+
 assert(goldSmoke.includes('const centerX = width * (mobile ? .54 : .59);'), 'Golden cloud is right-aligned on desktop');
 assert(goldSmoke.includes('const centerY = height * (mobile ? .42 : .50);'), 'Golden cloud vertical placement updated');
 assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'), 'Original cursor-driven swirl restored');
@@ -93,3 +108,5 @@ console.log('PASS: hero-only gold cursor, continuous hover trail, original rest-
 
 
 console.log('PASS: right-positioned original golden cloud; light-theme golden dust and blue cursor highlights; dark palette and project atlas retained.');
+
+console.log('PASS: smoothly morphing golden nebula, infinity, galaxy and bloom forms with original cursor lighting preserved.');
