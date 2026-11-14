@@ -45,7 +45,7 @@ export function SoundToggle() {
             }
           }}
         >
-          <summary aria-label="Adjust sound volume">⌁</summary>
+          <summary aria-label="Adjust sound volume">···</summary>
           <div className="sound-popover">
             <label htmlFor="sound-volume">
               Sound level <output>{level}%</output>

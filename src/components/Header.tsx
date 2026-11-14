@@ -84,12 +84,14 @@ export function Header() {
           <SoundToggle />
           <button
             type="button"
+            className="theme-switch"
             onClick={changeTheme}
             aria-label={
               "Switch to " + (theme === "dark" ? "light" : "dark") + " mode"
             }
           >
-            {theme === "dark" ? "☼ Light" : "◐ Dark"}
+            <span aria-hidden="true">{theme === "dark" ? "☼" : "◐"}</span>
+            <span className="theme-switch-label">{theme === "dark" ? "Light" : "Dark"}</span>
           </button>
           <button
             ref={toggle}

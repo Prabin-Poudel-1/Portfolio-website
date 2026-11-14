@@ -8,6 +8,7 @@ export function CustomCursor() {
     const root = overlay.current!;
     const dot = root.querySelector<HTMLElement>(".cursor-dot")!;
     const ring = root.querySelector<HTMLElement>(".cursor-ring")!;
+    const aura = root.querySelector<HTMLElement>(".cursor-aura")!;
     const label = root.querySelector<HTMLElement>(".cursor-label")!;
     const canvas = root.querySelector("canvas")!;
     const ctx = canvas.getContext("2d");
@@ -16,7 +17,7 @@ export function CustomCursor() {
     const size = 320, ratio = Math.min(devicePixelRatio || 1, 2);
     canvas.width = canvas.height = size * ratio;
     ctx?.scale(ratio, ratio);
-    let x = 0, y = 0, rx = 0, ry = 0, shown = false, down = false;
+    let x = 0, y = 0, rx = 0, ry = 0, gx = 0, gy = 0, shown = false, down = false;
     let frame = 0, lastFrame = 0, released = 0, speed = 0;
     let points: Point[] = [];
     let hoverLabel = "";
@@ -75,13 +76,19 @@ export function CustomCursor() {
     const tick = (now: number) => {
       frame = 0;
       if (!shown) return;
-      const ease = 1 - Math.exp(-Math.min(now - lastFrame || 16, 40) / 65);
+      const step = Math.min(now - lastFrame || 16, 40);
+      const ease = 1 - Math.exp(-step / 65);
+      const glowEase = 1 - Math.exp(-step / 115);
       lastFrame = now;
       rx += (x - rx) * ease;
       ry += (y - ry) * ease;
+      gx += (x - gx) * glowEase;
+      gy += (y - gy) * glowEase;
       position(ring, rx, ry);
+      position(aura, gx - 130, gy - 130);
       const tail = drawTail(now);
-      if (tail || Math.hypot(x - rx, y - ry) > .1) frame = requestAnimationFrame(tick);
+      if (tail || Math.hypot(x - rx, y - ry) > .1 || Math.hypot(x - gx, y - gy) > .2)
+        frame = requestAnimationFrame(tick);
     };
     const request = () => { if (!frame) frame = requestAnimationFrame(tick); };
     const move = (e: PointerEvent) => {
@@ -89,7 +96,7 @@ export function CustomCursor() {
       const el = document.elementFromPoint(e.clientX, e.clientY);
       if (!el || el.closest(native)) { clear(); return; }
       x = e.clientX; y = e.clientY;
-      if (!shown) { rx = x; ry = y; lastFrame = performance.now(); }
+      if (!shown) { rx = x; ry = y; gx = x; gy = y; lastFrame = performance.now(); }
       shown = true;
       root.dataset.visible = "true";
       document.documentElement.classList.add("custom-cursor-active");
@@ -164,6 +171,7 @@ export function CustomCursor() {
   }, []);
   return (
     <div ref={overlay} className="custom-cursor" aria-hidden="true" data-visible="false">
+      <span className="cursor-aura" />
       <canvas className="cursor-comet" />
       <span className="cursor-ring" />
       <span className="cursor-dot" />

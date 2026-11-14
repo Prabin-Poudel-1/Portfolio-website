@@ -3,7 +3,21 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 const css = readFileSync('theme.css', 'utf8');
-for (const token of ['--ink-0: #0F1420', '--text: #E8ECF3', '--accent: #60A5FA', '--paper-0: #F7F6F2', '--paper-1: #FFFFFF', '--text: #12171F', '--editorial: #B45309', '--accent: #15803D', '--particle: #60A5FA', '--particle: #B45309']) assert(css.includes(token), token);
+for (const token of [
+  '--ink-0: #090A10',
+  '--ink-1: #12141D',
+  '--text: #EEF0F7',
+  '--paper-0: #FFFFFF',
+  '--paper-1: #FFFFFF',
+  '--bg: #FFFFFF',
+  '--text: #111827',
+  '--muted: #4B5563',
+  '--accent: #1D4ED8',
+  '--border: #E5E7EB',
+  '--glass-strong: #FFFFFF',
+  '--font-display: ui-sans-serif',
+  '--font-body: ui-sans-serif',
+]) assert(css.includes(token), 'Missing theme token: ' + token);
 const listeners = new Map(), frames = new Map();
 let id = 0, intersection, motionChange, disconnected = false, draws = 0;
 const reduced = { matches: false, addEventListener: (_, fn) => { motionChange = fn; }, removeEventListener: () => { motionChange = undefined; } };
@@ -28,45 +42,35 @@ reduced.matches = false; motionChange(); assert.equal(frames.size, 1);
 intersection([{ isIntersecting: false }]); assert.equal(frames.size, 0);
 vm.runInContext('stop()', context); assert(disconnected); assert.equal(listeners.size, 0); assert.equal(motionChange, undefined);
 const hero = readFileSync('src/sections/Hero.tsx','utf8');
-assert.equal((hero.match(/<HeroFlow /g)||[]).length,1);
-assert(css.includes('pointer-events: none'));
+assert(!hero.includes('HeroFlow'), 'No luminous canvas should be mounted');
+assert(!css.includes('.hero-flow'), 'Remove obsolete luminous canvas styling');
 const diagram=readFileSync('src/components/SystemDiagram.tsx','utf8');
 assert(diagram.includes('cycle >= 6'));
 assert(!diagram.slice(diagram.indexOf('const stop'),diagram.indexOf('const node')).includes('playSound'));
-console.log('PASS: exact theme tokens; hero loop offscreen, visibility, reduced-motion and cleanup; single hero field; silent automatic node cycle. Browser visual checks remain separate.');
-
-const flow = readFileSync('src/components/HeroFlow.tsx', 'utf8');
-assert(flow.includes("getPropertyValue('--particle')"));
-assert(flow.includes('ctx.lineWidth = 1.3'));
-assert(flow.includes('.60 + influence'));
-assert(flow.includes('const TRAIL_POINTS = 34'));
-assert(flow.includes('new Float32Array(TRAIL_POINTS * 2)'));
-assert(flow.includes('(p.head + 1) % TRAIL_POINTS'));
-assert(flow.includes('(p.head - k + TRAIL_POINTS) % TRAIL_POINTS'));
-const samples = Number(flow.match(/const TRAIL_POINTS = (\d+)/)[1]);
-const groups = Number(flow.match(/const FADE_GROUPS = (\d+)/)[1]);
-const segments = Number(flow.match(/const SEGMENTS_PER_GROUP = (\d+)/)[1]);
-assert.equal(groups * segments, samples - 1, 'fade groups cover the entire trail without gaps');
-assert.equal(samples, 34);
-const countExpression = flow.match(/const count = (.+);/)[1];
-for (let baseCount = 0; baseCount <= 115; baseCount++) {
-  assert.equal(vm.runInNewContext(countExpression, { baseCount }), Math.round(baseCount * 2.5) * 2);
-}
-assert.equal(vm.runInNewContext(countExpression, { baseCount: 40 }), 200);
-assert.equal(vm.runInNewContext(countExpression, { baseCount: 115 }), 576);
-assert(flow.includes('const SPEED_MULTIPLIER = 3'));
-assert(flow.includes('const travel = dt * SPEED_MULTIPLIER'));
-assert(flow.includes('p.x += p.vx * travel; p.y += p.vy * travel;'));
-// Every circular head position covers all 33 adjacent segments, including wraparound.
-for (let head = 0; head < samples; head++) {
-  const edges = [];
-  for (let group = 0; group < groups; group++) {
-    for (let k = group * segments; k < (group + 1) * segments; k++) {
-      const a = (head - k + samples) % samples, b = (head - k - 1 + samples) % samples;
-      assert.equal((a - b + samples) % samples, 1);
-      edges.push(a);
-    }
-  }
-  assert.equal(new Set(edges).size, samples - 1);
-}
-console.log('PASS: dedicated particle palettes, 1.3px strokes, .60 leading opacity, 34-sample circular trails; exact doubled counts (200 mobile / 576 max desktop); 3× dt-scaled movement.');
+assert(!diagram.includes('FIELD NOTES / CONNECTED SYSTEMS'));
+assert(!diagram.includes('SELECT A NODE TO EXPLORE'));
+assert(!diagram.includes('<circle cx="48" cy="48" r="35"'));
+const projectPage = readFileSync('src/sections/Projects.tsx', 'utf8');
+const composition = readFileSync('src/styles/composition.css', 'utf8');
+const interactionStyle = readFileSync('src/styles/interactions.css', 'utf8');
+const cursor = readFileSync('src/components/CustomCursor.tsx', 'utf8');
+assert(!hero.includes('Try the Signal Lost Lab'));
+assert(!projectPage.includes('Technical detail, sources, and project boundaries'));
+assert(!projectPage.includes('From independent AI authorization to offline emergency communication.'));
+assert(projectPage.includes('Browse project documentation'));
+assert(interactionStyle.includes('.project-index > summary::after'));
+assert(!composition.includes('background-size: 28px 28px'));
+assert(cursor.includes('className="cursor-aura"'));
+assert(cursor.includes('const glowEase = 1 - Math.exp(-step / 115)'));
+assert(interactionStyle.includes('.custom-cursor[data-visible="true"] .cursor-aura'));
+assert(interactionStyle.includes('opacity: .585'), 'Cursor aura reduced by 35%');
+assert(interactionStyle.includes(':root[data-theme="light"] .cursor-aura'), 'Light-mode cursor glow visible');
+assert(css.includes('--cursor-glow-soft: rgba(29, 78, 216, .065)'), 'Light-mode blue glow');
+const about = readFileSync('src/sections/About.tsx', 'utf8');
+const header = readFileSync('src/components/Header.tsx', 'utf8');
+assert(about.includes('className="button cv-download"'), 'CV link styled as a button');
+assert(header.includes('className="theme-switch"'), 'Header theme control tagged');
+assert(header.includes('className="theme-switch-label"'), 'Mobile theme control labelled');
+assert(css.includes('.header .nav-wrap .navbar a'), 'Consistent navigation styling');
+assert(css.includes('.react-ready .header .nav-wrap .navbar.active'), 'Responsive menu preserved');
+console.log('PASS: CV download button, responsive header, 35% softer glow in both themes, and simplified portfolio content.');

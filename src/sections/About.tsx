@@ -38,7 +38,7 @@ export function About() {
           development practice.
         </p>
         <a
-          className="text-link"
+          className="button cv-download"
           href="cv.pdf?v=20261014-ai"
           download="Prabin-Poudel-CV.pdf"
         >

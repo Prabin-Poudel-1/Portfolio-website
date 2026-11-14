@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { HeroFlow } from "../components/HeroFlow";
 import { SystemDiagram } from "../components/SystemDiagram";
 import { HeroInterests } from "../components/HeroInterests";
 export function Hero() {
   const [motionPaused, setMotionPaused] = useState(false);
   return (
     <section className="home section-wrap" id="home">
-      <HeroFlow paused={motionPaused} />
       <div className="hero-topline">
-        <p className="eyebrow">Prabin Poudel / Engineering portfolio</p>
         <p className="availability">
           <span />
           Open to internships
@@ -32,7 +29,6 @@ export function Hero() {
           <a className="button primary" href="#portfolio">
             Explore my work ↗
           </a>
-          <a className="text-link hero-lab-link" href="/?demo=rescuer-sathi#portfolio">Try the Signal Lost Lab ↗</a>
           <a
             className="button"
             href="cv.pdf?v=20261014-ai"

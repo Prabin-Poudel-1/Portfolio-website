@@ -222,19 +222,41 @@
   margin-top: 35px;
   border-block: 1px solid var(--border);
 }
+.project-index {
+  border-block: none;
+}
 .project-index > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
-  padding: 24px 0;
-  font-size: 16px;
+  padding: 13px 20px;
+  margin-top: 8px;
+  margin-bottom: 22px;
+  min-height: 48px;
+  width: fit-content;
+  font: 650 14px/1.35 var(--font-body, system-ui, sans-serif);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  list-style: none;
+  transition: border-color 180ms ease, background-color 180ms ease;
 }
-.project-index > summary > span {
-  float: right;
-  font: 10px monospace;
-  color: var(--muted);
+.project-index > summary::-webkit-details-marker { display: none; }
+.project-index > summary::after {
+  content: "＋";
+  font-size: 18px;
+  line-height: 1;
+  color: var(--accent);
 }
-.project-index[open] > summary {
-  margin-bottom: 40px;
+.project-index[open] > summary::after { content: "−"; }
+.project-index > summary:hover {
+  border-color: var(--accent);
+  background: var(--panel-2);
 }
+.project-index > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.project-index[open] > summary { margin-bottom: 28px; }
 .project-archive {
   padding: 0;
 }
@@ -497,11 +519,6 @@
   .type-cover strong {
     font-size: 22px;
   }
-  .project-index > summary > span {
-    float: none;
-    display: block;
-    margin-top: 10px;
-  }
   .pending-projects {
     grid-template-columns: 1fr;
   }
@@ -609,6 +626,35 @@
 .custom-cursor[data-dragging="true"] .cursor-ring::before { width: 26px; height: 26px; margin: -13px; opacity: .9; }
 .cursor-label { padding: 20px 0 0 23px; color: var(--accent); font: 9px ui-monospace, monospace; letter-spacing: .1em; white-space: nowrap; text-shadow: 0 1px 2px var(--bg); }
 .cursor-comet { width: 320px; height: 320px; }
+/* One soft GPU-translated glow follows the existing cursor loop in both themes.
+   Reducing visible opacity from .9 to .585 lowers the glow by 35%. */
+.cursor-aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle,
+    var(--cursor-glow, rgba(167, 139, 250, .27)) 0%,
+    var(--cursor-glow-soft, rgba(167, 139, 250, .10)) 30%,
+    transparent 69%);
+  filter: blur(9px);
+  mix-blend-mode: screen;
+  will-change: transform;
+  transition: opacity 200ms ease;
+}
+.custom-cursor[data-visible="true"] .cursor-aura {
+  opacity: .585;
+}
+:root[data-theme="light"] .cursor-aura {
+  mix-blend-mode: normal;
+}
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {
+  .cursor-aura { display: none !important; }
+}
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html.custom-cursor-active, html.custom-cursor-active * { cursor: none !important; }
   html.custom-cursor-active :is(input, textarea, [contenteditable]:not([contenteditable="false"])) { cursor: text !important; }
