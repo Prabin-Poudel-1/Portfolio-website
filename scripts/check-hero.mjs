@@ -36,15 +36,18 @@ assert(!diagram.slice(diagram.indexOf('const stop'),diagram.indexOf('const node'
 console.log('PASS: graphite/ivory/blue theme tokens; hero loop offscreen, visibility, reduced-motion and cleanup; single hero field; silent automatic node cycle. Browser visual checks remain separate.');
 
 const flow = readFileSync('src/components/HeroFlow.tsx', 'utf8');
-assert(flow.includes("getPropertyValue('--text')"), 'Mist uses theme-aware monochrome ink');
-assert(flow.includes("getPropertyValue('--particle')"), 'Theme accent read');
-assert(flow.includes("getPropertyValue('--particle-secondary')"), 'Theme secondary accent read');
+assert(flow.includes("getPropertyValue('--smoke-ambient')"), 'Theme-aware golden mist');
+assert(flow.includes("getPropertyValue('--smoke-gold')"), 'Warm gold light reads theme token');
+assert(flow.includes("getPropertyValue('--smoke-flare')"), 'Golden cursor glow reads theme token');
 assert(flow.includes('const MOBILE_COUNT = 280'), 'Bounded mobile density');
 assert(flow.includes('const DESKTOP_COUNT = 900'), 'Bounded desktop density');
-assert(flow.includes('createRadialGradient'), 'Soft cloud sprites');
+assert(flow.includes('createRadialGradient'), 'Soft cloud sprites and golden cursor halo');
+assert(flow.includes('ctx.drawImage(brightGold'), 'Golden cursor glow applied to near-pointer particles');
+assert(css.includes('z-index: 2; pointer-events: none'), 'Cloud positioned above diagram without blocking clicks');
+assert(css.includes('.home > .home-content, .home > .hero-topline, .home > .hero-bottom'), 'Text and controls stay above mist');
 assert(flow.includes("ctx.globalCompositeOperation = dark ? 'screen' : 'source-over'"), 'Light/dark compositing');
 assert(flow.includes('pointer.vx * influence'), 'Cursor velocity response');
-assert(flow.includes('pointer.down ? 155 : 75'), 'Pointer press amplifies vortex');
+assert(flow.includes('pointer.down ? 48 : 24'), 'Pointer press amplifies a gentle vortex');
 assert(flow.includes("hero.addEventListener('pointermove'"), 'Cursor movement tracked');
 assert(flow.includes("hero.addEventListener('pointerdown'"), 'Mouse press tracked');
 assert(flow.includes('new ResizeObserver(resize)'), 'Resize supported');
