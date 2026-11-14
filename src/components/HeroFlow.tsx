@@ -17,13 +17,14 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
     let width = 1, height = 1, ratio = 1, particles: Particle[] = [];
-    let accent = '#60A5FA', editorial = accent;
+    let accent = '#3B82F6', editorial = '#7C8CFF', glow = '#DCEBFF';
     let bounds = hero.getBoundingClientRect();
     const pointer = { x: -1000, y: -1000, vx: 0, vy: 0, speed: 0, at: 0, inside: false };
     const colors = () => {
       const style = getComputedStyle(hero);
       accent = style.getPropertyValue('--particle').trim();
-      editorial = style.getPropertyValue('--editorial').trim();
+      editorial = style.getPropertyValue('--particle-secondary').trim() || accent;
+      glow = style.getPropertyValue('--particle-glow').trim() || '#DCEBFF';
       ctx.clearRect(0, 0, width, height);
     };
     const spawn = (existing?: Particle): Particle => {
@@ -60,10 +61,79 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     };
     const leave = () => { pointer.inside = false; };
     const scroll = () => { bounds = hero.getBoundingClientRect(); pointer.inside = false; };
+    // Coherent luminous ribbons overlay the existing independent particles.
+    // Bands share a central field and are displaced by the same pointer vortex.
+    // Keep a small fixed path count: CSS filter blur per individual particle is costly.
+    const drawRibbon = (time: number) => {
+      const dark = document.documentElement.dataset.theme !== 'light';
+      const glowStrength = dark ? 0.30 : 0.18;
+      const centerY = height * 0.57;
+      const amplitude = Math.min(80, height * 0.10);
+      const span = Math.max(150, width / 7);
+      const bands = 19;
+      const points = 52;
+      const range = Math.max(160, Math.min(width * .24, 280));
+      const paths: number[][] = [];
+      for (let band = 0; band < bands; band++) {
+        const track: number[] = [];
+        const offset = (band - (bands - 1) / 2) * Math.min(5, height * .006);
+        for (let point = 0; point <= points; point++) {
+          const x = width * point / points;
+          const undulation = Math.sin(x / span - time * .31) * amplitude
+            + Math.sin(x / (span * .57) + time * .19) * amplitude * .18;
+          let y = centerY + offset + undulation;
+          if (pointer.inside) {
+            const dx = x - pointer.x;
+            const dy = y - pointer.y;
+            const distance = Math.hypot(dx, dy);
+            const influence = Math.max(0, 1 - distance / range);
+            // A local, smooth vortex makes the streamlines wrap around the cursor.
+            const swirl = influence * influence * (34 + pointer.speed * 30);
+            y += dx / Math.max(22, distance) * swirl;
+            y += pointer.vy * influence * 13;
+          }
+          track.push(x, y);
+        }
+        paths.push(track);
+      }
+      const strokePaths = (lineWidth: number, alpha: number, color: string) => {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.globalAlpha = alpha;
+        for (let band = 0; band < bands; band++) {
+          const path = paths[band];
+          ctx.beginPath();
+          ctx.moveTo(path[0], path[1]);
+          for (let i = 2; i < path.length; i += 2) ctx.lineTo(path[i], path[i + 1]);
+          ctx.stroke();
+        }
+      };
+      ctx.save();
+      ctx.lineCap = 'round';
+      // Diffuse bloom is drawn only for a limited number of paths.
+      ctx.shadowBlur = dark ? 22 : 13;
+      ctx.shadowColor = glow;
+      strokePaths(dark ? 2.4 : 2.0, glowStrength * .46, glow);
+      ctx.shadowBlur = 0;
+      strokePaths(.85, dark ? .32 : .35, accent);
+      // Bright restrained core: varying color yields depth rather than a flat neon block.
+      ctx.lineWidth = 1;
+      for (let band = 0; band < bands; band += 3) {
+        const path = paths[band];
+        ctx.strokeStyle = band % 2 ? editorial : glow;
+        ctx.globalAlpha = dark ? .48 : .40;
+        ctx.beginPath();
+        ctx.moveTo(path[0], path[1]);
+        for (let i = 2; i < path.length; i += 2) ctx.lineTo(path[i], path[i + 1]);
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
     const draw = (dt: number, time: number) => {
       if (ratio !== Math.min(devicePixelRatio || 1, 1.75)) resize();
       // Redraw bounded trails: alpha decay on an 8-bit canvas otherwise leaves persistent ghosts.
       ctx.clearRect(0, 0, width, height);
+      drawRibbon(time);
       ctx.lineCap = 'round'; ctx.lineWidth = 1.3;
       pointer.speed *= Math.exp(-dt * 3.5);
       pointer.vx *= Math.exp(-dt * 3.5); pointer.vy *= Math.exp(-dt * 3.5);
