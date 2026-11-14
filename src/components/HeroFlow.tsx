@@ -1,132 +1,227 @@
 import { useEffect, useRef } from 'react';
 import { animateHero } from '../utils/heroMotion';
 
-// 34 samples / 33 segments, fully covered by eleven fading groups.
-const TRAIL_POINTS = 34;
-const FADE_GROUPS = 11;
-const SPEED_MULTIPLIER = 3;
-const SEGMENTS_PER_GROUP = 3;
+/**
+ * Atmospheric particle sculpture, inspired by experimental WebGL portfolios.
+ * Original Canvas 2D implementation: no third-party assets, no extra dependencies.
+ * Existing Hero controls, project network, sound and animation loop are untouched.
+ */
+type MistParticle = {
+  angle: number;
+  radius: number;
+  depth: number;
+  phase: number;
+  speed: number;
+  size: number;
+  kind: number;
+  x: number;
+  y: number;
+  ready: boolean;
+};
 
-type Particle = { x: number; y: number; vx: number; vy: number; age: number; life: number; amber: boolean; trail: Float32Array; head: number; filled: number };
+const TAU = Math.PI * 2;
+const MOBILE_COUNT = 280;
+const DESKTOP_COUNT = 900;
 
-/** Decorative, hero-contained flow; no React updates, pointer capture or external assets. */
+const hexRGBA = (hex: string, opacity: number) => {
+  const clean = hex.trim().replace('#', '');
+  const six = clean.length === 3 ? clean.split('').map(v => v + v).join('') : clean;
+  if (!/^[a-f\d]{6}$/i.test(six)) return `rgba(220, 226, 245, ${opacity})`;
+  const n = parseInt(six, 16);
+  return `rgba(${(n >>> 16) & 255}, ${(n >>> 8) & 255}, ${n & 255}, ${opacity})`;
+};
+
+function makeMistSprite(color: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 96;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
+  const gradient = ctx.createRadialGradient(48, 48, 0, 48, 48, 48);
+  gradient.addColorStop(0, hexRGBA(color, .75));
+  gradient.addColorStop(.18, hexRGBA(color, .43));
+  gradient.addColorStop(.48, hexRGBA(color, .13));
+  gradient.addColorStop(1, hexRGBA(color, 0));
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 96, 96);
+  return canvas;
+}
+
 export function HeroFlow({ paused }: { paused: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
-    const canvas = ref.current!, hero = canvas.parentElement!;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) return;
-    let width = 1, height = 1, ratio = 1, particles: Particle[] = [];
-    let accent = '#3B82F6', editorial = '#7C8CFF';
+    const canvas = ref.current;
+    const hero = canvas?.parentElement;
+    const ctx = canvas?.getContext('2d', { alpha: true });
+    if (!canvas || !hero || !ctx) return;
+
+    let width = 1;
+    let height = 1;
+    let ratio = 1;
+    let dark = true;
+    let particles: MistParticle[] = [];
+    let mist = makeMistSprite('#F6F1E8');
+    let highlight = makeMistSprite('#7C8CFF');
+    let ink = '#F6F1E8';
+    let accent = '#3B82F6';
     let bounds = hero.getBoundingClientRect();
-    const pointer = { x: -1000, y: -1000, vx: 0, vy: 0, speed: 0, at: 0, inside: false };
-    const colors = () => {
+
+    const pointer = {
+      x: -1000, y: -1000, vx: 0, vy: 0, speed: 0,
+      at: 0, inside: false, down: false,
+    };
+
+    const updateColors = () => {
       const style = getComputedStyle(hero);
-      accent = style.getPropertyValue('--particle').trim();
-      editorial = style.getPropertyValue('--particle-secondary').trim() || accent;
+      dark = document.documentElement.dataset.theme !== 'light';
+      ink = style.getPropertyValue('--text').trim() || (dark ? '#F6F1E8' : '#1F232B');
+      accent = style.getPropertyValue('--particle').trim() || '#3B82F6';
+      const secondary = style.getPropertyValue('--particle-secondary').trim() || '#7C8CFF';
+      mist = makeMistSprite(ink);
+      highlight = makeMistSprite(secondary);
       ctx.clearRect(0, 0, width, height);
     };
-    const spawn = (existing?: Particle): Particle => {
-      // Recycling reuses both the particle and its buffer; allocations occur only at resize.
-      const p = existing || { x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 0, amber: false,
-        trail: new Float32Array(TRAIL_POINTS * 2), head: 0, filled: 0 };
-      p.x = Math.random() * width; p.y = Math.random() * height;
-      p.vx = 0; p.vy = 0; p.age = 0;
-      p.life = 10 + Math.random() * 12; p.amber = Math.random() < .12;
-      p.head = 0; p.filled = 0;
-      return p;
-    };
+
+    const createParticle = (): MistParticle => ({
+      angle: Math.random() * TAU,
+      // Several layers of a warped 3D-looking cloud; no linear wave ribbons.
+      radius: Math.pow(Math.random(), .72),
+      depth: Math.random(),
+      phase: Math.random() * TAU,
+      speed: .55 + Math.random() * .9,
+      size: .45 + Math.random() * 1.4,
+      kind: Math.random(),
+      x: 0, y: 0, ready: false,
+    });
+
     const resize = () => {
       bounds = hero.getBoundingClientRect();
-      width = hero.clientWidth; height = hero.clientHeight;
-      ratio = Math.min(devicePixelRatio || 1, 1.75);
-      canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
+      width = Math.max(1, hero.clientWidth);
+      height = Math.max(1, hero.clientHeight);
+      ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      const baseCount = width < 700 ? 40 : Math.min(115, Math.round(width * height / 12500));
-      const count = Math.round(baseCount * 2.5) * 2;
-      particles = Array.from({ length: count }, () => { const p = spawn(); p.age = Math.random() * p.life; return p; });
-      colors();
+      const density = Math.min(1, width * height / 800000);
+      const count = width < 700 ? MOBILE_COUNT : Math.round(DESKTOP_COUNT * Math.max(.6, density));
+      particles = Array.from({ length: count }, createParticle);
+      updateColors();
     };
-    const move = (e: PointerEvent) => {
-      if (e.pointerType === 'touch') return;
-      const now = performance.now(), x = e.clientX - bounds.left, y = e.clientY - bounds.top;
+
+    const move = (event: PointerEvent) => {
+      if (event.pointerType === 'touch') return;
+      const now = performance.now();
+      const x = event.clientX - bounds.left;
+      const y = event.clientY - bounds.top;
       const dt = Math.max(8, now - pointer.at);
       if (pointer.inside) {
         pointer.vx = (x - pointer.x) / dt;
         pointer.vy = (y - pointer.y) / dt;
-        pointer.speed = Math.min(2.8, Math.hypot(pointer.vx, pointer.vy));
+        pointer.speed = Math.min(2.6, Math.hypot(pointer.vx, pointer.vy));
       }
-      Object.assign(pointer, { x, y, at: now, inside: true });
+      pointer.x = x;
+      pointer.y = y;
+      pointer.at = now;
+      pointer.inside = true;
     };
-    const leave = () => { pointer.inside = false; };
+    const leave = () => { pointer.inside = false; pointer.down = false; };
+    const down = (event: PointerEvent) => { if (event.pointerType !== 'touch') pointer.down = true; };
+    const up = () => { pointer.down = false; };
     const scroll = () => { bounds = hero.getBoundingClientRect(); pointer.inside = false; };
+
     const draw = (dt: number, time: number) => {
-      if (ratio !== Math.min(devicePixelRatio || 1, 1.75)) resize();
-      // Redraw bounded trails: alpha decay on an 8-bit canvas otherwise leaves persistent ghosts.
+      if (ratio !== Math.min(window.devicePixelRatio || 1, 1.5)) resize();
       ctx.clearRect(0, 0, width, height);
-      ctx.lineCap = 'round'; ctx.lineWidth = 1.3;
-      pointer.speed *= Math.exp(-dt * 3.5);
-      pointer.vx *= Math.exp(-dt * 3.5); pointer.vy *= Math.exp(-dt * 3.5);
-      const travel = dt * SPEED_MULTIPLIER;
+      pointer.vx *= Math.exp(-dt * 5);
+      pointer.vy *= Math.exp(-dt * 5);
+      pointer.speed *= Math.exp(-dt * 4.5);
+
+      const mobile = width < 700;
+      const centerX = width * (mobile ? .59 : .73);
+      const centerY = height * (mobile ? .47 : .48);
+      const spreadX = Math.min(width * (mobile ? .40 : .31), 385);
+      const spreadY = Math.min(height * .39, 305);
+      const settle = 1 - Math.exp(-dt * (pointer.inside ? 8 : 3.5));
+      const cursorRadius = pointer.down ? 260 : 195;
+      ctx.globalCompositeOperation = dark ? 'screen' : 'source-over';
+
       for (const p of particles) {
-        p.age += dt;
-        if (p.age >= p.life || p.x < -20 || p.x > width + 20 || p.y < -20 || p.y > height + 20) spawn(p);
-        const angle = .55 + Math.sin(p.x * .004 + time * .09) * 1.2 + Math.cos(p.y * .005 - time * .07) * .85;
-        let vx = Math.cos(angle) * 32, vy = Math.sin(angle) * 32;
-        const dx = p.x - pointer.x, dy = p.y - pointer.y, distance = pointer.inside ? Math.hypot(dx, dy) : 0;
-        const influence = pointer.inside ? Math.max(0, 1 - distance / 165) ** 2 : 0;
-        const force = influence * (38 + pointer.speed * 85);
-        vx += (-dy / Math.max(12, distance)) * force + pointer.vx * influence * 10;
-        vy += (dx / Math.max(12, distance)) * force + pointer.vy * influence * 10;
-        const ease = 1 - Math.exp(-dt * 4);
-        p.vx += (vx - p.vx) * ease; p.vy += (vy - p.vy) * ease;
-        p.x += p.vx * travel; p.y += p.vy * travel;
-        const envelope = Math.min(1, p.age / 1.3, (p.life - p.age) / 1.5);
-        p.head = (p.head + 1) % TRAIL_POINTS;
-        p.trail[p.head * 2] = p.x; p.trail[p.head * 2 + 1] = p.y;
-        p.filled = Math.min(TRAIL_POINTS, p.filled + 1);
-        ctx.strokeStyle = p.amber ? editorial : accent;
-        // Cache per-particle brightness; skip invisible/newborn trails at the higher count.
-        const opacity = envelope * Math.min(.75, .60 + influence * pointer.speed * .2);
-        if (opacity < .001 || p.filled < 2) continue;
-        for (let group = 0; group < FADE_GROUPS; group++) {
-          const first = group * SEGMENTS_PER_GROUP;
-          if (first >= p.filled - 1) break;
-          ctx.globalAlpha = opacity * (1 - group / FADE_GROUPS);
-          ctx.beginPath();
-          for (let k = first; k <= Math.min(first + SEGMENTS_PER_GROUP, p.filled - 1); k++) {
-            const index = ((p.head - k + TRAIL_POINTS) % TRAIL_POINTS) * 2;
-            if (k === first) ctx.moveTo(p.trail[index], p.trail[index + 1]);
-            else ctx.lineTo(p.trail[index], p.trail[index + 1]);
-          }
-          ctx.stroke();
+        const spin = p.angle + time * (.085 + p.depth * .060) * p.speed;
+        const r = p.radius + Math.sin(p.phase + time * .22) * .022;
+        const a = spin + (1 - r) * 1.75;
+        // Asymmetric wandering contours create soft volumetric folds and depth.
+        const fold = Math.sin(a * 3.1 + time * .24 + p.phase) * 21 * p.depth;
+        const anchorX = centerX + Math.cos(a) * spreadX * r + fold;
+        const anchorY = centerY + Math.sin(a) * spreadY * r
+          + Math.cos(a * 2 - time * .17 + p.phase) * 19 * p.depth;
+
+        let targetX = anchorX;
+        let targetY = anchorY;
+        let influence = 0;
+        if (pointer.inside) {
+          const dx = anchorX - pointer.x;
+          const dy = anchorY - pointer.y;
+          const distance = Math.hypot(dx, dy);
+          influence = Math.pow(Math.max(0, 1 - distance / cursorRadius), 2);
+          const turn = influence * (pointer.down ? 155 : 75);
+          const safe = Math.max(16, distance);
+          targetX += (-dy / safe) * turn + pointer.vx * influence * 34;
+          targetY += (dx / safe) * turn + pointer.vy * influence * 34;
+        }
+        if (!p.ready) {
+          p.x = anchorX;
+          p.y = anchorY;
+          p.ready = true;
+        }
+        p.x += (targetX - p.x) * settle;
+        p.y += (targetY - p.y) * settle;
+
+        // Soft translucent dots overlap into a cloud, instead of tracing neon lines.
+        const sprite = p.kind < .12 ? highlight : mist;
+        const spotSize = (12 + p.size * 30) * (.55 + p.depth * .9);
+        const lit = Math.min(1, influence * (1 + pointer.speed * .3));
+        ctx.globalAlpha = (dark ? .19 : .12) * (.35 + p.depth * .7) * (1 + lit * .42);
+        ctx.drawImage(sprite, p.x - spotSize / 2, p.y - spotSize / 2, spotSize, spotSize);
+
+        // A sparse crisp layer makes the haze feel particulate at close range.
+        if (p.kind > .955) {
+          const size = .55 + p.depth * 1.3;
+          ctx.fillStyle = p.kind > .985 ? accent : ink;
+          ctx.globalAlpha = (dark ? .26 : .24) + lit * .24;
+          ctx.fillRect(p.x, p.y, size, size);
         }
       }
-      if (pointer.inside && pointer.speed > .18) {
-        ctx.strokeStyle = accent;
-        ctx.globalAlpha = Math.min(.12, pointer.speed * .045);
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(pointer.x - pointer.vx * 23, pointer.y - pointer.vy * 23);
-        ctx.quadraticCurveTo(pointer.x - pointer.vx * 9 - pointer.vy * 3, pointer.y - pointer.vy * 9 + pointer.vx * 3, pointer.x, pointer.y);
-        ctx.stroke();
-      }
+      ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
     };
+
     resize();
-    const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(hero);
-    const theme = new MutationObserver(colors); theme.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(hero);
+    const themeObserver = new MutationObserver(updateColors);
+    themeObserver.observe(document.documentElement, {
+      attributes: true, attributeFilter: ['data-theme'],
+    });
     hero.addEventListener('pointermove', move, { passive: true });
     hero.addEventListener('pointerleave', leave);
+    hero.addEventListener('pointerdown', down, { passive: true });
+    window.addEventListener('pointerup', up, { passive: true });
     window.addEventListener('scroll', scroll, { passive: true });
     window.addEventListener('resize', resize, { passive: true });
     const stop = paused ? () => {} : animateHero(hero, draw);
     return () => {
-      stop(); resizeObserver.disconnect(); theme.disconnect();
-      hero.removeEventListener('pointermove', move); hero.removeEventListener('pointerleave', leave);
-      window.removeEventListener('scroll', scroll); window.removeEventListener('resize', resize);
+      stop();
+      resizeObserver.disconnect();
+      themeObserver.disconnect();
+      hero.removeEventListener('pointermove', move);
+      hero.removeEventListener('pointerleave', leave);
+      hero.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('scroll', scroll);
+      window.removeEventListener('resize', resize);
       ctx.clearRect(0, 0, width, height);
     };
   }, [paused]);
+
   return <canvas className="hero-flow" ref={ref} aria-hidden="true" />;
 }
