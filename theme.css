@@ -21,6 +21,9 @@
   --smoke-ambient: #A78B63;
   --smoke-gold: #D7AE6D;
   --smoke-flare: #FFE2A0;
+  --sculpture-base: #C4C5C8;
+  --sculpture-gold: #E3BC7B;
+  --sculpture-flare: #FFE4A3;
   --accent-ink: #FFFFFF;
   --border: #374151;
   --line: var(--border);
@@ -52,6 +55,9 @@
   --smoke-ambient: #988367;
   --smoke-gold: #AC772B;
   --smoke-flare: #D79A39;
+  --sculpture-base: #64626A;
+  --sculpture-gold: #B57B2F;
+  --sculpture-flare: #E7AB4B;
   --accent-ink: #FFFFFF;
   --border: #D8DDE6;
   --line: var(--border);
