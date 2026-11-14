@@ -6,6 +6,9 @@ const TRAIL_POINTS = 34;
 const FADE_GROUPS = 11;
 const SPEED_MULTIPLIER = 3;
 const SEGMENTS_PER_GROUP = 3;
+const STREAMLINE_COUNT_DESKTOP = 22;
+const STREAMLINE_COUNT_MOBILE = 13;
+const STREAMLINE_STEPS = 52;
 
 type Particle = { x: number; y: number; vx: number; vy: number; age: number; life: number; amber: boolean; trail: Float32Array; head: number; filled: number };
 
@@ -17,13 +20,15 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
     let width = 1, height = 1, ratio = 1, particles: Particle[] = [];
-    let accent = '#60A5FA', editorial = accent;
+    let accent = '#3B82F6', secondary = '#7C8CFF', highlight = '#DCEBFF', lightTheme = false;
     let bounds = hero.getBoundingClientRect();
     const pointer = { x: -1000, y: -1000, vx: 0, vy: 0, speed: 0, at: 0, inside: false };
     const colors = () => {
       const style = getComputedStyle(hero);
       accent = style.getPropertyValue('--particle').trim();
-      editorial = style.getPropertyValue('--editorial').trim();
+      secondary = style.getPropertyValue('--particle-secondary').trim() || '#7C8CFF';
+      highlight = style.getPropertyValue('--particle-highlight').trim() || '#DCEBFF';
+      lightTheme = document.documentElement.dataset.theme === 'light';
       ctx.clearRect(0, 0, width, height);
     };
     const spawn = (existing?: Particle): Particle => {
@@ -60,10 +65,95 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     };
     const leave = () => { pointer.inside = false; };
     const scroll = () => { bounds = hero.getBoundingClientRect(); pointer.inside = false; };
+    // Connected, luminous ribbons complement the existing fast particle field.
+    // The pointer displaces actual curve geometry, not merely its brightness.
+    const drawStreamlines = (time: number) => {
+      const count = width < 700 ? STREAMLINE_COUNT_MOBILE : STREAMLINE_COUNT_DESKTOP;
+      const xStart = -width * 0.10, xEnd = width * 1.10;
+      const span = xEnd - xStart;
+      const phase = time * 0.62;
+      const centerY = height * (width < 700 ? 0.72 : 0.70);
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (let strand = 0; strand < count; strand++) {
+        const lane = strand / (count - 1) - 0.5;
+        let previousX = 0, previousY = 0, moteX = 0, moteY = 0;
+        const moteAt = (time * 0.095 + strand * 0.137) % 1;
+        ctx.beginPath();
+        for (let step = 0; step <= STREAMLINE_STEPS; step++) {
+          const along = step / STREAMLINE_STEPS;
+          const x = xStart + span * along;
+          const wave =
+            Math.sin(along * 7.4 - phase + lane * 1.6) * (23 + Math.abs(lane) * 28) +
+            Math.sin(along * 12.8 + phase * 0.54 + lane * 2) * 11;
+          let px = x;
+          let py = centerY + lane * Math.min(150, height * 0.22) + wave;
+          if (pointer.inside) {
+            const dx = px - pointer.x, dy = py - pointer.y;
+            const distance = Math.hypot(dx, dy);
+            const radius = width < 700 ? 145 : 205;
+            if (distance < radius) {
+              const falloff = (1 - distance / radius) ** 2;
+              const inv = 1 / Math.max(28, distance);
+              const disturbance = (54 + pointer.speed * 52) * falloff;
+              px += dx * inv * disturbance - dy * inv * pointer.speed * 23 * falloff;
+              py += dy * inv * disturbance + dx * inv * pointer.speed * 23 * falloff;
+              px += pointer.vx * 45 * falloff;
+              py += pointer.vy * 45 * falloff;
+            }
+          }
+          if (step === 0) ctx.moveTo(px, py);
+          else {
+            const midX = (previousX + px) * 0.5;
+            const midY = (previousY + py) * 0.5;
+            ctx.quadraticCurveTo(previousX, previousY, midX, midY);
+            if (moteAt >= (step - 1) / STREAMLINE_STEPS && moteAt < along) {
+              const fraction = moteAt * STREAMLINE_STEPS - (step - 1);
+              moteX = previousX + (px - previousX) * fraction;
+              moteY = previousY + (py - previousY) * fraction;
+            }
+          }
+          previousX = px;
+          previousY = py;
+        }
+        ctx.lineTo(previousX, previousY);
+        const prominence = 1 - Math.abs(lane) * 0.55;
+        // Three intentionally distinct passes: atmospheric light, tinted
+        // luminous glass, and an optically sharp filament.
+        ctx.strokeStyle = secondary;
+        ctx.shadowColor = secondary;
+        ctx.shadowBlur = lightTheme ? 7 : 17;
+        ctx.lineWidth = lightTheme ? 3.5 : 4.5;
+        ctx.globalAlpha = prominence * (lightTheme ? 0.12 : 0.17);
+        ctx.stroke();
+        ctx.shadowBlur = lightTheme ? 3 : 7;
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 1.55;
+        ctx.globalAlpha = prominence * (lightTheme ? 0.34 : 0.40);
+        ctx.stroke();
+        ctx.shadowBlur = lightTheme ? 0 : 3;
+        ctx.strokeStyle = strand % 4 === 0 && !lightTheme ? highlight : accent;
+        ctx.lineWidth = strand % 4 === 0 ? 0.9 : 0.72;
+        ctx.globalAlpha = prominence * (lightTheme ? 0.65 : 0.68);
+        ctx.stroke();
+        if (strand % 2 === 0) {
+          ctx.beginPath();
+          ctx.arc(moteX, moteY, strand % 4 === 0 ? 1.8 : 1.25, 0, Math.PI * 2);
+          ctx.fillStyle = lightTheme ? accent : highlight;
+          ctx.shadowColor = lightTheme ? accent : highlight;
+          ctx.shadowBlur = lightTheme ? 5 : 12;
+          ctx.globalAlpha = lightTheme ? 0.78 : 0.91;
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+    };
     const draw = (dt: number, time: number) => {
       if (ratio !== Math.min(devicePixelRatio || 1, 1.75)) resize();
       // Redraw bounded trails: alpha decay on an 8-bit canvas otherwise leaves persistent ghosts.
       ctx.clearRect(0, 0, width, height);
+      drawStreamlines(time);
       ctx.lineCap = 'round'; ctx.lineWidth = 1.3;
       pointer.speed *= Math.exp(-dt * 3.5);
       pointer.vx *= Math.exp(-dt * 3.5); pointer.vy *= Math.exp(-dt * 3.5);
@@ -85,7 +175,7 @@ export function HeroFlow({ paused }: { paused: boolean }) {
         p.head = (p.head + 1) % TRAIL_POINTS;
         p.trail[p.head * 2] = p.x; p.trail[p.head * 2 + 1] = p.y;
         p.filled = Math.min(TRAIL_POINTS, p.filled + 1);
-        ctx.strokeStyle = p.amber ? editorial : accent;
+        ctx.strokeStyle = p.amber ? secondary : accent;
         // Cache per-particle brightness; skip invisible/newborn trails at the higher count.
         const opacity = envelope * Math.min(.75, .60 + influence * pointer.speed * .2);
         if (opacity < .001 || p.filled < 2) continue;
