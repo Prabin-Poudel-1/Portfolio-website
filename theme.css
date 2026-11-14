@@ -33,6 +33,7 @@
   --radius-sm: 8px;
   --radius-md: 16px;
   --cursor-glow: rgba(167, 139, 250, .27);
+  --cursor-glow-soft: rgba(167, 139, 250, .10);
   /* Dark-mode frosted-glass surfaces; no hero canvas is rendered. */
   --glass-surface: rgba(18, 20, 29, .63);
   --glass-strong: rgba(18, 20, 29, .80);
@@ -73,6 +74,8 @@
   --glass-shadow: 0 8px 24px #1118270a;
   --font-display: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --cursor-glow: rgba(29, 78, 216, .18);
+  --cursor-glow-soft: rgba(29, 78, 216, .065);
 }
 body {
   background: var(--bg);
