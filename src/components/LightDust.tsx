@@ -78,8 +78,9 @@ void main() {
   float kernel = exp(-r2 * 3.7);
   float fog = exp(-r2 * 2.9);
   float light = pow(vLight, 1.12);
-  vec3 color = mix(uNeutral, uGold, light * .92);
-  color = mix(color, uFlare, pow(vLight, 3.) * .68);
+  // Warm, restrained gold at rest; cursor proximity turns nearby dust light blue.
+  vec3 color = mix(uNeutral, uGold, light * .82);
+  color = mix(color, uFlare, pow(vLight, 2.4) * .78);
   color *= mix(.5, 1.22, vDepth);
   float alpha = mix(kernel * .59, fog * .13, vHaze) * vOpacity;
   if (uDark < .5) {
