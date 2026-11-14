@@ -30,7 +30,6 @@ export function Hero() {
           <a className="button primary" href="#portfolio">
             Explore my work ↗
           </a>
-          <a className="text-link hero-lab-link" href="/?demo=rescuer-sathi#portfolio">Try the Signal Lost Lab ↗</a>
           <a
             className="button"
             href="cv.pdf?v=20261014-ai"
