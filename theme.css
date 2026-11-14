@@ -32,6 +32,12 @@
   --globe-shadow: #0D1117;
   --radius-sm: 8px;
   --radius-md: 16px;
+  /* Controlled frosted-glass surfaces; the hero streamlines remain behind them. */
+  --glass-surface: rgba(17, 24, 39, .58);
+  --glass-strong: rgba(17, 24, 39, .78);
+  --glass-border: rgba(220, 235, 255, .20);
+  --glass-edge: rgba(220, 235, 255, .09);
+  --glass-shadow: 0 16px 48px rgba(0, 0, 0, .20);
 }
 :root[data-theme="light"] {
   --bg: var(--paper-0);
@@ -58,6 +64,11 @@
   --globe-land: #4B5563;
   --globe-grid: #B4C3D6;
   --globe-shadow: #BFC8D5;
+  --glass-surface: rgba(255, 255, 255, .57);
+  --glass-strong: rgba(246, 241, 232, .82);
+  --glass-border: rgba(255, 255, 255, .86);
+  --glass-edge: rgba(59, 130, 246, .07);
+  --glass-shadow: 0 16px 42px rgba(31, 35, 43, .09);
 }
 body {
   background: var(--bg);
@@ -81,8 +92,11 @@ p {
   text-wrap: pretty;
 }
 .header {
-  background: var(--header);
-  border-bottom: 1px solid var(--border);
+  background: var(--glass-strong);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 var(--glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
 }
 .nav-wrap {
   border: 0;
@@ -610,6 +624,56 @@ pre {
 .journey-guide a { transition: color 180ms ease; }
 .journey-guide a[aria-current="step"] { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 6px; }
 .engineering-notes summary, .lab-stage-guide summary { font-size: 13px; line-height: 1.7; }
+
+/* Selective frosted glass: navigation, showcases and informational shells only.
+   Keep interactive demos, diagrams, input fields, and primary CTAs opaque. */
+.nav-actions button,
+.theme-toggle,
+.menu-toggle,
+.availability,
+.node-inspector,
+.case-nav,
+.command-dialog,
+#contact-form,
+.about {
+  background: var(--glass-strong);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-edge);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
+  backdrop-filter: blur(16px) saturate(135%);
+}
+.cinema {
+  background: var(--glass-surface);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-edge);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
+}
+.button:not(.primary) {
+  background: var(--glass-surface);
+  border-color: var(--glass-border);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+}
+.button:not(.primary):hover {
+  background: var(--glass-strong);
+  border-color: var(--accent);
+}
+@media (max-width: 700px) {
+  .header, .cinema, .about, #contact-form, .command-dialog {
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .header, .nav-actions button, .theme-toggle, .menu-toggle,
+  .availability, .node-inspector, .case-nav, .command-dialog,
+  #contact-form, .about, .cinema, .button:not(.primary) {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
 
 /* Exact shared palette: editorial emphasis is separate from technical state. */
 .eyebrow, .case-subtitle, .inspector-number { color: var(--editorial); }
