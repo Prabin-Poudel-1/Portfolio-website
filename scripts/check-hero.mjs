@@ -40,9 +40,8 @@ assert(flow.includes("getPropertyValue('--particle')"));
 assert(flow.includes('ctx.lineWidth = 1.3'));
 assert(flow.includes('.60 + influence'));
 assert(flow.includes('const TRAIL_POINTS = 34'));
-assert(flow.includes('const drawRibbon = (time: number) => {'));
-assert(flow.includes('drawRibbon(time);'));
 assert(flow.includes('pointer.inside'));
+assert(!flow.includes('drawRibbon('), 'Luminous ribbon overlay must remain disabled');
 assert(flow.includes("getPropertyValue('--particle-secondary')"));
 assert(flow.includes('new Float32Array(TRAIL_POINTS * 2)'));
 assert(flow.includes('(p.head + 1) % TRAIL_POINTS'));
@@ -73,4 +72,4 @@ for (let head = 0; head < samples; head++) {
   }
   assert.equal(new Set(edges).size, samples - 1);
 }
-console.log('PASS: cursor-reactive luminous ribbons and dedicated particle palettes, 1.3px strokes, .60 leading opacity, 34-sample circular trails; exact doubled counts (200 mobile / 576 max desktop); 3× dt-scaled movement.');
+console.log('PASS: cursor-responsive particles with luminous wave ribbons removed; dedicated particle palettes, 1.3px strokes, .60 leading opacity, 34-sample circular trails; exact doubled counts (200 mobile / 576 max desktop); 3× dt-scaled movement.');
