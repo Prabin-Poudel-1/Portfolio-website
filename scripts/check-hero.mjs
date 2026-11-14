@@ -73,7 +73,7 @@ assert(goldSmoke.includes('const [toX, toY] = particleForm(next'), 'Particles in
 assert(goldSmoke.includes('shapeX += (toX - fromX) * blend'), 'Morphing is continuous');
 assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'), 'Cursor swirl preserved during morph');
 
-assert(goldSmoke.includes('const centerX = width * (mobile ? .54 : .59);'), 'Golden cloud is right-aligned on desktop');
+assert(goldSmoke.includes('const centerX = width * (mobile ? .57 : .69);'), 'Golden cloud is right-aligned on desktop');
 assert(goldSmoke.includes('const centerY = height * (mobile ? .42 : .50);'), 'Golden cloud vertical placement updated');
 assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'), 'Original cursor-driven swirl restored');
 assert(goldSmoke.includes('ctx.createRadialGradient('), 'Original golden cursor halo restored');
