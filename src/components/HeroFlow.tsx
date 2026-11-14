@@ -122,7 +122,7 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     // One S-shaped trajectory: a low, luminous valley rises toward the right.
     // This composition keeps the headline largely clear, unlike the old field.
     const waveY = (u: number, time: number) => {
-      const valley = .15 * Math.exp(-((u - .40) / .235) ** 2);
+      const valley = .15 * Math.exp(-Math.pow((u - .40) / .235, 2));
       const lift = .34 * smoothstep((u - .43) / .55);
       const breathing = .009 * Math.sin(u * 6.0 - time * .42)
         + .004 * Math.sin(u * 12.0 + time * .24);
