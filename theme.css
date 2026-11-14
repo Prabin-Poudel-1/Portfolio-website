@@ -18,6 +18,9 @@
   --particle: #3B82F6;
   --particle-secondary: #7C8CFF;
   --particle-glow: #DCEBFF;
+  --smoke-ambient: #A78B63;
+  --smoke-gold: #D7AE6D;
+  --smoke-flare: #FFE2A0;
   --accent-ink: #FFFFFF;
   --border: #374151;
   --line: var(--border);
@@ -46,6 +49,9 @@
   --particle: #3B82F6;
   --particle-secondary: #7C8CFF;
   --particle-glow: #DCEBFF;
+  --smoke-ambient: #988367;
+  --smoke-gold: #AC772B;
+  --smoke-flare: #D79A39;
   --accent-ink: #FFFFFF;
   --border: #D8DDE6;
   --line: var(--border);
@@ -618,7 +624,11 @@ pre {
 .architecture, .architecture-stage { color: var(--text); }
 .home { position: relative; isolation: isolate; }
 .home > :not(.hero-flow) { position: relative; z-index: 1; }
-.hero-flow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
+/* Mist floats above the diagram instead of disappearing underneath it.
+   Typography and actionable hero controls stay in the foreground. */
+.hero-flow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; border-radius: inherit; mix-blend-mode: screen; }
+:root[data-theme="light"] .hero-flow { mix-blend-mode: multiply; }
+.home > .home-content, .home > .hero-topline, .home > .hero-bottom { position: relative; z-index: 3; }
 .network-stage .network-signal { fill: var(--accent); stroke: none; }
 .hero-motion-toggle { border: 1px solid var(--control); border-radius: 4px; color: var(--muted); background: var(--bg); font: inherit; padding: 4px 8px; min-height: 28px; }
 .hero-motion-toggle:hover, .hero-motion-toggle[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
