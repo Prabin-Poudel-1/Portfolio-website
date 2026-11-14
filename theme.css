@@ -706,3 +706,37 @@ pre {
   .portfolio-atlas { padding-top: 26px; margin-bottom: 32px; }
   .portfolio-atlas-intro h3 { font-size: 30px; }
 }
+
+
+/* Hero-only golden cursor, echoing the shader's proximity illumination.
+   Elsewhere the original blue cursor and drag-only trail remain unchanged. */
+.custom-cursor[data-zone="hero"] .cursor-dot::before {
+  background: var(--sculpture-flare);
+  box-shadow: 0 0 9px 2px var(--sculpture-gold);
+}
+.custom-cursor[data-zone="hero"] .cursor-ring::before {
+  border-color: var(--sculpture-gold);
+  opacity: .87;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--sculpture-gold) 48%, transparent);
+}
+.custom-cursor[data-zone="hero"] .cursor-ring::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -42px;
+  left: -42px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--sculpture-flare) 24%, transparent) 0%,
+    color-mix(in srgb, var(--sculpture-gold) 8%, transparent) 45%,
+    transparent 72%);
+  pointer-events: none;
+}
+.custom-cursor[data-zone="hero"] .cursor-label {
+  color: var(--sculpture-gold);
+}
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .custom-cursor[data-zone="hero"] .cursor-ring::after { display: none; }
+}
