@@ -90,7 +90,8 @@ export function Header() {
               "Switch to " + (theme === "dark" ? "light" : "dark") + " mode"
             }
           >
-            {theme === "dark" ? "☼ Light" : "◐ Dark"}
+            <span aria-hidden="true">{theme === "dark" ? "☼" : "◐"}</span>
+            <span className="theme-switch-label">{theme === "dark" ? "Light" : "Dark"}</span>
           </button>
           <button
             ref={toggle}
