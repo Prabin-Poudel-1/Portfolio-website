@@ -141,12 +141,13 @@ export function HeroFlow({ paused }: { paused: boolean }) {
       pointer.speed *= Math.exp(-dt * 4.5);
 
       const mobile = width < 700;
-      // Shift toward the gap between the heading and engineering diagram.
-      // The foreground layer ensures the cloud isn't swallowed by that panel.
-      const centerX = width * (mobile ? .52 : .53);
-      const centerY = height * (mobile ? .47 : .52);
-      const spreadX = Math.min(width * (mobile ? .45 : .34), 460);
-      const spreadY = Math.min(height * .42, 340);
+      // Occupy the negative space next to the headline, not the project diagram.
+      // The engineering diagram has its own opaque foreground surface and must
+      // never be painted over by the smoke canvas.
+      const centerX = width * (mobile ? .50 : .435);
+      const centerY = height * (mobile ? .41 : .52);
+      const spreadX = Math.min(width * (mobile ? .40 : .19), 260);
+      const spreadY = Math.min(height * (mobile ? .31 : .31), 260);
       const settle = 1 - Math.exp(-dt * (pointer.inside ? 8 : 3.5));
       const cursorRadius = pointer.down ? 300 : 255;
       ctx.globalCompositeOperation = dark ? 'screen' : 'source-over';
@@ -187,13 +188,13 @@ export function HeroFlow({ paused }: { paused: boolean }) {
         const sprite = p.kind < .26 ? highlight : mist;
         const spotSize = (14 + p.size * 34) * (.55 + p.depth * .9);
         const lit = Math.min(1, influence * (1 + pointer.speed * .25));
-        ctx.globalAlpha = (dark ? .29 : .18) * (.35 + p.depth * .7) * (1 + lit * .48);
+        ctx.globalAlpha = (dark ? .245 : .16) * (.35 + p.depth * .7) * (1 + lit * .48);
         ctx.drawImage(sprite, p.x - spotSize / 2, p.y - spotSize / 2, spotSize, spotSize);
 
         // Golden light blooms *on* the existing cloud near the cursor.
         if (lit > .03) {
           const glowSize = spotSize * (1.10 + lit * .60);
-          ctx.globalAlpha = (dark ? .53 : .38) * lit;
+          ctx.globalAlpha = (dark ? .46 : .32) * lit;
           ctx.drawImage(brightGold, p.x - glowSize / 2, p.y - glowSize / 2, glowSize, glowSize);
         }
 
