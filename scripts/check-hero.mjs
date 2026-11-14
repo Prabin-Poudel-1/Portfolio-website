@@ -74,3 +74,14 @@ for (const token of ['--sculpture-base: #C4C5C8', '--sculpture-gold: #E3BC7B', '
 console.log('PASS: GPU particle field, gold proximity lighting, foreground nodes, existing animation lifecycle and light/dark tokens.');
 
 console.log('PASS: light-only dust rendering, project atlas relocation, node-to-gallery synchronization, shared pause control.');
+
+
+const cursor = readFileSync('src/components/CustomCursor.tsx', 'utf8');
+assert(cursor.includes('heroZone = !!el.closest(".home")'), 'Cursor detects hero region');
+assert(cursor.includes('if (down || heroZone)'), 'Hero trail runs without mouse press');
+assert(cursor.includes('ctx.strokeStyle = heroZone ? goldColor : tailColor'), 'Hero tail is golden');
+assert(cursor.includes('const enabled = () => fine.matches && !reduced.matches'), 'Native cursor fallback and reduced-motion preference retained');
+assert(css.includes('.custom-cursor[data-zone="hero"] .cursor-ring::after'), 'Hero cursor glow ring');
+assert(css.includes('.custom-cursor[data-zone="hero"] .cursor-dot::before'), 'Golden hero cursor dot');
+assert(cursor.includes('document.removeEventListener("pointermove", move, true)'), 'Cursor event cleanup retained');
+console.log('PASS: hero-only gold cursor, continuous hover trail, original rest-of-site cursor and reduced-motion fallback.');
