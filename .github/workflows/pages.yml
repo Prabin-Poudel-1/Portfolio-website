@@ -1,7 +1,7 @@
 name: Build and deploy portfolio
 on:
   push:
-    branches: [master, feat/react-portfolio-phase-1, integration/master-particle-preview]
+    branches: [master, feat/react-portfolio-phase-1]
   workflow_dispatch:
 permissions:
   contents: read
