@@ -643,3 +643,66 @@ pre {
   .hero-flow, .network-signal { display: none; }
   .node-inspector > .inspector-content.is-active { animation: none; }
 }
+
+
+/* Project atlas layout: move the complete, interactive domain map below the hero. */
+.home {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  min-height: clamp(690px, 88svh, 880px);
+}
+.home-content {
+  width: min(100%, 600px);
+  align-self: center;
+}
+.portfolio-atlas {
+  display: grid;
+  grid-template-columns: minmax(220px, .72fr) minmax(0, 1.28fr);
+  gap: clamp(24px, 5vw, 72px);
+  align-items: center;
+  padding: 52px 0 64px;
+  margin-bottom: 46px;
+  border-bottom: 1px solid var(--border);
+}
+.portfolio-atlas-intro {
+  max-width: 390px;
+  align-self: center;
+}
+.portfolio-atlas-intro h3 {
+  margin: 15px 0 20px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(29px, 3.4vw, 46px);
+  font-weight: 650;
+  letter-spacing: -.052em;
+  line-height: 1.12;
+}
+.portfolio-atlas-intro > p:last-child {
+  color: var(--muted);
+  max-width: 34ch;
+  font-size: 14px;
+  line-height: 1.85;
+}
+#portfolio .portfolio-atlas .engineering-map {
+  min-width: 0;
+  width: 100%;
+  max-width: 720px;
+  justify-self: end;
+  box-sizing: border-box;
+  box-shadow: 10px 10px 0 var(--accent-soft);
+}
+@media (max-width: 860px) {
+  .home {
+    min-height: 680px;
+    grid-template-rows: auto 1fr auto;
+  }
+  .portfolio-atlas { grid-template-columns: 1fr; gap: 24px; padding: 36px 0 48px; }
+  .portfolio-atlas-intro { max-width: 610px; }
+  .portfolio-atlas-intro > p:last-child { max-width: 55ch; }
+  #portfolio .portfolio-atlas .engineering-map { justify-self: center; max-width: 680px; }
+}
+@media (max-width: 540px) {
+  .home { min-height: 690px; }
+  .portfolio-atlas { padding-top: 26px; margin-bottom: 32px; }
+  .portfolio-atlas-intro h3 { font-size: 30px; }
+}
