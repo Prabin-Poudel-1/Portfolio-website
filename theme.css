@@ -52,9 +52,10 @@
   --particle: #3B82F6;
   --particle-secondary: #7C8CFF;
   --particle-glow: #DCEBFF;
-  --smoke-ambient: #988367;
-  --smoke-gold: #AC772B;
-  --smoke-flare: #D79A39;
+  /* A visible blue particle cloud against ivory, darker blue near the pointer. */
+  --smoke-ambient: #809BB5;
+  --smoke-gold: #77ACDA;
+  --smoke-flare: #356BA5;
   --sculpture-base: #899AA9;
   --sculpture-gold: #A3CDEA;
   --sculpture-flare: #3B6FA8;
