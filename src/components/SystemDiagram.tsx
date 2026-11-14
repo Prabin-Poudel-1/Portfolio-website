@@ -136,7 +136,6 @@ export function SystemDiagram({ paused, onPause }: { paused: boolean; onPause: (
           onClick={() => playSound("secret")}
         >
           <span>PP</span>
-          <small>BUILD / CONNECT</small>
         </button>
         {nodes.map((n, i) => (
           <button
