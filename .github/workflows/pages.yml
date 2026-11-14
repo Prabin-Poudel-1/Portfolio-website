@@ -1,7 +1,7 @@
 name: Build and deploy portfolio
 on:
   push:
-    branches: [master, feat/react-portfolio-phase-1]
+    branches: [master, feat/react-portfolio-phase-1, integration/master-particle-preview]
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,7 +21,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: node scripts/check.mjs && node scripts/check-sound.mjs && npx --no-install tsx scripts/check-demos.ts && npx --no-install tsx scripts/check-correction.ts && node scripts/check-production.mjs && npx --no-install tsx scripts/check-typewriter.ts
+      - run: node scripts/check.mjs && node scripts/check-hero.mjs && node scripts/check-sound.mjs && npx --no-install tsx scripts/check-demos.ts && npx --no-install tsx scripts/check-correction.ts && node scripts/check-production.mjs && npx --no-install tsx scripts/check-typewriter.ts
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/master'
         with:
