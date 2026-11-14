@@ -205,22 +205,23 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       const cursorRadius = pointer.down ? 300 : 255;
       ctx.globalCompositeOperation = dark ? 'screen' : 'source-over';
 
+      // One timeline for the entire sculpture rather than one per particle.
+      const stage = (time % (FORM_SECONDS * FORM_COUNT)) / FORM_SECONDS;
+      const current = Math.floor(stage) as Form;
+      const next = ((current + 1) % FORM_COUNT) as Form;
+      const local = stage - current;
+      const transition = Math.max(0, Math.min(1,
+        (local * FORM_SECONDS - FORM_HOLD) / (FORM_SECONDS - FORM_HOLD),
+      ));
+      const blend = smoothstep5(transition);
+
       for (const p of particles) {
         const spin = p.angle + time * (.085 + p.depth * .060) * p.speed;
         const r = p.radius + Math.sin(p.phase + time * .22) * .022;
         const a = spin + (1 - r) * 1.75;
         // Asymmetric wandering contours create soft volumetric folds and depth.
         const fold = Math.sin(a * 3.1 + time * .24 + p.phase) * 21 * p.depth;
-        // Stay in one form for eight seconds, then continuously morph over six.
-        // Both forms use the same particles: no random respawning or jumps.
-        const stage = (time % (FORM_SECONDS * FORM_COUNT)) / FORM_SECONDS;
-        const current = Math.floor(stage) as Form;
-        const next = ((current + 1) % FORM_COUNT) as Form;
-        const local = stage - current;
-        const transition = Math.max(0, Math.min(1,
-          (local * FORM_SECONDS - FORM_HOLD) / (FORM_SECONDS - FORM_HOLD),
-        ));
-        const blend = smoothstep5(transition);
+        // Continuous movement from one formation into the next.
         const [fromX, fromY] = particleForm(current, p, a, r, time, spreadX, spreadY, fold);
         // Compute the next shape only when the blend actually begins.
         let shapeX = fromX;
