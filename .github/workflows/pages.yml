@@ -1,7 +1,7 @@
 name: Build and deploy portfolio
 on:
   push:
-    branches: [master, feat/react-portfolio-phase-1]
+    branches: [master, feat/react-portfolio-phase-1, fix/hero-cursor-light-red-stars]
   workflow_dispatch:
 permissions:
   contents: read
