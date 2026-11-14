@@ -75,10 +75,10 @@ assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'),
 
 assert(goldSmoke.includes('const centerX = width * (mobile ? .57 : .69);'), 'Golden cloud is right-aligned on desktop');
 
-assert(goldSmoke.includes('const starCount = Math.round(count * .33);'), 'Exactly 33 percent of particles assigned to star class');
+assert(goldSmoke.includes('const starCount = Math.round(count * .5);'), 'Exactly 50 percent of particles assigned to star class');
 assert(goldSmoke.includes('createParticle(index < starCount)'), 'Particle classification is deterministic per resize');
-assert(goldSmoke.includes('kind: isStar ? Math.random() * .33 : .33 + Math.random() * .67'), 'Star/dust categories remain disjoint');
-assert(goldSmoke.includes('const isStar = p.kind < .33;'), '33 percent stars, 67 percent dust drawing split');
+assert(goldSmoke.includes('kind: isStar ? Math.random() * .5 : .5 + Math.random() * .5'), 'Star/dust categories remain disjoint');
+assert(goldSmoke.includes('const isStar = p.kind < .5;'), '50 percent stars, 50 percent dust drawing split');
 assert(goldSmoke.includes('const twinkle = .15 + .85 * shimmer * shimmer;'), 'Independently modulated star brightness');
 assert(goldSmoke.includes("? (lit > .25 ? '#FFF5D7' : '#FFE8B8')"), 'Bright golden core preserved in dark mode');
 assert(goldSmoke.includes('Preserve the atmospheric dust and its existing golden cursor bloom.'), 'Soft dust remains');
@@ -123,6 +123,6 @@ console.log('PASS: right-positioned original golden cloud; light-theme golden du
 
 console.log('PASS: smoothly morphing golden nebula, infinity, galaxy and bloom forms with original cursor lighting preserved.');
 
-console.log('PASS: 33% twinkling stars / 67% atmospheric dust with existing morphs, cursor glow, and light mode unchanged.');
+console.log('PASS: 50% twinkling stars / 50% atmospheric dust with existing morphs, cursor glow, and light mode unchanged.');
 
 console.log('PASS: visible light-blue Canvas stars/dust and deep-blue cursor response; 4 shared morphs; dark mode unchanged.');
