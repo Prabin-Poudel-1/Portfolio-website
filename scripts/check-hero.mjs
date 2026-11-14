@@ -46,36 +46,18 @@ assert(flow.includes('drawStreamlines(time)'));
 assert(flow.includes('ctx.quadraticCurveTo(previousX, previousY, midX, midY)'));
 assert(flow.includes('const falloff = (1 - distance / radius) ** 2'));
 assert(flow.includes('ctx.shadowBlur = lightTheme ? 7 : 17'));
-assert(flow.includes('ctx.lineWidth = 1.3'));
-assert(flow.includes('.60 + influence'));
-assert(flow.includes('const TRAIL_POINTS = 34'));
-assert(flow.includes('new Float32Array(TRAIL_POINTS * 2)'));
-assert(flow.includes('(p.head + 1) % TRAIL_POINTS'));
-assert(flow.includes('(p.head - k + TRAIL_POINTS) % TRAIL_POINTS'));
-const samples = Number(flow.match(/const TRAIL_POINTS = (\d+)/)[1]);
-const groups = Number(flow.match(/const FADE_GROUPS = (\d+)/)[1]);
-const segments = Number(flow.match(/const SEGMENTS_PER_GROUP = (\d+)/)[1]);
-assert.equal(groups * segments, samples - 1, 'fade groups cover the entire trail without gaps');
-assert.equal(samples, 34);
-const countExpression = flow.match(/const count = (.+);/)[1];
-for (let baseCount = 0; baseCount <= 115; baseCount++) {
-  assert.equal(vm.runInNewContext(countExpression, { baseCount }), Math.round(baseCount * 2.5) * 2);
-}
-assert.equal(vm.runInNewContext(countExpression, { baseCount: 40 }), 200);
-assert.equal(vm.runInNewContext(countExpression, { baseCount: 115 }), 576);
-assert(flow.includes('const SPEED_MULTIPLIER = 3'));
-assert(flow.includes('const travel = dt * SPEED_MULTIPLIER'));
-assert(flow.includes('p.x += p.vx * travel; p.y += p.vy * travel;'));
-// Every circular head position covers all 33 adjacent segments, including wraparound.
-for (let head = 0; head < samples; head++) {
-  const edges = [];
-  for (let group = 0; group < groups; group++) {
-    for (let k = group * segments; k < (group + 1) * segments; k++) {
-      const a = (head - k + samples) % samples, b = (head - k - 1 + samples) % samples;
-      assert.equal((a - b + samples) % samples, 1);
-      edges.push(a);
-    }
-  }
-  assert.equal(new Set(edges).size, samples - 1);
-}
-console.log('PASS: luminous geometry, pointer distortion, 34-sample trails, 200 mobile / 576 desktop particles, and 3× dt-scaled movement.');
+// The original freely moving magnetic particles are deliberately removed.
+for (const removed of [
+  'const TRAIL_POINTS',
+  'const SPEED_MULTIPLIER',
+  'const baseCount',
+  'const count = Math.round',
+  'for (const p of particles)',
+  'const spawn =',
+  'new Float32Array(TRAIL_POINTS * 2)',
+]) assert(!flow.includes(removed), 'Removed magnetic particle system must stay absent: ' + removed);
+assert(flow.includes('drawStreamlines(time)'), 'The luminous ribbon remains active');
+assert(flow.includes('const moteAt = (time * 0.095 + strand * 0.137) % 1'), 'Star motes continue to move along the ribbon');
+assert(flow.includes('ctx.arc(moteX, moteY'), 'The ribbon retains its star highlights');
+assert(flow.includes('const falloff = (1 - distance / radius) ** 2'), 'Ribbon geometry responds to the cursor');
+console.log('PASS: independent magnetic particles removed; luminous ribbons, moving star motes, cursor bending, and theme-aware glow retained.');
