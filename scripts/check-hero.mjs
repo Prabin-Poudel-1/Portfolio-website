@@ -49,11 +49,11 @@ assert(css.includes('.portfolio-atlas {'), 'Atlas layout is responsive');
 const switcher = readFileSync('src/components/HeroFlow.tsx', 'utf8');
 const goldSmoke = readFileSync('src/components/GoldenSmoke.tsx', 'utf8');
 const dust = readFileSync('src/components/LightDust.tsx', 'utf8');
-assert(switcher.includes("theme === 'light'"), 'Renderer chosen by active theme');
-assert(switcher.includes('<LightDust paused={paused} />'), 'Light mode preserves wider GPU dust');
+assert(!switcher.includes('LightDust'), 'Light mode no longer depends on the failing WebGL renderer');
+assert(switcher.includes('return <GoldenSmoke paused={paused} />;'), 'Both light and dark use reliable Canvas particles');
 assert(switcher.includes('<GoldenSmoke paused={paused} />'), 'Dark mode uses previous gold cloud');
-assert(switcher.includes("attributeFilter: ['data-theme']"), 'Renderer switches on theme toggle');
-assert(switcher.includes('observer.disconnect()'), 'Theme listener cleanup');
+assert(goldSmoke.includes("attributeFilter: ['data-theme']"), 'Canvas updates its palette when theme changes');
+assert(goldSmoke.includes('themeObserver.disconnect()'), 'Canvas theme listener cleans up');
 assert(goldSmoke.includes('function makeMistSprite(color: string)'), 'Original atmospheric smoke sprite restored');
 assert(goldSmoke.includes("let mist = makeMistSprite('#A78B63')"), 'Original golden amber base restored');
 assert(goldSmoke.includes("let brightGold = makeMistSprite('#FFE2A0')"), 'Original bright golden core restored');
@@ -80,7 +80,7 @@ assert(goldSmoke.includes('createParticle(index < starCount)'), 'Particle classi
 assert(goldSmoke.includes('kind: isStar ? Math.random() * .33 : .33 + Math.random() * .67'), 'Star/dust categories remain disjoint');
 assert(goldSmoke.includes('const isStar = p.kind < .33;'), '33 percent stars, 67 percent dust drawing split');
 assert(goldSmoke.includes('const twinkle = .15 + .85 * shimmer * shimmer;'), 'Independently modulated star brightness');
-assert(goldSmoke.includes("ctx.fillStyle = lit > .25 ? '#FFF5D7' : '#FFE8B8';"), 'Bright star core preserved');
+assert(goldSmoke.includes("? (lit > .25 ? '#FFF5D7' : '#FFE8B8')"), 'Bright golden core preserved in dark mode');
 assert(goldSmoke.includes('Preserve the atmospheric dust and its existing golden cursor bloom.'), 'Soft dust remains');
 
 assert(goldSmoke.includes('const centerY = height * (mobile ? .42 : .50);'), 'Golden cloud vertical placement updated');
@@ -88,37 +88,24 @@ assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'),
 assert(goldSmoke.includes('ctx.createRadialGradient('), 'Original golden cursor halo restored');
 assert(goldSmoke.includes('const stop = paused ? () => {} : animateHero(hero, draw)'), 'Original gold field uses shared pause');
 assert(goldSmoke.includes("hero.removeEventListener('pointermove', move)"), 'Gold field releases pointer listener');
-assert(dust.includes("getContext('webgl'"), 'Light mode GPU dust remains');
-assert(dust.includes('gl.drawArrays(gl.POINTS'), 'Light dust is GPU rendered');
+// The experimental WebGL implementation is retained for possible rollback,
+// but the visible light theme uses Canvas and must not depend on its availability.
+assert(dust.includes("getContext('webgl'"), 'Previous experimental shader remains available for rollback');
+assert(goldSmoke.includes("dark = document.documentElement.dataset.theme !== 'light';"), 'Active Canvas determines theme');
+assert(goldSmoke.includes("ctx.globalCompositeOperation = dark ? 'screen' : 'source-over';"), 'Light mode avoids screen blending');
+assert(goldSmoke.includes("dark ? .21 + lit * .085 : .43 + lit * .12"), 'Light-mode dust is visible against ivory');
+assert(goldSmoke.includes("lit > .25 ? '#275B95' : '#5C8FC0'"), 'Blue light-mode star cores');
+assert(goldSmoke.includes("dark ? .34 + lit * .57 : .20 + lit * .72"), 'Light-mode star halo darkens near pointer');
+assert(goldSmoke.includes("dark ? .37 : .58"), 'Light-mode dust brightens when the cursor approaches');
+assert(css.includes('--smoke-ambient: #809BB5;'), 'Light theme uses visible slate-blue dust');
+assert(css.includes('--smoke-gold: #77ACDA;'), 'Light theme uses light-blue stars');
+assert(css.includes('--smoke-flare: #356BA5;'), 'Light theme uses darker blue proximity glow');
+assert(css.includes('--smoke-ambient: #A78B63;'), 'Dark theme still uses golden ambient dust');
+assert(css.includes('--smoke-flare: #FFE2A0;'), 'Dark theme still uses golden highlights');
 
-assert(dust.includes('i < Math.round(count * .33) ? 2'), 'Exactly one third of light particles are assigned star type');
-assert(dust.includes('vStar = step(1.5, aDetail.z);'), 'Light-mode shader separates 33 percent stars from dust');
-assert(dust.includes('vTwinkle = .15 + .85 * blink * blink;'), 'Light stars blink independently');
-assert(dust.includes('float starCore = pow(max(0., 1. - r2), 9.);'), 'Light stars have sharp cores');
-assert(dust.includes('float starHalo = exp(-r2 * 7.);'), 'Light stars have a restrained halo');
-assert(dust.includes('alpha = mix(dustAlpha, starAlpha, vStar)'), 'Remaining dust remains soft');
-assert(dust.includes('vec2 formPosition(float form,'), 'Light-mode shape transformation is GPU-driven');
-assert(dust.includes('float petals = .55 + .35 * cos(5. * angle'), 'Bloom formation exists in light mode');
-assert(dust.includes('float arm = floor(detail.x * 3.);'), 'Three-armed spiral exists in light mode');
-assert(dust.includes('sin(2. * phase) * ring * .55'), 'Infinity loop exists in light mode');
-assert(dust.includes('gl.uniform1f(U.form, form);'), 'CPU morph schedule connected to shader');
-assert(dust.includes('gl.uniform1f(U.blend, blend);'), 'Smooth quintic blend connected to shader');
-assert(dust.includes('const stage = (time % 56) / 14;'), 'Light mode matches dark mode 8+6 second timing');
-assert(dust.includes('width * (width < 700 ? .57 : .69)'), 'Light particles align to the right like dark particles');
-
-assert(dust.includes('p.x = p.x * 1.28'), 'Wider light dust preserved');
-assert(dust.includes('float dustSize = mix(.9 + aDetail.x * 1.9'), 'Fine light particles preserved');
-assert(dust.includes('vec3 color = mix(uNeutral, uGold, mix(.24, .78, vStar));'), 'Light-blue star and subtler blue dust at rest');
-assert(dust.includes('color = mix(color, uFlare, hover * mix(.72, .84, vStar));'), 'Cursor darkens nearby light-blue particles');
-assert(css.includes('--sculpture-base: #899AA9;'), 'Light theme muted slate-blue dust');
-assert(css.includes('--sculpture-gold: #A3CDEA;'), 'Light theme soft sky-blue stars');
-assert(css.includes('--sculpture-flare: #3B6FA8;'), 'Light theme darker blue proximity highlights');
-assert(css.includes('--sculpture-flare: #FFE4A3;'), 'Dark theme accent unchanged');
-assert(dust.includes('point += tangent * field * swirl'), 'Cursor-responsive WebGL particle flow preserved');
-assert(dust.includes('const stop = paused ? () => {} : animateHero(hero, draw)'), 'Light dust uses shared pause');
 assert(css.includes('z-index: 0; pointer-events: none'), 'Particle canvas does not obstruct interaction');
 assert(css.includes('.portfolio-atlas {'), 'Project section atlas is retained');
-console.log('PASS: original screenshot golden-smoke renderer restored for dark; wider GPU dust for light; theme transition, cursor interaction, pause, and atlas preserved.');
+console.log('PASS: reliable Canvas particle renderer for both themes; golden dark and visible blue light palettes; theme transition, cursor interaction, pause, and atlas preserved.');
 
 const cursor = readFileSync('src/components/CustomCursor.tsx', 'utf8');
 assert(cursor.includes('heroZone = !!el.closest(".home")'), 'Cursor detects hero region');
@@ -138,4 +125,4 @@ console.log('PASS: smoothly morphing golden nebula, infinity, galaxy and bloom f
 
 console.log('PASS: 33% twinkling stars / 67% atmospheric dust with existing morphs, cursor glow, and light mode unchanged.');
 
-console.log('PASS: light mode 33% blinking light-blue stars and 67% dust; richer blue near cursor; 4 smooth shapes; dark mode unchanged.');
+console.log('PASS: visible light-blue Canvas stars/dust and deep-blue cursor response; 4 shared morphs; dark mode unchanged.');
