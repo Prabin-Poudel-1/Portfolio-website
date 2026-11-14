@@ -90,13 +90,29 @@ assert(goldSmoke.includes('const stop = paused ? () => {} : animateHero(hero, dr
 assert(goldSmoke.includes("hero.removeEventListener('pointermove', move)"), 'Gold field releases pointer listener');
 assert(dust.includes("getContext('webgl'"), 'Light mode GPU dust remains');
 assert(dust.includes('gl.drawArrays(gl.POINTS'), 'Light dust is GPU rendered');
+
+assert(dust.includes('i < Math.round(count * .33) ? 2'), 'Exactly one third of light particles are assigned star type');
+assert(dust.includes('vStar = step(1.5, aDetail.z);'), 'Light-mode shader separates 33 percent stars from dust');
+assert(dust.includes('vTwinkle = .15 + .85 * blink * blink;'), 'Light stars blink independently');
+assert(dust.includes('float starCore = pow(max(0., 1. - r2), 9.);'), 'Light stars have sharp cores');
+assert(dust.includes('float starHalo = exp(-r2 * 7.);'), 'Light stars have a restrained halo');
+assert(dust.includes('alpha = mix(dustAlpha, starAlpha, vStar)'), 'Remaining dust remains soft');
+assert(dust.includes('vec2 formPosition(float form,'), 'Light-mode shape transformation is GPU-driven');
+assert(dust.includes('float petals = .55 + .35 * cos(5. * angle'), 'Bloom formation exists in light mode');
+assert(dust.includes('float arm = floor(detail.x * 3.);'), 'Three-armed spiral exists in light mode');
+assert(dust.includes('sin(2. * phase) * ring * .55'), 'Infinity loop exists in light mode');
+assert(dust.includes('gl.uniform1f(U.form, form);'), 'CPU morph schedule connected to shader');
+assert(dust.includes('gl.uniform1f(U.blend, blend);'), 'Smooth quintic blend connected to shader');
+assert(dust.includes('const stage = (time % 56) / 14;'), 'Light mode matches dark mode 8+6 second timing');
+assert(dust.includes('width * (width < 700 ? .57 : .69)'), 'Light particles align to the right like dark particles');
+
 assert(dust.includes('p.x = p.x * 1.28'), 'Wider light dust preserved');
-assert(dust.includes('size = mix(.9 + aDetail.x * 1.9'), 'Fine light particles preserved');
-assert(dust.includes('vec3 color = mix(uNeutral, uGold, light * .82);'), 'Warm gold at rest blends toward cursor response');
-assert(dust.includes('color = mix(color, uFlare, pow(vLight, 2.4) * .78);'), 'Light-blue flares appear near pointer');
-assert(css.includes('--sculpture-base: #8C806B;'), 'Light theme warm dust base');
-assert(css.includes('--sculpture-gold: #D2B06A;'), 'Light theme subdued gold');
-assert(css.includes('--sculpture-flare: #8EC5FF;'), 'Light theme blue proximity highlights');
+assert(dust.includes('float dustSize = mix(.9 + aDetail.x * 1.9'), 'Fine light particles preserved');
+assert(dust.includes('vec3 color = mix(uNeutral, uGold, mix(.24, .78, vStar));'), 'Light-blue star and subtler blue dust at rest');
+assert(dust.includes('color = mix(color, uFlare, hover * mix(.72, .84, vStar));'), 'Cursor darkens nearby light-blue particles');
+assert(css.includes('--sculpture-base: #899AA9;'), 'Light theme muted slate-blue dust');
+assert(css.includes('--sculpture-gold: #A3CDEA;'), 'Light theme soft sky-blue stars');
+assert(css.includes('--sculpture-flare: #3B6FA8;'), 'Light theme darker blue proximity highlights');
 assert(css.includes('--sculpture-flare: #FFE4A3;'), 'Dark theme accent unchanged');
 assert(dust.includes('point += tangent * field * swirl'), 'Cursor-responsive WebGL particle flow preserved');
 assert(dust.includes('const stop = paused ? () => {} : animateHero(hero, draw)'), 'Light dust uses shared pause');
@@ -121,3 +137,5 @@ console.log('PASS: right-positioned original golden cloud; light-theme golden du
 console.log('PASS: smoothly morphing golden nebula, infinity, galaxy and bloom forms with original cursor lighting preserved.');
 
 console.log('PASS: 33% twinkling stars / 67% atmospheric dust with existing morphs, cursor glow, and light mode unchanged.');
+
+console.log('PASS: light mode 33% blinking light-blue stars and 67% dust; richer blue near cursor; 4 smooth shapes; dark mode unchanged.');
