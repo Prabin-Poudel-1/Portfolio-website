@@ -197,7 +197,7 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       const mobile = width < 700;
       // Position the cloud to the right of the hero headline; keep the original
       // smoke density, illumination, cursor swirl, and overall visual treatment.
-      const centerX = width * (mobile ? .54 : .59);
+      const centerX = width * (mobile ? .57 : .69);
       const centerY = height * (mobile ? .42 : .50);
       const spreadX = Math.min(width * (mobile ? .45 : .34), 460);
       const spreadY = Math.min(height * .42, 340);
