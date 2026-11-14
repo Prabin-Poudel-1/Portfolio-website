@@ -740,3 +740,10 @@ pre {
 @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
   .custom-cursor[data-zone="hero"] .cursor-ring::after { display: none; }
 }
+
+
+/* Screenshot-faithful dark-mode light blending for the original golden cloud.
+   The canvas stays behind real content; light mode retains normal WebGL dust. */
+:root:not([data-theme="light"]) .hero-flow {
+  mix-blend-mode: screen;
+}
