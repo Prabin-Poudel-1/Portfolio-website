@@ -23,30 +23,32 @@ const TAU = Math.PI * 2;
 const MOBILE_COUNT = 280;
 const DESKTOP_COUNT = 900;
 
-// Four dust sculptures, not hard-edged line drawings.
-// An extended hold and quintic easing make transitions feel fluid.
-const FORM_SECONDS = 14;
-const FORM_HOLD = 8;
-const FORM_COUNT = 4;
+// Eight organic particle formations. Each holds for six seconds and
+// interpolates over four seconds; one full loop lasts 80 seconds.
+const FORM_SECONDS = 10;
+const FORM_HOLD = 6;
+const FORM_COUNT = 8;
 const smoothstep5 = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
-type Form = 0 | 1 | 2 | 3;
+type Form = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 function particleForm(
   form: Form, particle: MistParticle, angle: number, radius: number,
   time: number, spreadX: number, spreadY: number, fold: number,
 ): [number, number] {
   const phase = particle.phase;
   const depth = particle.depth;
+
   if (form === 0) {
-    // Original, screenshot-approved atmospheric nebula.
+    // 0. Nebula: original, screenshot-approved warm cloud.
     return [
       Math.cos(angle) * spreadX * radius + fold,
       Math.sin(angle) * spreadY * radius
         + Math.cos(angle * 2 - time * .17 + phase) * 19 * depth,
     ];
   }
+
   if (form === 1) {
-    // Infinity: two loose lobes with a scattered soft-volume cross section.
+    // 1. Infinity: two softly overlapping, rotating dust lobes.
     const loop = angle + time * .035;
     const radiusWidth = .48 + radius * .55;
     return [
@@ -56,8 +58,9 @@ function particleForm(
         + Math.cos(phase * 3 + time * .16) * 18 * (1 - depth * .3),
     ];
   }
+
   if (form === 2) {
-    // Three rotating spiral arms. Independent phases keep the shape dusty.
+    // 2. Three-arm spiral: retain the existing rotating structure.
     const arm = Math.floor(phase / TAU * 3);
     const sweep = arm * TAU / 3 + radius * 4.9 - time * .13
       + Math.sin(particle.angle * 2) * .22;
@@ -67,13 +70,65 @@ function particleForm(
       Math.sin(sweep) * spreadY * distance + Math.cos(phase * 4) * 14,
     ];
   }
-  // A slowly breathing, five-petal nebula bloom.
-  const petals = .55 + .35 * Math.cos(5 * angle - time * .05);
-  const bloom = petals * (.23 + radius * .84);
+
+  if (form === 3) {
+    // 3. Bloom: five gently breathing petals.
+    const petals = .55 + .35 * Math.cos(5 * angle - time * .05);
+    const bloom = petals * (.23 + radius * .84);
+    return [
+      Math.cos(angle) * spreadX * bloom * 1.09 + fold * .32,
+      Math.sin(angle) * spreadY * bloom
+        + Math.sin(phase * 2 + time * .13) * 13 * depth,
+    ];
+  }
+
+  if (form === 4) {
+    // 4. Torus vortex: orbit around a hollow ring with a rotating tube.
+    // Perspective compression of the rear tube creates apparent 3D depth.
+    const u = angle + time * .075;
+    const v = phase * 2 + time * .19;
+    const major = .57 + radius * .12;
+    const tube = .11 + .10 * depth;
+    const ring = major + tube * Math.cos(v);
+    const back = .83 + .17 * Math.sin(u);
+    return [
+      Math.cos(u) * spreadX * ring * 1.22 + Math.sin(v) * 12,
+      (Math.sin(u) * spreadY * ring * .64 + Math.sin(v) * spreadY * tube * .7) * back,
+    ];
+  }
+
+  if (form === 5) {
+    // 5. Double helix: two offset spirals winding around a vertical axis.
+    const strand = phase < Math.PI ? 0 : Math.PI;
+    const yTrack = radius * 2 - 1;
+    const twist = yTrack * TAU * 1.7 + time * .18 + strand;
+    const thickness = (depth - .5) * 18;
+    return [
+      Math.cos(twist) * spreadX * .27 + thickness,
+      yTrack * spreadY * .87 + Math.sin(twist) * 13,
+    ];
+  }
+
+  if (form === 6) {
+    // 6. Möbius strip: a half-twist in a soft ribbon viewed in perspective.
+    const u = angle + time * .065;
+    const band = (radius * 2 - 1) * .22;
+    const halfTwist = u * .5;
+    const ring = .62 + band * Math.cos(halfTwist);
+    const height3d = band * Math.sin(halfTwist);
+    return [
+      Math.cos(u) * spreadX * ring * 1.13 + Math.sin(phase * 3) * 7,
+      Math.sin(u) * spreadY * ring * .68 + height3d * spreadY * .65,
+    ];
+  }
+
+  // 7. Fluid wave: a ribbonless, continuously undulating dust current.
+  const waveX = radius * 2 - 1;
+  const current = waveX * Math.PI * 1.55 + time * .16;
   return [
-    Math.cos(angle) * spreadX * bloom * 1.09 + fold * .32,
-    Math.sin(angle) * spreadY * bloom
-      + Math.sin(phase * 2 + time * .13) * 13 * depth,
+    waveX * spreadX * .96 + Math.sin(angle * 2 + phase) * 17,
+    Math.sin(current) * spreadY * .4
+      + Math.cos(angle * 2.4 + phase * 1.4) * 19 * (.45 + depth * .4),
   ];
 }
 
