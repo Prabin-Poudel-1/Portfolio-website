@@ -1,16 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { animateHero } from '../utils/heroMotion';
 
-// 34 samples / 33 segments, fully covered by eleven fading groups.
-const TRAIL_POINTS = 34;
-const FADE_GROUPS = 11;
-const SPEED_MULTIPLIER = 3;
-const SEGMENTS_PER_GROUP = 3;
+// A single cursor-responsive luminous ribbon; no free-moving particle field.
 const STREAMLINE_COUNT_DESKTOP = 22;
 const STREAMLINE_COUNT_MOBILE = 13;
 const STREAMLINE_STEPS = 52;
-
-type Particle = { x: number; y: number; vx: number; vy: number; age: number; life: number; amber: boolean; trail: Float32Array; head: number; filled: number };
 
 /** Decorative, hero-contained flow; no React updates, pointer capture or external assets. */
 export function HeroFlow({ paused }: { paused: boolean }) {
@@ -19,7 +13,7 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     const canvas = ref.current!, hero = canvas.parentElement!;
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
-    let width = 1, height = 1, ratio = 1, particles: Particle[] = [];
+    let width = 1, height = 1, ratio = 1;
     let accent = '#3B82F6', secondary = '#7C8CFF', highlight = '#DCEBFF', lightTheme = false;
     let bounds = hero.getBoundingClientRect();
     const pointer = { x: -1000, y: -1000, vx: 0, vy: 0, speed: 0, at: 0, inside: false };
@@ -31,25 +25,12 @@ export function HeroFlow({ paused }: { paused: boolean }) {
       lightTheme = document.documentElement.dataset.theme === 'light';
       ctx.clearRect(0, 0, width, height);
     };
-    const spawn = (existing?: Particle): Particle => {
-      // Recycling reuses both the particle and its buffer; allocations occur only at resize.
-      const p = existing || { x: 0, y: 0, vx: 0, vy: 0, age: 0, life: 0, amber: false,
-        trail: new Float32Array(TRAIL_POINTS * 2), head: 0, filled: 0 };
-      p.x = Math.random() * width; p.y = Math.random() * height;
-      p.vx = 0; p.vy = 0; p.age = 0;
-      p.life = 10 + Math.random() * 12; p.amber = Math.random() < .12;
-      p.head = 0; p.filled = 0;
-      return p;
-    };
     const resize = () => {
       bounds = hero.getBoundingClientRect();
       width = hero.clientWidth; height = hero.clientHeight;
       ratio = Math.min(devicePixelRatio || 1, 1.75);
       canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      const baseCount = width < 700 ? 40 : Math.min(115, Math.round(width * height / 12500));
-      const count = Math.round(baseCount * 2.5) * 2;
-      particles = Array.from({ length: count }, () => { const p = spawn(); p.age = Math.random() * p.life; return p; });
       colors();
     };
     const move = (e: PointerEvent) => {
@@ -65,7 +46,7 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     };
     const leave = () => { pointer.inside = false; };
     const scroll = () => { bounds = hero.getBoundingClientRect(); pointer.inside = false; };
-    // Connected, luminous ribbons complement the existing fast particle field.
+    // Connected glowing ribbons and traveling starlight motes.
     // The pointer displaces actual curve geometry, not merely its brightness.
     const drawStreamlines = (time: number) => {
       const count = width < 700 ? STREAMLINE_COUNT_MOBILE : STREAMLINE_COUNT_DESKTOP;
@@ -151,47 +132,11 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     };
     const draw = (dt: number, time: number) => {
       if (ratio !== Math.min(devicePixelRatio || 1, 1.75)) resize();
-      // Redraw bounded trails: alpha decay on an 8-bit canvas otherwise leaves persistent ghosts.
+      // The star wave is the sole animated background layer.
       ctx.clearRect(0, 0, width, height);
       drawStreamlines(time);
-      ctx.lineCap = 'round'; ctx.lineWidth = 1.3;
       pointer.speed *= Math.exp(-dt * 3.5);
       pointer.vx *= Math.exp(-dt * 3.5); pointer.vy *= Math.exp(-dt * 3.5);
-      const travel = dt * SPEED_MULTIPLIER;
-      for (const p of particles) {
-        p.age += dt;
-        if (p.age >= p.life || p.x < -20 || p.x > width + 20 || p.y < -20 || p.y > height + 20) spawn(p);
-        const angle = .55 + Math.sin(p.x * .004 + time * .09) * 1.2 + Math.cos(p.y * .005 - time * .07) * .85;
-        let vx = Math.cos(angle) * 32, vy = Math.sin(angle) * 32;
-        const dx = p.x - pointer.x, dy = p.y - pointer.y, distance = pointer.inside ? Math.hypot(dx, dy) : 0;
-        const influence = pointer.inside ? Math.max(0, 1 - distance / 165) ** 2 : 0;
-        const force = influence * (38 + pointer.speed * 85);
-        vx += (-dy / Math.max(12, distance)) * force + pointer.vx * influence * 10;
-        vy += (dx / Math.max(12, distance)) * force + pointer.vy * influence * 10;
-        const ease = 1 - Math.exp(-dt * 4);
-        p.vx += (vx - p.vx) * ease; p.vy += (vy - p.vy) * ease;
-        p.x += p.vx * travel; p.y += p.vy * travel;
-        const envelope = Math.min(1, p.age / 1.3, (p.life - p.age) / 1.5);
-        p.head = (p.head + 1) % TRAIL_POINTS;
-        p.trail[p.head * 2] = p.x; p.trail[p.head * 2 + 1] = p.y;
-        p.filled = Math.min(TRAIL_POINTS, p.filled + 1);
-        ctx.strokeStyle = p.amber ? secondary : accent;
-        // Cache per-particle brightness; skip invisible/newborn trails at the higher count.
-        const opacity = envelope * Math.min(.75, .60 + influence * pointer.speed * .2);
-        if (opacity < .001 || p.filled < 2) continue;
-        for (let group = 0; group < FADE_GROUPS; group++) {
-          const first = group * SEGMENTS_PER_GROUP;
-          if (first >= p.filled - 1) break;
-          ctx.globalAlpha = opacity * (1 - group / FADE_GROUPS);
-          ctx.beginPath();
-          for (let k = first; k <= Math.min(first + SEGMENTS_PER_GROUP, p.filled - 1); k++) {
-            const index = ((p.head - k + TRAIL_POINTS) % TRAIL_POINTS) * 2;
-            if (k === first) ctx.moveTo(p.trail[index], p.trail[index + 1]);
-            else ctx.lineTo(p.trail[index], p.trail[index + 1]);
-          }
-          ctx.stroke();
-        }
-      }
       if (pointer.inside && pointer.speed > .18) {
         ctx.strokeStyle = accent;
         ctx.globalAlpha = Math.min(.12, pointer.speed * .045);
