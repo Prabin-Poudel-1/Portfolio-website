@@ -85,6 +85,10 @@
   --smoke-ambient: #809BB5;
   --smoke-gold: #77ACDA;
   --smoke-flare: #356BA5;
+  /* Star-only red highlights; dust stays blue. */
+  --smoke-star-halo: #F87171;
+  --smoke-star-flare: #DC2626;
+  --smoke-star-core: #B91C1C;
   --sculpture-gold: #A3CDEA;
   --sculpture-flare: #3B6FA8;
 }
@@ -1019,20 +1023,5 @@ pre {
   .portfolio-atlas-intro h3 { font-size: 30px; }
 }
 
-/* Master cursor glow stays at .585 opacity; tint the cursor only in hero. */
-.custom-cursor[data-zone="hero"] .cursor-dot::before {
-  background: var(--smoke-flare);
-  box-shadow: 0 0 9px 2px var(--smoke-gold);
-}
-.custom-cursor[data-zone="hero"] .cursor-ring::before {
-  border-color: var(--smoke-gold);
-  opacity: .87;
-}
-.custom-cursor[data-zone="hero"] .cursor-aura {
-  background: radial-gradient(circle,
-    color-mix(in srgb, var(--smoke-flare) 24%, transparent) 0%,
-    color-mix(in srgb, var(--smoke-gold) 7%, transparent) 30%,
-    transparent 69%);
-}
-.custom-cursor[data-zone="hero"] .cursor-label { color: var(--smoke-gold); }
-
+/* Disable the cursor aura only in the hero; keep the normal cursor elsewhere. */
+.custom-cursor[data-zone="hero"] .cursor-aura { display: none !important; }

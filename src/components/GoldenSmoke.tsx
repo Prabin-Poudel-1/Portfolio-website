@@ -195,7 +195,10 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
     let mist = makeMistSprite('#A78B63');
     let highlight = makeMistSprite('#D7AE6D');
     let brightGold = makeMistSprite('#FFE2A0');
-    let dustColor = '#E1C999';
+    // Star sprites are independent of dust, so light mode can use red stars.
+    let starHalo = highlight;
+    let starFlare = brightGold;
+    let starCore = '#FFE8B8';
     let bounds = hero.getBoundingClientRect();
 
     const pointer = {
@@ -206,15 +209,21 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
     const updateColors = () => {
       const style = getComputedStyle(hero);
       dark = document.documentElement.dataset.theme !== 'light';
-      // A warm golden mist is intentionally independent of blue UI accents.
-      // Dark: illuminated honey / champagne. Light: antique gold on ivory.
+      // Dark mode remains golden; light mode keeps blue dust and red stars.
       const warm = style.getPropertyValue('--smoke-ambient').trim() || (dark ? '#A78B63' : '#988367');
       const gold = style.getPropertyValue('--smoke-gold').trim() || (dark ? '#D7AE6D' : '#AC772B');
       const flare = style.getPropertyValue('--smoke-flare').trim() || (dark ? '#FFE2A0' : '#D79A39');
-      dustColor = flare;
       mist = makeMistSprite(warm);
       highlight = makeMistSprite(gold);
       brightGold = makeMistSprite(flare);
+      starHalo = dark ? highlight : makeMistSprite(
+        style.getPropertyValue('--smoke-star-halo').trim() || '#F87171',
+      );
+      starFlare = dark ? brightGold : makeMistSprite(
+        style.getPropertyValue('--smoke-star-flare').trim() || '#DC2626',
+      );
+      starCore = dark ? '#FFE8B8' :
+        (style.getPropertyValue('--smoke-star-core').trim() || '#B91C1C');
       ctx.clearRect(0, 0, width, height);
     };
 
@@ -344,12 +353,11 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
         p.x += (targetX - p.x) * settle;
         p.y += (targetY - p.y) * settle;
 
-        const lit = Math.min(1, influence * (1 + pointer.speed * .25));
+        // Preserve cursor-driven motion, but do not illuminate particles near it.
         const isStar = p.kind < .5;
 
         if (isStar) {
-          // Bright golden stars shimmer independently while sharing the cloud's
-          // existing shape morphing and cursor-responsive movement.
+          // Stars retain independent twinkles; on light backgrounds they are red.
           const shimmer = .57 + .43 * Math.sin(time * (2.1 + p.speed * 1.3)
             + p.phase * 7 + p.depth * 4);
           const twinkle = .15 + .85 * shimmer * shimmer;
@@ -357,72 +365,42 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
             * (dark ? 1 : 1.22);
           const haloSize = (5 + p.size * 6) * (.7 + p.depth * .75);
 
-          ctx.globalAlpha = Math.min(1,
-            (dark ? .44 + lit * .36 : .63 + lit * .24) * twinkle);
+          ctx.globalAlpha = (dark ? .44 : .63) * twinkle;
           ctx.drawImage(
-            highlight,
+            starHalo,
             p.x - haloSize / 2, p.y - haloSize / 2,
             haloSize, haloSize,
           );
 
-          const flareSize = haloSize * (1.6 + lit * .6);
-          // At rest light mode stays pale blue; near the cursor deep blue blooms.
-          ctx.globalAlpha = Math.min(1,
-            (dark ? .34 + lit * .57 : .20 + lit * .72) * twinkle);
+          const flareSize = haloSize * 1.6;
+          ctx.globalAlpha = (dark ? .34 : .20) * twinkle;
           ctx.drawImage(
-            brightGold,
+            starFlare,
             p.x - flareSize / 2, p.y - flareSize / 2,
             flareSize, flareSize,
           );
 
-          // Crisp bright cores distinguish the stars from the 50% soft dust.
-          ctx.fillStyle = dark
-            ? (lit > .25 ? '#FFF5D7' : '#FFE8B8')
-            : (lit > .25 ? '#275B95' : '#5C8FC0');
-          ctx.globalAlpha = Math.min(1,
-            (dark ? .68 + lit * .25 : .78 + lit * .18) * twinkle);
+          // Crisp cores distinguish stars from the soft dust.
+          ctx.fillStyle = starCore;
+          ctx.globalAlpha = (dark ? .68 : .78) * twinkle;
           ctx.fillRect(
             p.x - coreSize / 2, p.y - coreSize / 2,
             coreSize, coreSize,
           );
         } else {
-          // Preserve the atmospheric dust and its existing golden cursor bloom.
+          // Keep the original atmospheric blue/gold dust without cursor glow.
           const spotSize = (14 + p.size * 34) * (.55 + p.depth * .9);
           const sprite = p.kind < .55 ? highlight : mist;
           // More contrast on ivory: tiny translucent GPU dust had vanished.
-          ctx.globalAlpha = (dark ? .21 + lit * .085 : .43 + lit * .12)
-            * (.35 + p.depth * .7);
+          ctx.globalAlpha = (dark ? .21 : .43) * (.35 + p.depth * .7);
           ctx.drawImage(
             sprite,
             p.x - spotSize / 2, p.y - spotSize / 2,
             spotSize, spotSize,
           );
-          if (lit > .03) {
-            const glowSize = spotSize * (1.08 + lit * .48);
-            ctx.globalAlpha = (dark ? .37 : .58) * lit;
-            ctx.drawImage(
-              brightGold,
-              p.x - glowSize / 2, p.y - glowSize / 2,
-              glowSize, glowSize,
-            );
-          }
-        }
+         }
       }
       ctx.globalCompositeOperation = 'source-over';
-      // A subtle localized golden aura tracks the pointer without hiding content.
-      if (pointer.inside) {
-        const haloRadius = pointer.down ? 170 : 125;
-        const halo = ctx.createRadialGradient(
-          pointer.x, pointer.y, 3,
-          pointer.x, pointer.y, haloRadius,
-        );
-        halo.addColorStop(0, hexRGBA(dustColor, dark ? .13 : .115));
-        halo.addColorStop(.5, hexRGBA(dustColor, dark ? .055 : .055));
-        halo.addColorStop(1, hexRGBA(dustColor, 0));
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = halo;
-        ctx.fillRect(pointer.x - haloRadius, pointer.y - haloRadius, haloRadius * 2, haloRadius * 2);
-      }
       ctx.globalAlpha = 1;
     };
 
