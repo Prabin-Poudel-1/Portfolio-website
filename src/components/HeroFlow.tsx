@@ -14,12 +14,21 @@ uniform float uPress;
 uniform float uTime;
 uniform float uScale;
 uniform float uDpr;
+uniform float uDark;
 varying float vLight;
 varying float vDepth;
 varying float vHaze;
 varying float vOpacity;
 void main() {
   vec3 p = aPosition;
+  // Only the light theme becomes a wider, free-floating field of fine dust.
+  // The dark theme keeps its original sculpture geometry and movement.
+  if (uDark < .5) {
+    p.x = p.x * 1.28 + .11 * sin(aDetail.y * 57. + aDetail.x * 19.);
+    p.y = p.y * 1.10 + .075 * cos(aDetail.y * 37. + aDetail.x * 23.);
+    p.x += .025 * sin(uTime * .55 + aDetail.y * 38.);
+    p.y += .019 * cos(uTime * .48 + aDetail.y * 34.);
+  }
   p.x += .048 * sin(p.y * 7.2 + uTime * .26 + aDetail.y * 5.);
   p.y += .048 * cos(p.x * 5.8 - uTime * .22 + aDetail.y * 5.);
   float c = cos(uTime * .054), s = sin(uTime * .054);
@@ -38,6 +47,10 @@ void main() {
   vHaze = aDetail.z;
   vOpacity = aDetail.w;
   float size = mix(1.2 + aDetail.x * 2.4, 13. + aDetail.x * 21., vHaze);
+  if (uDark < .5) {
+    // Smaller point sprites prevent a muddy fog on the ivory background.
+    size = mix(.9 + aDetail.x * 1.9, 4.2 + aDetail.x * 5.8, vHaze);
+  }
   gl_PointSize = min(64., size * uDpr * (.70 + depth * .45));
 }`;
 const fragmentSource = `
@@ -61,6 +74,11 @@ void main() {
   color = mix(color, uFlare, pow(vLight, 3.) * .68);
   color *= mix(.5, 1.22, vDepth);
   float alpha = mix(kernel * .59, fog * .13, vHaze) * vOpacity;
+  if (uDark < .5) {
+    // Fine, high-definition dust specks rather than broad translucent smoke.
+    float fleck = pow(max(0., 1. - r2), 4.8);
+    alpha = mix(fleck * .88, exp(-r2 * 5.) * .21, vHaze) * vOpacity * .81;
+  }
   alpha *= 1. + light * (uDark > .5 ? 1.1 : .65);
   gl_FragColor = vec4(color, alpha);
 }`;
