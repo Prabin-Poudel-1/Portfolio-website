@@ -72,9 +72,17 @@ assert(goldSmoke.includes('if (form === 2)'), 'Spiral-arm formation exists');
 assert(goldSmoke.includes('if (form === 3)'), 'Bloom formation exists');
 assert(goldSmoke.includes('if (form === 4)'), 'Torus vortex formation exists');
 assert(goldSmoke.includes('if (form === 5)'), 'Double helix formation exists');
-assert(goldSmoke.includes('if (form === 6)'), 'Mobius strip formation exists');
+assert(goldSmoke.includes('if (form === 6)'), 'Butterfly formation replaces Mobius strip');
+assert(goldSmoke.includes('const wingIndex = Math.min(3, Math.floor(group / .23));'), 'Butterfly has four wings');
+assert(goldSmoke.includes('const flutter = 1 + .07 * Math.sin(time * .85'), 'Butterfly wings flutter gently');
+assert(goldSmoke.includes('if (group >= .92)'), 'Butterfly has an independent body');
+assert(goldSmoke.includes('if (group >= .975)'), 'Butterfly has antennae');
+assert(!goldSmoke.includes('Möbius strip'), 'Old Mobius formation removed');
 assert(goldSmoke.includes('const waveX = radius * 2 - 1;'), 'Fluid wave formation exists');
-assert(goldSmoke.includes('const starCount = Math.round(count * .5);'), '50 percent stars are retained');
+assert(goldSmoke.includes('const oldStarCount = Math.round(count * .5);'), 'Original star baseline is 50% of particles');
+assert(goldSmoke.includes('const dustCount = count - oldStarCount;'), 'Dust count stays unchanged');
+assert(goldSmoke.includes('const starCount = Math.round(oldStarCount * 1.5);'), 'Stars increase 1.5 times');
+assert(goldSmoke.includes('{ length: starCount + dustCount }'), 'Total particles reflect extra stars');
 assert(goldSmoke.includes('const next = ((current + 1) % FORM_COUNT) as Form;'), 'All eight forms cycle back to nebula');
 assert(goldSmoke.includes('const blend = smoothstep5(transition);'), 'Transition uses smooth interpolation');
 assert(goldSmoke.includes('const [fromX, fromY] = particleForm(current'), 'Stable particle identities used for morph');
@@ -84,10 +92,10 @@ assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'),
 
 assert(goldSmoke.includes('const centerX = width * (mobile ? .57 : .69);'), 'Golden cloud is right-aligned on desktop');
 
-assert(goldSmoke.includes('const starCount = Math.round(count * .5);'), 'Exactly 50 percent of particles assigned to star class');
+assert(goldSmoke.includes('const starCount = Math.round(oldStarCount * 1.5);'), 'Star count increases by 50 percent');
 assert(goldSmoke.includes('createParticle(index < starCount)'), 'Particle classification is deterministic per resize');
 assert(goldSmoke.includes('kind: isStar ? Math.random() * .5 : .5 + Math.random() * .5'), 'Star/dust categories remain disjoint');
-assert(goldSmoke.includes('const isStar = p.kind < .5;'), '50 percent stars, 50 percent dust drawing split');
+assert(goldSmoke.includes('const isStar = p.kind < .5;'), 'Star and dust remain visually distinct');
 assert(goldSmoke.includes('const twinkle = .15 + .85 * shimmer * shimmer;'), 'Independently modulated star brightness');
 assert(goldSmoke.includes("? (lit > .25 ? '#FFF5D7' : '#FFE8B8')"), 'Bright golden core preserved in dark mode');
 assert(goldSmoke.includes('Preserve the atmospheric dust and its existing golden cursor bloom.'), 'Soft dust remains');
@@ -130,8 +138,8 @@ console.log('PASS: hero-only gold cursor, continuous hover trail, original rest-
 
 console.log('PASS: right-positioned original golden cloud; light-theme golden dust and blue cursor highlights; dark palette and project atlas retained.');
 
-console.log('PASS: eight smoothly morphing formations, including torus/helix/mobius/wave, with cursor glow and 50/50 particles preserved.');
+console.log('PASS: eight smoothly morphing formations, including torus/helix/butterfly/wave, with cursor glow preserved.');
 
-console.log('PASS: 50% twinkling stars / 50% atmospheric dust with existing morphs, cursor glow, and light mode unchanged.');
+console.log('PASS: stars increased by 1.5x while original dust count, cursor glow, and both light/dark palettes remain unchanged.');
 
 console.log('PASS: visible light-blue Canvas stars/dust and deep-blue cursor response; 4 shared morphs; dark mode unchanged.');
