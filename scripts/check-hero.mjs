@@ -59,14 +59,20 @@ assert(goldSmoke.includes("let mist = makeMistSprite('#A78B63')"), 'Original gol
 assert(goldSmoke.includes("let brightGold = makeMistSprite('#FFE2A0')"), 'Original bright golden core restored');
 assert(goldSmoke.includes('brightGold,\n') && goldSmoke.includes('ctx.drawImage('), 'Golden star and dust illumination retained');
 
-assert(goldSmoke.includes('const FORM_SECONDS = 14;'), 'Morph pacing is 14 seconds per shape');
-assert(goldSmoke.includes('const FORM_HOLD = 8;'), 'Shapes hold before transitions');
-assert(goldSmoke.includes('const FORM_COUNT = 4;'), 'Four forms are available');
+assert(goldSmoke.includes('const FORM_SECONDS = 10;'), 'Morph pacing is 10 seconds per shape');
+assert(goldSmoke.includes('const FORM_HOLD = 6;'), 'Shapes hold before transitions');
+assert(goldSmoke.includes('const FORM_COUNT = 8;'), 'Eight forms are available');
 assert(goldSmoke.includes('const smoothstep5 = (t: number)'), 'Quintic easing avoids abrupt transitions');
 assert(goldSmoke.includes('if (form === 0)'), 'Original nebula remains as the starting shape');
 assert(goldSmoke.includes('if (form === 1)'), 'Infinity loop formation exists');
 assert(goldSmoke.includes('if (form === 2)'), 'Spiral-arm formation exists');
-assert(goldSmoke.includes('const petals = .55 + .35 * Math.cos(5 * angle'), 'Bloom formation exists');
+assert(goldSmoke.includes('if (form === 3)'), 'Bloom formation exists');
+assert(goldSmoke.includes('if (form === 4)'), 'Torus vortex formation exists');
+assert(goldSmoke.includes('if (form === 5)'), 'Double helix formation exists');
+assert(goldSmoke.includes('if (form === 6)'), 'Mobius strip formation exists');
+assert(goldSmoke.includes('const waveX = radius * 2 - 1;'), 'Fluid wave formation exists');
+assert(goldSmoke.includes('const starCount = Math.round(count * .5);'), '50 percent stars are retained');
+assert(goldSmoke.includes('const next = ((current + 1) % FORM_COUNT) as Form;'), 'All eight forms cycle back to nebula');
 assert(goldSmoke.includes('const blend = smoothstep5(transition);'), 'Transition uses smooth interpolation');
 assert(goldSmoke.includes('const [fromX, fromY] = particleForm(current'), 'Stable particle identities used for morph');
 assert(goldSmoke.includes('const [toX, toY] = particleForm(next'), 'Particles interpolate into the next form');
@@ -121,7 +127,7 @@ console.log('PASS: hero-only gold cursor, continuous hover trail, original rest-
 
 console.log('PASS: right-positioned original golden cloud; light-theme golden dust and blue cursor highlights; dark palette and project atlas retained.');
 
-console.log('PASS: smoothly morphing golden nebula, infinity, galaxy and bloom forms with original cursor lighting preserved.');
+console.log('PASS: eight smoothly morphing formations, including torus/helix/mobius/wave, with cursor glow and 50/50 particles preserved.');
 
 console.log('PASS: 50% twinkling stars / 50% atmospheric dust with existing morphs, cursor glow, and light mode unchanged.');
 
