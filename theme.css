@@ -717,7 +717,7 @@ pre {
 .network-stage .network-signal { fill: var(--accent); stroke: none; }
 .hero-motion-toggle { border: 1px solid var(--control); border-radius: 4px; color: var(--muted); background: var(--bg); font: inherit; padding: 4px 8px; min-height: 28px; }
 .hero-motion-toggle:hover, .hero-motion-toggle[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
-.node-inspector > .inspector-content { grid-area: 1 / 2; animation: none; }
+.node-inspector > .inspector-content { grid-area: 1 / 1; animation: none; }
 .node-inspector > .inspector-content.is-active { animation: inspector-enter 250ms ease-out; }
 @media (max-width: 700px) { .hero-motion-toggle { min-height: 36px; } }
 @media (prefers-reduced-motion: reduce) {
