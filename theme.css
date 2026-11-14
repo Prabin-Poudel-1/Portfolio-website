@@ -32,7 +32,7 @@
   --globe-shadow: #0D1117;
   --radius-sm: 8px;
   --radius-md: 16px;
-  /* Controlled frosted-glass surfaces; the hero streamlines remain behind them. */
+  /* Dark-mode frosted-glass surfaces; no hero canvas is rendered. */
   --glass-surface: rgba(17, 24, 39, .58);
   --glass-strong: rgba(17, 24, 39, .78);
   --glass-border: rgba(220, 235, 255, .20);
