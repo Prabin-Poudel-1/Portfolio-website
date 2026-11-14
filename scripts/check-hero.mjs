@@ -85,3 +85,20 @@ assert(css.includes('.custom-cursor[data-zone="hero"] .cursor-ring::after'), 'He
 assert(css.includes('.custom-cursor[data-zone="hero"] .cursor-dot::before'), 'Golden hero cursor dot');
 assert(cursor.includes('document.removeEventListener("pointermove", move, true)'), 'Cursor event cleanup retained');
 console.log('PASS: hero-only gold cursor, continuous hover trail, original rest-of-site cursor and reduced-motion fallback.');
+
+
+const particle = readFileSync('src/components/HeroFlow.tsx', 'utf8');
+assert(particle.includes('uniform vec2 uMotion;'), 'Shader receives cursor movement');
+assert(particle.includes('uniform float uSpeed;'), 'Shader receives cursor speed');
+assert(particle.includes('point += tangent * field * swirl;'), 'GPU particles swirl near pointer');
+assert(particle.includes('point += normal * field * (8. + uPress * 14.);'), 'GPU particles respond to cursor proximity');
+assert(particle.includes('gl.uniform2f(U.motion, pointer.directionX, pointer.directionY);'), 'JS cursor direction reaches GPU');
+assert(particle.includes('gl.uniform1f(U.speed, pointer.speed);'), 'JS cursor speed reaches GPU');
+assert(particle.includes('p.x = p.x * 1.28'), 'Wider light-mode dust retained');
+assert(particle.includes('const vertexSource'), 'WebGL vertex shader retained');
+assert(particle.includes('const fragmentSource'), 'WebGL fragment shader retained');
+assert(particle.includes('const stop = paused ? () => {} : animateHero(hero, draw)'), 'Existing motion pause retained');
+const unaffected = readFileSync('src/sections/Projects.tsx', 'utf8');
+assert(unaffected.includes('className="portfolio-atlas"'), 'Relocated project atlas retained');
+assert(unaffected.includes('<SystemDiagram'), 'Engineering map retained');
+console.log('PASS: original WebGL particle interaction restored and wired to pointer speed/motion; dark idle look and light dust preserved.');
