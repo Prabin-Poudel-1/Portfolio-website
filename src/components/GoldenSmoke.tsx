@@ -20,8 +20,8 @@ type MistParticle = {
 };
 
 const TAU = Math.PI * 2;
-const MOBILE_COUNT = 280;
-const DESKTOP_COUNT = 900;
+const MOBILE_COUNT = 560;
+const DESKTOP_COUNT = 1800;
 
 // Eight organic particle formations. Each holds for six seconds and
 // interpolates over four seconds; one full loop lasts 80 seconds.
