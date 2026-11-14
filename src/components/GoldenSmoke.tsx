@@ -23,6 +23,60 @@ const TAU = Math.PI * 2;
 const MOBILE_COUNT = 280;
 const DESKTOP_COUNT = 900;
 
+// Four dust sculptures, not hard-edged line drawings.
+// An extended hold and quintic easing make transitions feel fluid.
+const FORM_SECONDS = 14;
+const FORM_HOLD = 8;
+const FORM_COUNT = 4;
+const smoothstep5 = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
+
+type Form = 0 | 1 | 2 | 3;
+function particleForm(
+  form: Form, particle: MistParticle, angle: number, radius: number,
+  time: number, spreadX: number, spreadY: number, fold: number,
+): [number, number] {
+  const phase = particle.phase;
+  const depth = particle.depth;
+  if (form === 0) {
+    // Original, screenshot-approved atmospheric nebula.
+    return [
+      Math.cos(angle) * spreadX * radius + fold,
+      Math.sin(angle) * spreadY * radius
+        + Math.cos(angle * 2 - time * .17 + phase) * 19 * depth,
+    ];
+  }
+  if (form === 1) {
+    // Infinity: two loose lobes with a scattered soft-volume cross section.
+    const loop = angle + time * .035;
+    const radiusWidth = .48 + radius * .55;
+    return [
+      Math.sin(loop) * spreadX * radiusWidth * 1.04
+        + Math.sin(phase * 2 + time * .13) * 16 * (1 - depth * .4),
+      Math.sin(loop * 2) * spreadY * radiusWidth * .64
+        + Math.cos(phase * 3 + time * .16) * 18 * (1 - depth * .3),
+    ];
+  }
+  if (form === 2) {
+    // Three rotating spiral arms. Independent phases keep the shape dusty.
+    const arm = Math.floor(phase / TAU * 3);
+    const sweep = arm * TAU / 3 + radius * 4.9 - time * .13
+      + Math.sin(particle.angle * 2) * .22;
+    const distance = .13 + radius * .87;
+    return [
+      Math.cos(sweep) * spreadX * distance + Math.sin(phase * 4) * 14,
+      Math.sin(sweep) * spreadY * distance + Math.cos(phase * 4) * 14,
+    ];
+  }
+  // A slowly breathing, five-petal nebula bloom.
+  const petals = .55 + .35 * Math.cos(5 * angle - time * .05);
+  const bloom = petals * (.23 + radius * .84);
+  return [
+    Math.cos(angle) * spreadX * bloom * 1.09 + fold * .32,
+    Math.sin(angle) * spreadY * bloom
+      + Math.sin(phase * 2 + time * .13) * 13 * depth,
+  ];
+}
+
 const hexRGBA = (hex: string, opacity: number) => {
   const clean = hex.trim().replace('#', '');
   const six = clean.length === 3 ? clean.split('').map(v => v + v).join('') : clean;
@@ -157,9 +211,27 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
         const a = spin + (1 - r) * 1.75;
         // Asymmetric wandering contours create soft volumetric folds and depth.
         const fold = Math.sin(a * 3.1 + time * .24 + p.phase) * 21 * p.depth;
-        const anchorX = centerX + Math.cos(a) * spreadX * r + fold;
-        const anchorY = centerY + Math.sin(a) * spreadY * r
-          + Math.cos(a * 2 - time * .17 + p.phase) * 19 * p.depth;
+        // Stay in one form for eight seconds, then continuously morph over six.
+        // Both forms use the same particles: no random respawning or jumps.
+        const stage = (time % (FORM_SECONDS * FORM_COUNT)) / FORM_SECONDS;
+        const current = Math.floor(stage) as Form;
+        const next = ((current + 1) % FORM_COUNT) as Form;
+        const local = stage - current;
+        const transition = Math.max(0, Math.min(1,
+          (local * FORM_SECONDS - FORM_HOLD) / (FORM_SECONDS - FORM_HOLD),
+        ));
+        const blend = smoothstep5(transition);
+        const [fromX, fromY] = particleForm(current, p, a, r, time, spreadX, spreadY, fold);
+        // Compute the next shape only when the blend actually begins.
+        let shapeX = fromX;
+        let shapeY = fromY;
+        if (blend > 0) {
+          const [toX, toY] = particleForm(next, p, a, r, time, spreadX, spreadY, fold);
+          shapeX += (toX - fromX) * blend;
+          shapeY += (toY - fromY) * blend;
+        }
+        const anchorX = centerX + shapeX;
+        const anchorY = centerY + shapeY;
 
         let targetX = anchorX;
         let targetY = anchorY;
