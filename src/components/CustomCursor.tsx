@@ -17,12 +17,17 @@ export function CustomCursor() {
     const size = 320, ratio = Math.min(devicePixelRatio || 1, 2);
     canvas.width = canvas.height = size * ratio;
     ctx?.scale(ratio, ratio);
-    let x = 0, y = 0, rx = 0, ry = 0, gx = 0, gy = 0, shown = false, down = false;
+    let x = 0, y = 0, rx = 0, ry = 0, gx = 0, gy = 0, shown = false, down = false, heroZone = false, lastMove = 0;
     let frame = 0, lastFrame = 0, released = 0, speed = 0;
     let points: Point[] = [];
     let hoverLabel = "";
     let tailColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-    const themeObserver = new MutationObserver(() => { tailColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(); });
+    let particleColor = getComputedStyle(document.documentElement).getPropertyValue('--smoke-flare').trim() || '#FFE2A0';
+    const themeObserver = new MutationObserver(() => {
+      const palette = getComputedStyle(document.documentElement);
+      tailColor = palette.getPropertyValue('--accent').trim();
+      particleColor = palette.getPropertyValue('--smoke-flare').trim() || '#FFE2A0';
+    });
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     const native = "input, textarea, select, [contenteditable]:not([contenteditable='false']), iframe, video";
     const enabled = () => fine.matches && !reduced.matches;
@@ -32,7 +37,9 @@ export function CustomCursor() {
     const clear = () => {
       cancelAnimationFrame(frame);
       frame = 0;
-      shown = down = false;
+      shown = down = heroZone = false;
+      lastMove = 0;
+      root.dataset.zone = "default";
       points = [];
       speed = 0;
       root.dataset.visible = "false";
@@ -43,14 +50,16 @@ export function CustomCursor() {
     const drawTail = (now: number) => {
       if (!ctx) return false;
       ctx.clearRect(0, 0, size, size);
-      if (down) points = points.filter(p => now - p.time < 170);
-      const fade = down ? 1 : Math.max(0, 1 - (now - released) / 250);
+      if (down || heroZone) points = points.filter(p => now - p.time < 230);
+      const fade = down ? 1 : heroZone
+        ? Math.max(0, 1 - (now - lastMove) / 260)
+        : Math.max(0, 1 - (now - released) / 250);
       if (fade <= 0) { points = []; return false; }
       if (points.length < 2) return false;
       const head = points[points.length - 1];
       canvas.style.transform = `translate3d(${head.x - size / 2}px, ${head.y - size / 2}px, 0)`;
       // A short bounded path, not particles or a blurred full-screen surface.
-      const limit = 18 + Math.min(speed, 2.5) * 38;
+      const limit = (heroZone ? 38 : 18) + Math.min(speed, 2.5) * (heroZone ? 48 : 38);
       let distance = 0;
       ctx.lineCap = "round";
       for (let i = points.length - 1; i > 0; i--) {
@@ -58,10 +67,10 @@ export function CustomCursor() {
         distance += Math.hypot(a.x - b.x, a.y - b.y);
         if (distance > limit) break;
         const taper = Math.max(0, 1 - distance / limit);
-        const age = Math.max(0, 1 - ((down ? now : released) - a.time) / 170);
+        const age = Math.max(0, 1 - (((down || heroZone) ? now : released) - a.time) / (heroZone ? 230 : 170));
         const alpha = fade * age * taper * (.45 + Math.min(speed, 2.5) * .15);
         for (const [width, opacity] of [[7, .1], [3, .3], [1.2, .85]]) {
-          ctx.strokeStyle = tailColor;
+          ctx.strokeStyle = heroZone ? particleColor : tailColor;
           ctx.globalAlpha = alpha * opacity;
           ctx.lineWidth = width * (.45 + taper * .55);
           ctx.beginPath();
@@ -96,7 +105,10 @@ export function CustomCursor() {
       const el = document.elementFromPoint(e.clientX, e.clientY);
       if (!el || el.closest(native)) { clear(); return; }
       x = e.clientX; y = e.clientY;
-      if (!shown) { rx = x; ry = y; gx = x; gy = y; lastFrame = performance.now(); }
+      heroZone = !!el.closest(".home");
+      root.dataset.zone = heroZone ? "hero" : "default";
+      lastMove = performance.now();
+      if (!shown) { rx = x; ry = y; gx = x; gy = y; lastFrame = lastMove; }
       shown = true;
       root.dataset.visible = "true";
       document.documentElement.classList.add("custom-cursor-active");
@@ -110,8 +122,10 @@ export function CustomCursor() {
       if (label.textContent !== nextLabel) label.textContent = nextLabel;
       root.dataset.hover = String(!!action || drag);
       if (down && e.buttons !== 1) release();
-      if (down) {
-        const now = performance.now(), previous = points[points.length - 1];
+      // The hero draws a short colored trail on movement, without clicking.
+      // Elsewhere the latest master drag-only trail and cursor aura remain intact.
+      if (down || heroZone) {
+        const now = lastMove, previous = points[points.length - 1];
         if (previous) {
           const travel = Math.hypot(x - previous.x, y - previous.y);
           speed = speed * .55 + Math.min(4, travel / Math.max(8, now - previous.time)) * .45;
