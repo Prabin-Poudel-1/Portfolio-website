@@ -79,16 +79,11 @@ export function Projects() {
   return (
     <section className="section-wrap cinema-section" id="portfolio">
       <div className="section-heading">
-        <p className="eyebrow">Selected work / 07 perspectives</p>
         <h2>
           Systems in focus.
           <br />
           <span className="accent">Explore the connections.</span>
         </h2>
-        <p>
-          From independent AI authorization to offline emergency communication.
-          Select a project to look closer.
-        </p>
       </div>
       <div
         ref={root}
@@ -134,7 +129,6 @@ export function Projects() {
         }}
       >
         <div className="cinema-meta">
-          <span>ENGINEERING COLLECTION</span>
           <span className="cinema-counter">
             {String(index + 1).padStart(2, "0")} <i>/ 07</i>
           </span>
@@ -267,10 +261,6 @@ export function Projects() {
           documentation below remains available.
         </p>
       </noscript>
-      <p className="gallery-hint">
-        Choose a number · Use arrow keys · Swipe on mobile{" "}
-        <span>No autoplay. Explore at your pace.</span>
-      </p>
       {demo && (
         <DemoPanel
           key={item.id}
@@ -283,8 +273,7 @@ export function Projects() {
       )}
       <details className="project-index" open={enhanced ? undefined : true}>
         <summary onClick={() => playSound("open")}>
-          Browse project documentation{" "}
-          <span>Technical detail, sources, and project boundaries ↗</span>
+          Browse project documentation
         </summary>
         <ProjectArchive />
         <div className="pending-projects">
