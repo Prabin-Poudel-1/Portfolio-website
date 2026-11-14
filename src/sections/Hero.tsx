@@ -6,7 +6,6 @@ export function Hero() {
   return (
     <section className="home section-wrap" id="home">
       <div className="hero-topline">
-        <p className="eyebrow">Prabin Poudel / Engineering portfolio</p>
         <p className="availability">
           <span />
           Open to internships
