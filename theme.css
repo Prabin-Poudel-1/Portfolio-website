@@ -1,8 +1,8 @@
 /* Shared art direction for React, static case studies, and interactive modules. */
 :root {
-  --ink-0: #0D1117;
-  --ink-1: #111827;
-  --ink-2: #1F2937;
+  --ink-0: #090A10;
+  --ink-1: #12141D;
+  --ink-2: #1C1F2C;
   --paper-0: #FFFFFF;
   --paper-1: #FFFFFF;
   --paper-2: #F9FAFB;
@@ -10,33 +10,34 @@
   --surface: var(--ink-1);
   --panel: var(--ink-1);
   --panel-2: var(--ink-2);
-  --text: #F6F1E8;
-  --muted: #A6B4C8;
-  --accent: #3B82F6;
-  --editorial: #3B82F6;
-  --particle: #3B82F6;
-  --particle-secondary: #7C8CFF;
-  --particle-highlight: #DCEBFF;
-  --accent-ink: #0D1117;
-  --border: #374151;
+  --text: #EEF0F7;
+  --muted: #A0A7BD;
+  --accent: #A78BFA;
+  --editorial: #C4B5FD;
+  --particle: #A78BFA;
+  --particle-secondary: #C4B5FD;
+  --particle-highlight: #EEE5FF;
+  --accent-ink: #090A10;
+  --border: #313446;
   --line: var(--border);
-  --control: #8CA7C7;
-  --header: #0D1117f5;
-  --grid: #3B82F60a;
+  --control: #8187A0;
+  --header: #090A10f5;
+  --grid: #A78BFA08;
   --shadow: 0 18px 55px #00000024;
-  --focus: #7C8CFF;
-  --accent-soft: #3B82F622;
-  --globe-ocean: #111827;
-  --globe-land: #DCEBFF;
-  --globe-grid: #4B5563;
-  --globe-shadow: #0D1117;
+  --focus: #C4B5FD;
+  --accent-soft: #A78BFA20;
+  --globe-ocean: #151825;
+  --globe-land: #DCD6F4;
+  --globe-grid: #64627E;
+  --globe-shadow: #090A10;
   --radius-sm: 8px;
   --radius-md: 16px;
+  --cursor-glow: rgba(167, 139, 250, .27);
   /* Dark-mode frosted-glass surfaces; no hero canvas is rendered. */
-  --glass-surface: rgba(17, 24, 39, .58);
-  --glass-strong: rgba(17, 24, 39, .78);
-  --glass-border: rgba(220, 235, 255, .20);
-  --glass-edge: rgba(220, 235, 255, .09);
+  --glass-surface: rgba(18, 20, 29, .63);
+  --glass-strong: rgba(18, 20, 29, .80);
+  --glass-border: rgba(196, 181, 253, .16);
+  --glass-edge: rgba(196, 181, 253, .10);
   --glass-shadow: 0 16px 48px rgba(0, 0, 0, .20);
 }
 :root[data-theme="light"] {
