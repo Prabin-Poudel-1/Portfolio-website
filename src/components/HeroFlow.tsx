@@ -1,256 +1,232 @@
 import { useEffect, useRef } from 'react';
 import { animateHero } from '../utils/heroMotion';
 
-/**
- * Atmospheric particle sculpture, inspired by experimental WebGL portfolios.
- * Original Canvas 2D implementation: no third-party assets, no extra dependencies.
- * Existing Hero controls, project network, sound and animation loop are untouched.
- */
-type MistParticle = {
-  angle: number;
-  radius: number;
-  depth: number;
-  phase: number;
-  speed: number;
-  size: number;
-  kind: number;
-  x: number;
-  y: number;
-  ready: boolean;
-};
-
-const TAU = Math.PI * 2;
-const MOBILE_COUNT = 280;
-const DESKTOP_COUNT = 900;
-
-const hexRGBA = (hex: string, opacity: number) => {
-  const clean = hex.trim().replace('#', '');
-  const six = clean.length === 3 ? clean.split('').map(v => v + v).join('') : clean;
-  if (!/^[a-f\d]{6}$/i.test(six)) return `rgba(220, 226, 245, ${opacity})`;
-  const n = parseInt(six, 16);
-  return `rgba(${(n >>> 16) & 255}, ${(n >>> 8) & 255}, ${n & 255}, ${opacity})`;
-};
-
-function makeMistSprite(color: string) {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 96;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return canvas;
-  const gradient = ctx.createRadialGradient(48, 48, 0, 48, 48, 48);
-  gradient.addColorStop(0, hexRGBA(color, .75));
-  gradient.addColorStop(.18, hexRGBA(color, .43));
-  gradient.addColorStop(.48, hexRGBA(color, .13));
-  gradient.addColorStop(1, hexRGBA(color, 0));
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, 96, 96);
-  return canvas;
+// Original, self-contained GPU particle sculpture: no external textures or copied assets.
+const vertexSource = `
+precision highp float;
+attribute vec3 aPosition;
+attribute vec4 aDetail;
+uniform vec2 uResolution;
+uniform vec2 uOrigin;
+uniform vec2 uPointer;
+uniform float uActive;
+uniform float uPress;
+uniform float uTime;
+uniform float uScale;
+uniform float uDpr;
+varying float vLight;
+varying float vDepth;
+varying float vHaze;
+varying float vOpacity;
+void main() {
+  vec3 p = aPosition;
+  p.x += .048 * sin(p.y * 7.2 + uTime * .26 + aDetail.y * 5.);
+  p.y += .048 * cos(p.x * 5.8 - uTime * .22 + aDetail.y * 5.);
+  float c = cos(uTime * .054), s = sin(uTime * .054);
+  p = vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z);
+  float depth = 1.32 / (1.65 - p.z * .23);
+  vec2 point = uOrigin + vec2(p.x, -p.y) * uScale * depth;
+  float distanceToCursor = length(point - uPointer);
+  float influence = uActive * (1. - smoothstep(20., 220., distanceToCursor));
+  vec2 normal = normalize(point - uPointer + vec2(.001));
+  point += vec2(-normal.y, normal.x) * influence * influence * (9. + uPress * 13.);
+  point += normal * influence * influence * 3.;
+  vec2 clip = point / uResolution * 2. - 1.;
+  gl_Position = vec4(clip.x, -clip.y, 0., 1.);
+  vLight = influence;
+  vDepth = .40 + smoothstep(-.9, .9, p.z) * .60;
+  vHaze = aDetail.z;
+  vOpacity = aDetail.w;
+  float size = mix(1.2 + aDetail.x * 2.4, 13. + aDetail.x * 21., vHaze);
+  gl_PointSize = min(64., size * uDpr * (.70 + depth * .45));
+}`;
+const fragmentSource = `
+precision mediump float;
+uniform vec3 uNeutral;
+uniform vec3 uGold;
+uniform vec3 uFlare;
+uniform float uDark;
+varying float vLight;
+varying float vDepth;
+varying float vHaze;
+varying float vOpacity;
+void main() {
+  vec2 uv = gl_PointCoord * 2. - 1.;
+  float r2 = dot(uv, uv);
+  if (r2 > 1.) discard;
+  float kernel = exp(-r2 * 3.7);
+  float fog = exp(-r2 * 2.9);
+  float light = pow(vLight, 1.5);
+  vec3 color = mix(uNeutral, uGold, light * .92);
+  color = mix(color, uFlare, pow(vLight, 3.) * .68);
+  color *= mix(.5, 1.22, vDepth);
+  float alpha = mix(kernel * .59, fog * .13, vHaze) * vOpacity;
+  alpha *= 1. + light * (uDark > .5 ? 1.1 : .65);
+  gl_FragColor = vec4(color, alpha);
+}`;
+function channel(hex: string, backup: string): [number, number, number] {
+  let h = (hex || backup).trim().replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  if (!/^[0-9a-f]{6}$/i.test(h)) h = backup.slice(1);
+  const n = parseInt(h, 16);
+  return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
 }
-
+function cloud(count: number) {
+  const data = new Float32Array(count * 7);
+  for (let i = 0; i < count; i++) {
+    const t = Math.random() * Math.PI * 2;
+    const r = (Math.random() + Math.random() + Math.random() - 1.5) * .14;
+    const b = (Math.random() * 2 - 1) * (.16 + .1 * Math.cos(3 * t));
+    const k = i * 7;
+    data[k] = .69 * Math.sin(t) + .34 * Math.sin(t * 2.13 + .82) + b * Math.cos(2.6 * t) + r;
+    data[k + 1] = .56 * Math.cos(t * 1.17) + .26 * Math.sin(t * 2.83 + .25) + b * Math.sin(2.1 * t) + r * .8;
+    data[k + 2] = .48 * Math.sin(t * 1.76 + .75) + .17 * Math.cos(t * 3.2) + b * 1.7 + r * 1.2;
+    data[k + 3] = Math.random();
+    data[k + 4] = Math.random();
+    data[k + 5] = Math.random() < .15 ? 1 : 0;
+    data[k + 6] = .38 + Math.random() * .62;
+  }
+  return data;
+}
 export function HeroFlow({ paused }: { paused: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     const canvas = ref.current;
     const hero = canvas?.parentElement;
-    const ctx = canvas?.getContext('2d', { alpha: true });
-    if (!canvas || !hero || !ctx) return;
-
-    let width = 1;
-    let height = 1;
-    let ratio = 1;
-    let dark = true;
-    let particles: MistParticle[] = [];
-    let mist = makeMistSprite('#A78B63');
-    let highlight = makeMistSprite('#D7AE6D');
-    let brightGold = makeMistSprite('#FFE2A0');
-    let dustColor = '#E1C999';
-    let bounds = hero.getBoundingClientRect();
-
-    const pointer = {
-      x: -1000, y: -1000, vx: 0, vy: 0, speed: 0,
-      at: 0, inside: false, down: false,
+    if (!canvas || !hero) return;
+    const gl = canvas.getContext('webgl', { alpha: true, depth: false, antialias: false, premultipliedAlpha: false });
+    if (!gl) return;
+    const compile = (type: number, source: string) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.warn('Hero particle shader:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
     };
-
-    const updateColors = () => {
-      const style = getComputedStyle(hero);
+    const vertex = compile(gl.VERTEX_SHADER, vertexSource);
+    const fragment = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    if (!vertex || !fragment) return;
+    const program = gl.createProgram();
+    if (!program) return;
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn('Hero particle link:', gl.getProgramInfoLog(program));
+      return;
+    }
+    const buffer = gl.createBuffer();
+    if (!buffer) return;
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    const position = gl.getAttribLocation(program, 'aPosition');
+    const detail = gl.getAttribLocation(program, 'aDetail');
+    gl.enableVertexAttribArray(position);
+    gl.enableVertexAttribArray(detail);
+    gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 28, 0);
+    gl.vertexAttribPointer(detail, 4, gl.FLOAT, false, 28, 12);
+    const uniform = (name: string) => gl.getUniformLocation(program, name);
+    const U = {
+      resolution: uniform('uResolution'), origin: uniform('uOrigin'),
+      pointer: uniform('uPointer'), active: uniform('uActive'),
+      press: uniform('uPress'), time: uniform('uTime'), scale: uniform('uScale'),
+      dpr: uniform('uDpr'), neutral: uniform('uNeutral'),
+      gold: uniform('uGold'), flare: uniform('uFlare'), dark: uniform('uDark'),
+    };
+    let width = 1, height = 1, dpr = 1, count = 0;
+    let dark = true, bounds = hero.getBoundingClientRect();
+    let neutral: [number, number, number] = [0.77, 0.77, 0.79];
+    let gold: [number, number, number] = [.89, .74, .48];
+    let flare: [number, number, number] = [1, .89, .64];
+    const pointer = { x: -5000, y: -5000, tx: -5000, ty: -5000, active: 0, inside: false, pressed: false };
+    const palette = () => {
       dark = document.documentElement.dataset.theme !== 'light';
-      // A warm golden mist is intentionally independent of blue UI accents.
-      // Dark: illuminated honey / champagne. Light: antique gold on ivory.
-      const warm = style.getPropertyValue('--smoke-ambient').trim() || (dark ? '#A78B63' : '#988367');
-      const gold = style.getPropertyValue('--smoke-gold').trim() || (dark ? '#D7AE6D' : '#AC772B');
-      const flare = style.getPropertyValue('--smoke-flare').trim() || (dark ? '#FFE2A0' : '#D79A39');
-      dustColor = flare;
-      mist = makeMistSprite(warm);
-      highlight = makeMistSprite(gold);
-      brightGold = makeMistSprite(flare);
-      ctx.clearRect(0, 0, width, height);
+      const css = getComputedStyle(hero);
+      neutral = channel(css.getPropertyValue('--sculpture-base'), dark ? '#C4C5C8' : '#64626A');
+      gold = channel(css.getPropertyValue('--sculpture-gold'), dark ? '#E3BC7B' : '#B57B2F');
+      flare = channel(css.getPropertyValue('--sculpture-flare'), dark ? '#FFE4A3' : '#E7AB4B');
     };
-
-    const createParticle = (): MistParticle => ({
-      angle: Math.random() * TAU,
-      // Several layers of a warped 3D-looking cloud; no linear wave ribbons.
-      radius: Math.pow(Math.random(), .72),
-      depth: Math.random(),
-      phase: Math.random() * TAU,
-      speed: .55 + Math.random() * .9,
-      size: .45 + Math.random() * 1.4,
-      kind: Math.random(),
-      x: 0, y: 0, ready: false,
-    });
-
     const resize = () => {
       bounds = hero.getBoundingClientRect();
       width = Math.max(1, hero.clientWidth);
       height = Math.max(1, hero.clientHeight);
-      ratio = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = Math.round(width * ratio);
-      canvas.height = Math.round(height * ratio);
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      const density = Math.min(1, width * height / 800000);
-      const count = width < 700 ? MOBILE_COUNT : Math.round(DESKTOP_COUNT * Math.max(.6, density));
-      particles = Array.from({ length: count }, createParticle);
-      updateColors();
-    };
-
-    const move = (event: PointerEvent) => {
-      if (event.pointerType === 'touch') return;
-      const now = performance.now();
-      const x = event.clientX - bounds.left;
-      const y = event.clientY - bounds.top;
-      const dt = Math.max(8, now - pointer.at);
-      if (pointer.inside) {
-        pointer.vx = (x - pointer.x) / dt;
-        pointer.vy = (y - pointer.y) / dt;
-        pointer.speed = Math.min(2.6, Math.hypot(pointer.vx, pointer.vy));
+      dpr = Math.min(window.devicePixelRatio || 1, 1.65);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      const nextCount = width < 700 ? 6500 : Math.round(Math.min(22000, Math.max(12000, width * height / 62)));
+      if (nextCount !== count) {
+        count = nextCount;
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, cloud(count), gl.STATIC_DRAW);
       }
-      pointer.x = x;
-      pointer.y = y;
-      pointer.at = now;
+    };
+    const move = (e: PointerEvent) => {
+      if (e.pointerType === 'touch') return;
+      pointer.tx = e.clientX - bounds.left;
+      pointer.ty = e.clientY - bounds.top;
       pointer.inside = true;
+      if (pointer.x < 0) { pointer.x = pointer.tx; pointer.y = pointer.ty; }
     };
-    const leave = () => { pointer.inside = false; pointer.down = false; };
-    const down = (event: PointerEvent) => { if (event.pointerType !== 'touch') pointer.down = true; };
-    const up = () => { pointer.down = false; };
+    const leave = () => { pointer.inside = false; pointer.pressed = false; };
+    const press = (e: PointerEvent) => { if (e.pointerType !== 'touch') pointer.pressed = true; };
+    const release = () => { pointer.pressed = false; };
     const scroll = () => { bounds = hero.getBoundingClientRect(); pointer.inside = false; };
-
     const draw = (dt: number, time: number) => {
-      if (ratio !== Math.min(window.devicePixelRatio || 1, 1.5)) resize();
-      ctx.clearRect(0, 0, width, height);
-      pointer.vx *= Math.exp(-dt * 5);
-      pointer.vy *= Math.exp(-dt * 5);
-      pointer.speed *= Math.exp(-dt * 4.5);
-
-      const mobile = width < 700;
-      // Occupy the negative space next to the headline, not the project diagram.
-      // The engineering diagram has its own opaque foreground surface and must
-      // never be painted over by the smoke canvas.
-      const centerX = width * (mobile ? .50 : .435);
-      const centerY = height * (mobile ? .41 : .52);
-      const spreadX = Math.min(width * (mobile ? .40 : .19), 260);
-      const spreadY = Math.min(height * (mobile ? .31 : .31), 260);
-      const settle = 1 - Math.exp(-dt * (pointer.inside ? 8 : 3.5));
-      const cursorRadius = pointer.down ? 300 : 255;
-      ctx.globalCompositeOperation = dark ? 'screen' : 'source-over';
-
-      for (const p of particles) {
-        const spin = p.angle + time * (.085 + p.depth * .060) * p.speed;
-        const r = p.radius + Math.sin(p.phase + time * .22) * .022;
-        const a = spin + (1 - r) * 1.75;
-        // Asymmetric wandering contours create soft volumetric folds and depth.
-        const fold = Math.sin(a * 3.1 + time * .24 + p.phase) * 21 * p.depth;
-        const anchorX = centerX + Math.cos(a) * spreadX * r + fold;
-        const anchorY = centerY + Math.sin(a) * spreadY * r
-          + Math.cos(a * 2 - time * .17 + p.phase) * 19 * p.depth;
-
-        let targetX = anchorX;
-        let targetY = anchorY;
-        let influence = 0;
-        if (pointer.inside) {
-          const dx = anchorX - pointer.x;
-          const dy = anchorY - pointer.y;
-          const distance = Math.hypot(dx, dy);
-          influence = Math.pow(Math.max(0, 1 - distance / cursorRadius), 1.45);
-          // A gentle swirl allows the gold to illuminate instead of fleeing.
-          const turn = influence * (pointer.down ? 48 : 24);
-          const safe = Math.max(16, distance);
-          targetX += (-dy / safe) * turn + pointer.vx * influence * 12;
-          targetY += (dx / safe) * turn + pointer.vy * influence * 12;
-        }
-        if (!p.ready) {
-          p.x = anchorX;
-          p.y = anchorY;
-          p.ready = true;
-        }
-        p.x += (targetX - p.x) * settle;
-        p.y += (targetY - p.y) * settle;
-
-        // Soft translucent dots overlap into a cloud, instead of tracing neon lines.
-        const sprite = p.kind < .26 ? highlight : mist;
-        const spotSize = (14 + p.size * 34) * (.55 + p.depth * .9);
-        const lit = Math.min(1, influence * (1 + pointer.speed * .25));
-        ctx.globalAlpha = (dark ? .245 : .16) * (.35 + p.depth * .7) * (1 + lit * .48);
-        ctx.drawImage(sprite, p.x - spotSize / 2, p.y - spotSize / 2, spotSize, spotSize);
-
-        // Golden light blooms *on* the existing cloud near the cursor.
-        if (lit > .03) {
-          const glowSize = spotSize * (1.10 + lit * .60);
-          ctx.globalAlpha = (dark ? .46 : .32) * lit;
-          ctx.drawImage(brightGold, p.x - glowSize / 2, p.y - glowSize / 2, glowSize, glowSize);
-        }
-
-        // Sparse sharp details distinguish warm dust from an empty blur.
-        if (p.kind > .955) {
-          const size = .55 + p.depth * 1.3;
-          ctx.fillStyle = lit > .08 ? dustColor : (dark ? '#DBC8A7' : '#79694F');
-          ctx.globalAlpha = (dark ? .43 : .30) + lit * .45;
-          ctx.fillRect(p.x, p.y, size, size);
-        }
-      }
-      ctx.globalCompositeOperation = 'source-over';
-      // A subtle localized golden aura tracks the pointer without hiding content.
-      if (pointer.inside) {
-        const haloRadius = pointer.down ? 170 : 125;
-        const halo = ctx.createRadialGradient(
-          pointer.x, pointer.y, 3,
-          pointer.x, pointer.y, haloRadius,
-        );
-        halo.addColorStop(0, hexRGBA(dustColor, dark ? .13 : .075));
-        halo.addColorStop(.5, hexRGBA(dustColor, dark ? .055 : .035));
-        halo.addColorStop(1, hexRGBA(dustColor, 0));
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = halo;
-        ctx.fillRect(pointer.x - haloRadius, pointer.y - haloRadius, haloRadius * 2, haloRadius * 2);
-      }
-      ctx.globalAlpha = 1;
+      if (gl.isContextLost()) return;
+      const ease = 1 - Math.exp(-dt * 14);
+      pointer.x += (pointer.tx - pointer.x) * ease;
+      pointer.y += (pointer.ty - pointer.y) * ease;
+      pointer.active += ((pointer.inside ? 1 : 0) - pointer.active) * (1 - Math.exp(-dt * 6));
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(program);
+      gl.blendFunc(gl.SRC_ALPHA, dark ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
+      gl.uniform2f(U.resolution, width, height);
+      gl.uniform2f(U.origin, width * (width < 700 ? .51 : .465), height * (width < 700 ? .47 : .51));
+      gl.uniform2f(U.pointer, pointer.x, pointer.y);
+      gl.uniform1f(U.active, pointer.active);
+      gl.uniform1f(U.press, pointer.pressed ? 1 : 0);
+      gl.uniform1f(U.time, time);
+      gl.uniform1f(U.scale, Math.min(width * (width < 700 ? .33 : .205), height * .35, 310));
+      gl.uniform1f(U.dpr, dpr);
+      gl.uniform3fv(U.neutral, neutral);
+      gl.uniform3fv(U.gold, gold);
+      gl.uniform3fv(U.flare, flare);
+      gl.uniform1f(U.dark, dark ? 1 : 0);
+      gl.drawArrays(gl.POINTS, 0, count);
     };
-
-    resize();
-    const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(hero);
-    const themeObserver = new MutationObserver(updateColors);
-    themeObserver.observe(document.documentElement, {
-      attributes: true, attributeFilter: ['data-theme'],
-    });
+    gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    resize(); palette();
+    const resizer = new ResizeObserver(resize); resizer.observe(hero);
+    const theme = new MutationObserver(palette);
+    theme.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     hero.addEventListener('pointermove', move, { passive: true });
     hero.addEventListener('pointerleave', leave);
-    hero.addEventListener('pointerdown', down, { passive: true });
-    window.addEventListener('pointerup', up, { passive: true });
+    hero.addEventListener('pointerdown', press, { passive: true });
+    window.addEventListener('pointerup', release, { passive: true });
     window.addEventListener('scroll', scroll, { passive: true });
     window.addEventListener('resize', resize, { passive: true });
     const stop = paused ? () => {} : animateHero(hero, draw);
     return () => {
-      stop();
-      resizeObserver.disconnect();
-      themeObserver.disconnect();
+      stop(); resizer.disconnect(); theme.disconnect();
       hero.removeEventListener('pointermove', move);
       hero.removeEventListener('pointerleave', leave);
-      hero.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointerup', up);
+      hero.removeEventListener('pointerdown', press);
+      window.removeEventListener('pointerup', release);
       window.removeEventListener('scroll', scroll);
       window.removeEventListener('resize', resize);
-      ctx.clearRect(0, 0, width, height);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertex);
+      gl.deleteShader(fragment);
     };
   }, [paused]);
-
   return <canvas className="hero-flow" ref={ref} aria-hidden="true" />;
 }
