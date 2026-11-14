@@ -222,19 +222,41 @@
   margin-top: 35px;
   border-block: 1px solid var(--border);
 }
+.project-index {
+  border-block: none;
+}
 .project-index > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
-  padding: 24px 0;
-  font-size: 16px;
+  padding: 13px 20px;
+  margin-top: 8px;
+  margin-bottom: 22px;
+  min-height: 48px;
+  width: fit-content;
+  font: 650 14px/1.35 var(--font-body, system-ui, sans-serif);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  list-style: none;
+  transition: border-color 180ms ease, background-color 180ms ease;
 }
-.project-index > summary > span {
-  float: right;
-  font: 10px monospace;
-  color: var(--muted);
+.project-index > summary::-webkit-details-marker { display: none; }
+.project-index > summary::after {
+  content: "＋";
+  font-size: 18px;
+  line-height: 1;
+  color: var(--accent);
 }
-.project-index[open] > summary {
-  margin-bottom: 40px;
+.project-index[open] > summary::after { content: "−"; }
+.project-index > summary:hover {
+  border-color: var(--accent);
+  background: var(--panel-2);
 }
+.project-index > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.project-index[open] > summary { margin-bottom: 28px; }
 .project-archive {
   padding: 0;
 }
@@ -496,11 +518,6 @@
   }
   .type-cover strong {
     font-size: 22px;
-  }
-  .project-index > summary > span {
-    float: none;
-    display: block;
-    margin-top: 10px;
   }
   .pending-projects {
     grid-template-columns: 1fr;
