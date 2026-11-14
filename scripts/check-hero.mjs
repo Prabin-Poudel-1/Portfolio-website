@@ -62,6 +62,9 @@ assert(goldSmoke.includes('brightGold,\n') && goldSmoke.includes('ctx.drawImage(
 assert(goldSmoke.includes('const FORM_SECONDS = 10;'), 'Morph pacing is 10 seconds per shape');
 assert(goldSmoke.includes('const FORM_HOLD = 6;'), 'Shapes hold before transitions');
 assert(goldSmoke.includes('const FORM_COUNT = 8;'), 'Eight forms are available');
+assert(goldSmoke.includes('const MOBILE_COUNT = 560;'), 'Mobile particles doubled from 280');
+assert(goldSmoke.includes('const DESKTOP_COUNT = 1800;'), 'Desktop particles doubled from 900');
+assert(goldSmoke.includes('const count = width < 700 ? MOBILE_COUNT : Math.round(DESKTOP_COUNT * Math.max(.6, density));'), 'Existing adaptive density retained');
 assert(goldSmoke.includes('const smoothstep5 = (t: number)'), 'Quintic easing avoids abrupt transitions');
 assert(goldSmoke.includes('if (form === 0)'), 'Original nebula remains as the starting shape');
 assert(goldSmoke.includes('if (form === 1)'), 'Infinity loop formation exists');
