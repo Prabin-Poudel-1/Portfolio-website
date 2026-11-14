@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { SignalJourney } from "./components/SignalJourney";
 import { Header } from "./components/Header";
@@ -15,6 +15,7 @@ import { mountContact } from "./utils/contact.js";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 function Home() {
+  const [motionPaused, setMotionPaused] = useState(false);
   useEffect(() => {
     const cleanup = mountContact();
     gsap.registerPlugin(ScrollTrigger);
@@ -46,8 +47,8 @@ function Home() {
   }, []);
   return (
     <>
-      <Hero />
-      <Projects />
+      <Hero motionPaused={motionPaused} />
+      <Projects motionPaused={motionPaused} onMotionToggle={() => setMotionPaused(value => !value)} />
       <SignalJourney>
         <Skills />
         <Expertise />
