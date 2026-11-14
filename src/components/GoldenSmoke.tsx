@@ -140,7 +140,7 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       ctx.clearRect(0, 0, width, height);
     };
 
-    const createParticle = (): MistParticle => ({
+    const createParticle = (isStar: boolean): MistParticle => ({
       angle: Math.random() * TAU,
       // Several layers of a warped 3D-looking cloud; no linear wave ribbons.
       radius: Math.pow(Math.random(), .72),
@@ -148,7 +148,8 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       phase: Math.random() * TAU,
       speed: .55 + Math.random() * .9,
       size: .45 + Math.random() * 1.4,
-      kind: Math.random(),
+      // Exactly 33% stars (rounded to a whole particle); the remainder is dust.
+      kind: isStar ? Math.random() * .33 : .33 + Math.random() * .67,
       x: 0, y: 0, ready: false,
     });
 
@@ -162,7 +163,8 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       const density = Math.min(1, width * height / 800000);
       const count = width < 700 ? MOBILE_COUNT : Math.round(DESKTOP_COUNT * Math.max(.6, density));
-      particles = Array.from({ length: count }, createParticle);
+      const starCount = Math.round(count * .33);
+      particles = Array.from({ length: count }, (_, index) => createParticle(index < starCount));
       updateColors();
     };
 
@@ -256,26 +258,59 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
         p.x += (targetX - p.x) * settle;
         p.y += (targetY - p.y) * settle;
 
-        // Soft translucent dots overlap into a cloud, instead of tracing neon lines.
-        const sprite = p.kind < .26 ? highlight : mist;
-        const spotSize = (14 + p.size * 34) * (.55 + p.depth * .9);
         const lit = Math.min(1, influence * (1 + pointer.speed * .25));
-        ctx.globalAlpha = (dark ? .29 : .18) * (.35 + p.depth * .7) * (1 + lit * .48);
-        ctx.drawImage(sprite, p.x - spotSize / 2, p.y - spotSize / 2, spotSize, spotSize);
+        const isStar = p.kind < .33;
 
-        // Golden light blooms *on* the existing cloud near the cursor.
-        if (lit > .03) {
-          const glowSize = spotSize * (1.10 + lit * .60);
-          ctx.globalAlpha = (dark ? .53 : .38) * lit;
-          ctx.drawImage(brightGold, p.x - glowSize / 2, p.y - glowSize / 2, glowSize, glowSize);
-        }
+        if (isStar) {
+          // Bright golden stars shimmer independently while sharing the cloud's
+          // existing shape morphing and cursor-responsive movement.
+          const shimmer = .57 + .43 * Math.sin(time * (2.1 + p.speed * 1.3)
+            + p.phase * 7 + p.depth * 4);
+          const twinkle = .15 + .85 * shimmer * shimmer;
+          const coreSize = (.7 + p.depth * 1.1) * (0.85 + twinkle * .3);
+          const haloSize = (5 + p.size * 6) * (.7 + p.depth * .75);
 
-        // Sparse sharp details distinguish warm dust from an empty blur.
-        if (p.kind > .955) {
-          const size = .55 + p.depth * 1.3;
-          ctx.fillStyle = lit > .08 ? dustColor : (dark ? '#DBC8A7' : '#79694F');
-          ctx.globalAlpha = (dark ? .43 : .30) + lit * .45;
-          ctx.fillRect(p.x, p.y, size, size);
+          ctx.globalAlpha = Math.min(1, (.44 + lit * .36) * twinkle);
+          ctx.drawImage(
+            highlight,
+            p.x - haloSize / 2, p.y - haloSize / 2,
+            haloSize, haloSize,
+          );
+
+          const flareSize = haloSize * (1.6 + lit * .6);
+          ctx.globalAlpha = Math.min(1, (.34 + lit * .57) * twinkle);
+          ctx.drawImage(
+            brightGold,
+            p.x - flareSize / 2, p.y - flareSize / 2,
+            flareSize, flareSize,
+          );
+
+          // Crisp bright cores distinguish the stars from the 67% soft dust.
+          ctx.fillStyle = lit > .25 ? '#FFF5D7' : '#FFE8B8';
+          ctx.globalAlpha = Math.min(1, (.68 + lit * .25) * twinkle);
+          ctx.fillRect(
+            p.x - coreSize / 2, p.y - coreSize / 2,
+            coreSize, coreSize,
+          );
+        } else {
+          // Preserve the atmospheric dust and its existing golden cursor bloom.
+          const spotSize = (14 + p.size * 34) * (.55 + p.depth * .9);
+          const sprite = p.kind < .55 ? highlight : mist;
+          ctx.globalAlpha = (.21 + lit * .085) * (.35 + p.depth * .7);
+          ctx.drawImage(
+            sprite,
+            p.x - spotSize / 2, p.y - spotSize / 2,
+            spotSize, spotSize,
+          );
+          if (lit > .03) {
+            const glowSize = spotSize * (1.08 + lit * .48);
+            ctx.globalAlpha = .37 * lit;
+            ctx.drawImage(
+              brightGold,
+              p.x - glowSize / 2, p.y - glowSize / 2,
+              glowSize, glowSize,
+            );
+          }
         }
       }
       ctx.globalCompositeOperation = 'source-over';
