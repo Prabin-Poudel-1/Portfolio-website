@@ -36,17 +36,32 @@ assert(!diagram.slice(diagram.indexOf('const stop'),diagram.indexOf('const node'
 console.log('PASS: graphite/ivory blue palette, glass tokens, offscreen suspension, reduced motion, and single hero field. Browser visual checks remain separate.');
 
 const flow = readFileSync('src/components/HeroFlow.tsx', 'utf8');
-assert(flow.includes("getPropertyValue('--particle')"));
-assert(flow.includes("getPropertyValue('--particle-secondary')"));
-assert(flow.includes("getPropertyValue('--particle-highlight')"));
-assert(flow.includes('const STREAMLINE_COUNT_DESKTOP = 22'));
-assert(flow.includes('const STREAMLINE_COUNT_MOBILE = 13'));
-assert(flow.includes('const drawStreamlines = (time: number) => {'));
-assert(flow.includes('drawStreamlines(time)'));
-assert(flow.includes('ctx.quadraticCurveTo(previousX, previousY, midX, midY)'));
-assert(flow.includes('const falloff = (1 - distance / radius) ** 2'));
-assert(flow.includes('ctx.shadowBlur = lightTheme ? 7 : 17'));
-// The original freely moving magnetic particles are deliberately removed.
+for (const required of [
+  "getPropertyValue('--particle')",
+  "getPropertyValue('--particle-secondary')",
+  "getPropertyValue('--particle-highlight')",
+  "const STRANDS_DESKTOP = 26",
+  "const STRANDS_MOBILE = 15",
+  "const STARS_DESKTOP = 220",
+  "const STARS_MOBILE = 105",
+  "const waveY = (u: number, time: number) => {",
+  "const positionAt = (u: number, lane: number, time: number, out: Point) => {",
+  "const drawStrands = (time: number) => {",
+  "const drawStars = (dt: number, time: number) => {",
+  "star.u += star.speed * dt",
+  "positionAt(star.u, star.lane, time, point)",
+  "ctx.shadowBlur = lightTheme ? 15 : 28",
+  "ctx.globalCompositeOperation = lightTheme ? 'source-over' : 'screen'",
+  "const flare = Math.pow(twinkle, 5)",
+  "const push = (43 + pointer.speed * 22) * effect",
+  "pointer.presence += ((pointer.inside ? 1 : 0) - pointer.presence)",
+  "drawStrands(time)",
+  "drawStars(dt, time)",
+  "paused ? () => {} : animateHero(hero, draw)",
+]) assert(flow.includes(required), 'Missing starlight feature: ' + required);
+
+// The original magnetic field is intentionally absent; wave-attached motes
+// are not a resurrection of the old free-moving particle system.
 for (const removed of [
   'const TRAIL_POINTS',
   'const SPEED_MULTIPLIER',
@@ -55,9 +70,9 @@ for (const removed of [
   'for (const p of particles)',
   'const spawn =',
   'new Float32Array(TRAIL_POINTS * 2)',
-]) assert(!flow.includes(removed), 'Removed magnetic particle system must stay absent: ' + removed);
-assert(flow.includes('drawStreamlines(time)'), 'The luminous ribbon remains active');
-assert(flow.includes('const moteAt = (time * 0.095 + strand * 0.137) % 1'), 'Star motes continue to move along the ribbon');
-assert(flow.includes('ctx.arc(moteX, moteY'), 'The ribbon retains its star highlights');
-assert(flow.includes('const falloff = (1 - distance / radius) ** 2'), 'Ribbon geometry responds to the cursor');
-console.log('PASS: independent magnetic particles removed; luminous ribbons, moving star motes, cursor bending, and theme-aware glow retained.');
+]) assert(!flow.includes(removed), 'Unexpected magnetic field component: ' + removed);
+
+const starCount = Number(flow.match(/const STARS_DESKTOP = (\d+)/)?.[1]);
+const mobileCount = Number(flow.match(/const STARS_MOBILE = (\d+)/)?.[1]);
+assert(starCount >= 180 && mobileCount >= 80, 'Sufficient wave-bound starlight density');
+console.log('PASS: concentrated luminous wave, 220/105 traveling stars, comets, four-point glints, smoothed cursor bending, dual themes; independent magnetic field absent.');
