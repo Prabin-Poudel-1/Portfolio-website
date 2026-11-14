@@ -110,15 +110,38 @@ function particleForm(
   }
 
   if (form === 6) {
-    // 6. Möbius strip: a half-twist in a soft ribbon viewed in perspective.
-    const u = angle + time * .065;
-    const band = (radius * 2 - 1) * .22;
-    const halfTwist = u * .5;
-    const ring = .62 + band * Math.cos(halfTwist);
-    const height3d = band * Math.sin(halfTwist);
+    // 6. Butterfly: four soft, mirrored wings with breathing motion.
+    // The body and paired antennae stay visible without drawing hard lines.
+    const group = phase / TAU;
+    if (group >= .975) {
+      const side = group < .9875 ? -1 : 1;
+      const reach = radius * .93;
+      return [
+        side * spreadX * (.012 + .11 * reach),
+        -spreadY * (.23 + .32 * reach)
+          + Math.sin(time * .6 + phase * 2) * 2,
+      ];
+    }
+    if (group >= .92) {
+      return [
+        Math.sin(angle * 3 + time * .15) * (4 + depth * 5),
+        (radius * 2 - 1) * spreadY * .42,
+      ];
+    }
+    const wingIndex = Math.min(3, Math.floor(group / .23));
+    const side = wingIndex % 2 === 0 ? -1 : 1;
+    const upper = wingIndex < 2;
+    const wingRadius = Math.sqrt(radius);
+    const flutter = 1 + .07 * Math.sin(time * .85 + (upper ? 0 : 1.2));
+    const width = upper ? .36 : .265;
+    const height = upper ? .39 : .27;
+    const centerX = upper ? .42 : .33;
+    const centerY = upper ? -.34 : .30;
     return [
-      Math.cos(u) * spreadX * ring * 1.13 + Math.sin(phase * 3) * 7,
-      Math.sin(u) * spreadY * ring * .68 + height3d * spreadY * .65,
+      side * spreadX * (centerX + Math.cos(angle) * width * wingRadius) * flutter
+        + Math.sin(phase * 7 + time * .16) * 6 * depth,
+      spreadY * (centerY + Math.sin(angle) * height * wingRadius)
+        + Math.cos(phase * 4 + time * .18) * 5 * depth,
     ];
   }
 
@@ -203,7 +226,7 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       phase: Math.random() * TAU,
       speed: .55 + Math.random() * .9,
       size: .45 + Math.random() * 1.4,
-      // Exactly half bright stars and half soft dust (rounded for odd counts).
+      // Star/dust appearance is selected separately from the count multiplier.
       kind: isStar ? Math.random() * .5 : .5 + Math.random() * .5,
       x: 0, y: 0, ready: false,
     });
@@ -218,8 +241,16 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       const density = Math.min(1, width * height / 800000);
       const count = width < 700 ? MOBILE_COUNT : Math.round(DESKTOP_COUNT * Math.max(.6, density));
-      const starCount = Math.round(count * .5);
-      particles = Array.from({ length: count }, (_, index) => createParticle(index < starCount));
+      // Increase stars 1.5x relative to the prior 50/50 field; keep dust fixed.
+      // Desktop at full density: 1,350 stars + 900 dust = 2,250 total.
+      // Mobile: 420 stars + 280 dust = 700 total.
+      const oldStarCount = Math.round(count * .5);
+      const dustCount = count - oldStarCount;
+      const starCount = Math.round(oldStarCount * 1.5);
+      particles = Array.from(
+        { length: starCount + dustCount },
+        (_, index) => createParticle(index < starCount),
+      );
       updateColors();
     };
 
