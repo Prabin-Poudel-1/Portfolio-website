@@ -29,17 +29,17 @@
 }
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg: #F6F1E8;
-  --panel: #EDE6DA;
-  --panel-2: #D8DDE6;
-  --text: #1F232B;
+  --bg: #FFFFFF;
+  --panel: #FFFFFF;
+  --panel-2: #F9FAFB;
+  --text: #111827;
   --muted: #4B5563;
-  --accent: #3B82F6;
-  --accent-ink: #0D1117;
-  --line: #BFC8D5;
-  --header: #F6F1E8f2;
-  --shadow: 0 14px 40px #1534420a;
-  --control: #64748B;
+  --accent: #1D4ED8;
+  --accent-ink: #FFFFFF;
+  --line: #E5E7EB;
+  --header: #FFFFFF;
+  --shadow: 0 10px 30px #1118270d;
+  --control: #9CA3AF;
 }
 * {
   box-sizing: border-box;
