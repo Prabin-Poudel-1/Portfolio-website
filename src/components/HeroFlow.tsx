@@ -11,6 +11,8 @@ uniform vec2 uOrigin;
 uniform vec2 uPointer;
 uniform float uActive;
 uniform float uPress;
+uniform vec2 uMotion;
+uniform float uSpeed;
 uniform float uTime;
 uniform float uScale;
 uniform float uDpr;
@@ -36,10 +38,16 @@ void main() {
   float depth = 1.32 / (1.65 - p.z * .23);
   vec2 point = uOrigin + vec2(p.x, -p.y) * uScale * depth;
   float distanceToCursor = length(point - uPointer);
-  float influence = uActive * (1. - smoothstep(20., 220., distanceToCursor));
+  // Restore the magnetic golden vortex from the older interactive smoke study.
+  // At rest (uActive = 0), the approved dark sculpture stays identical.
+  float influence = uActive * (1. - smoothstep(18., 315., distanceToCursor));
+  float field = influence * influence;
   vec2 normal = normalize(point - uPointer + vec2(.001));
-  point += vec2(-normal.y, normal.x) * influence * influence * (9. + uPress * 13.);
-  point += normal * influence * influence * 3.;
+  vec2 tangent = vec2(-normal.y, normal.x);
+  float swirl = 26. + uPress * 25. + min(uSpeed, 2.5) * 9.;
+  point += tangent * field * swirl;
+  point += normal * field * (8. + uPress * 14.);
+  point += uMotion * field * min(uSpeed, 2.5) * 12.;
   vec2 clip = point / uResolution * 2. - 1.;
   gl_Position = vec4(clip.x, -clip.y, 0., 1.);
   vLight = influence;
@@ -69,7 +77,7 @@ void main() {
   if (r2 > 1.) discard;
   float kernel = exp(-r2 * 3.7);
   float fog = exp(-r2 * 2.9);
-  float light = pow(vLight, 1.5);
+  float light = pow(vLight, 1.12);
   vec3 color = mix(uNeutral, uGold, light * .92);
   color = mix(color, uFlare, pow(vLight, 3.) * .68);
   color *= mix(.5, 1.22, vDepth);
@@ -79,7 +87,7 @@ void main() {
     float fleck = pow(max(0., 1. - r2), 4.8);
     alpha = mix(fleck * .88, exp(-r2 * 5.) * .21, vHaze) * vOpacity * .81;
   }
-  alpha *= 1. + light * (uDark > .5 ? 1.1 : .65);
+  alpha *= 1. + light * (uDark > .5 ? 1.55 : .95);
   gl_FragColor = vec4(color, alpha);
 }`;
 function channel(hex: string, backup: string): [number, number, number] {
@@ -152,7 +160,8 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     const U = {
       resolution: uniform('uResolution'), origin: uniform('uOrigin'),
       pointer: uniform('uPointer'), active: uniform('uActive'),
-      press: uniform('uPress'), time: uniform('uTime'), scale: uniform('uScale'),
+      press: uniform('uPress'), motion: uniform('uMotion'),
+      speed: uniform('uSpeed'), time: uniform('uTime'), scale: uniform('uScale'),
       dpr: uniform('uDpr'), neutral: uniform('uNeutral'),
       gold: uniform('uGold'), flare: uniform('uFlare'), dark: uniform('uDark'),
     };
@@ -161,7 +170,11 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     let neutral: [number, number, number] = [0.77, 0.77, 0.79];
     let gold: [number, number, number] = [.89, .74, .48];
     let flare: [number, number, number] = [1, .89, .64];
-    const pointer = { x: -5000, y: -5000, tx: -5000, ty: -5000, active: 0, inside: false, pressed: false };
+    const pointer = {
+      x: -5000, y: -5000, tx: -5000, ty: -5000,
+      active: 0, inside: false, pressed: false,
+      directionX: 0, directionY: 0, speed: 0, lastTime: 0,
+    };
     const palette = () => {
       dark = document.documentElement.dataset.theme !== 'light';
       const css = getComputedStyle(hero);
@@ -186,10 +199,25 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     };
     const move = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return;
-      pointer.tx = e.clientX - bounds.left;
-      pointer.ty = e.clientY - bounds.top;
+      const now = performance.now();
+      const nextX = e.clientX - bounds.left;
+      const nextY = e.clientY - bounds.top;
+      if (pointer.inside && pointer.lastTime > 0) {
+        const deltaX = nextX - pointer.tx;
+        const deltaY = nextY - pointer.ty;
+        const travel = Math.hypot(deltaX, deltaY);
+        const milliseconds = Math.max(8, now - pointer.lastTime);
+        if (travel > .01) {
+          pointer.directionX = deltaX / travel;
+          pointer.directionY = deltaY / travel;
+          pointer.speed = Math.min(2.5, travel / milliseconds);
+        }
+      }
+      pointer.tx = nextX;
+      pointer.ty = nextY;
+      pointer.lastTime = now;
       pointer.inside = true;
-      if (pointer.x < 0) { pointer.x = pointer.tx; pointer.y = pointer.ty; }
+      if (pointer.x < 0) { pointer.x = nextX; pointer.y = nextY; }
     };
     const leave = () => { pointer.inside = false; pointer.pressed = false; };
     const press = (e: PointerEvent) => { if (e.pointerType !== 'touch') pointer.pressed = true; };
@@ -201,6 +229,9 @@ export function HeroFlow({ paused }: { paused: boolean }) {
       pointer.x += (pointer.tx - pointer.x) * ease;
       pointer.y += (pointer.ty - pointer.y) * ease;
       pointer.active += ((pointer.inside ? 1 : 0) - pointer.active) * (1 - Math.exp(-dt * 6));
+      pointer.speed *= Math.exp(-dt * 5);
+      pointer.directionX *= Math.exp(-dt * 2);
+      pointer.directionY *= Math.exp(-dt * 2);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.useProgram(program);
@@ -210,6 +241,8 @@ export function HeroFlow({ paused }: { paused: boolean }) {
       gl.uniform2f(U.pointer, pointer.x, pointer.y);
       gl.uniform1f(U.active, pointer.active);
       gl.uniform1f(U.press, pointer.pressed ? 1 : 0);
+      gl.uniform2f(U.motion, pointer.directionX, pointer.directionY);
+      gl.uniform1f(U.speed, pointer.speed);
       gl.uniform1f(U.time, time);
       gl.uniform1f(U.scale, Math.min(width * (width < 700 ? .33 : .205), height * .35, 310));
       gl.uniform1f(U.dpr, dpr);
