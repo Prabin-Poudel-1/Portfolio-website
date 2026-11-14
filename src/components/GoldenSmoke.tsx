@@ -267,10 +267,12 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
           const shimmer = .57 + .43 * Math.sin(time * (2.1 + p.speed * 1.3)
             + p.phase * 7 + p.depth * 4);
           const twinkle = .15 + .85 * shimmer * shimmer;
-          const coreSize = (.7 + p.depth * 1.1) * (0.85 + twinkle * .3);
+          const coreSize = (.7 + p.depth * 1.1) * (0.85 + twinkle * .3)
+            * (dark ? 1 : 1.22);
           const haloSize = (5 + p.size * 6) * (.7 + p.depth * .75);
 
-          ctx.globalAlpha = Math.min(1, (.44 + lit * .36) * twinkle);
+          ctx.globalAlpha = Math.min(1,
+            (dark ? .44 + lit * .36 : .63 + lit * .24) * twinkle);
           ctx.drawImage(
             highlight,
             p.x - haloSize / 2, p.y - haloSize / 2,
@@ -278,7 +280,9 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
           );
 
           const flareSize = haloSize * (1.6 + lit * .6);
-          ctx.globalAlpha = Math.min(1, (.34 + lit * .57) * twinkle);
+          // At rest light mode stays pale blue; near the cursor deep blue blooms.
+          ctx.globalAlpha = Math.min(1,
+            (dark ? .34 + lit * .57 : .20 + lit * .72) * twinkle);
           ctx.drawImage(
             brightGold,
             p.x - flareSize / 2, p.y - flareSize / 2,
@@ -286,8 +290,11 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
           );
 
           // Crisp bright cores distinguish the stars from the 67% soft dust.
-          ctx.fillStyle = lit > .25 ? '#FFF5D7' : '#FFE8B8';
-          ctx.globalAlpha = Math.min(1, (.68 + lit * .25) * twinkle);
+          ctx.fillStyle = dark
+            ? (lit > .25 ? '#FFF5D7' : '#FFE8B8')
+            : (lit > .25 ? '#275B95' : '#5C8FC0');
+          ctx.globalAlpha = Math.min(1,
+            (dark ? .68 + lit * .25 : .78 + lit * .18) * twinkle);
           ctx.fillRect(
             p.x - coreSize / 2, p.y - coreSize / 2,
             coreSize, coreSize,
@@ -296,7 +303,9 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
           // Preserve the atmospheric dust and its existing golden cursor bloom.
           const spotSize = (14 + p.size * 34) * (.55 + p.depth * .9);
           const sprite = p.kind < .55 ? highlight : mist;
-          ctx.globalAlpha = (.21 + lit * .085) * (.35 + p.depth * .7);
+          // More contrast on ivory: tiny translucent GPU dust had vanished.
+          ctx.globalAlpha = (dark ? .21 + lit * .085 : .43 + lit * .12)
+            * (.35 + p.depth * .7);
           ctx.drawImage(
             sprite,
             p.x - spotSize / 2, p.y - spotSize / 2,
@@ -304,7 +313,7 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
           );
           if (lit > .03) {
             const glowSize = spotSize * (1.08 + lit * .48);
-            ctx.globalAlpha = .37 * lit;
+            ctx.globalAlpha = (dark ? .37 : .58) * lit;
             ctx.drawImage(
               brightGold,
               p.x - glowSize / 2, p.y - glowSize / 2,
@@ -321,8 +330,8 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
           pointer.x, pointer.y, 3,
           pointer.x, pointer.y, haloRadius,
         );
-        halo.addColorStop(0, hexRGBA(dustColor, dark ? .13 : .075));
-        halo.addColorStop(.5, hexRGBA(dustColor, dark ? .055 : .035));
+        halo.addColorStop(0, hexRGBA(dustColor, dark ? .13 : .115));
+        halo.addColorStop(.5, hexRGBA(dustColor, dark ? .055 : .055));
         halo.addColorStop(1, hexRGBA(dustColor, 0));
         ctx.globalAlpha = 1;
         ctx.fillStyle = halo;
