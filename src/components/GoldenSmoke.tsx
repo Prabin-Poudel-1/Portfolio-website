@@ -148,8 +148,8 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       phase: Math.random() * TAU,
       speed: .55 + Math.random() * .9,
       size: .45 + Math.random() * 1.4,
-      // Exactly 33% stars (rounded to a whole particle); the remainder is dust.
-      kind: isStar ? Math.random() * .33 : .33 + Math.random() * .67,
+      // Exactly half bright stars and half soft dust (rounded for odd counts).
+      kind: isStar ? Math.random() * .5 : .5 + Math.random() * .5,
       x: 0, y: 0, ready: false,
     });
 
@@ -163,7 +163,7 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       const density = Math.min(1, width * height / 800000);
       const count = width < 700 ? MOBILE_COUNT : Math.round(DESKTOP_COUNT * Math.max(.6, density));
-      const starCount = Math.round(count * .33);
+      const starCount = Math.round(count * .5);
       particles = Array.from({ length: count }, (_, index) => createParticle(index < starCount));
       updateColors();
     };
@@ -259,7 +259,7 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
         p.y += (targetY - p.y) * settle;
 
         const lit = Math.min(1, influence * (1 + pointer.speed * .25));
-        const isStar = p.kind < .33;
+        const isStar = p.kind < .5;
 
         if (isStar) {
           // Bright golden stars shimmer independently while sharing the cloud's
@@ -289,7 +289,7 @@ export function GoldenSmoke({ paused }: { paused: boolean }) {
             flareSize, flareSize,
           );
 
-          // Crisp bright cores distinguish the stars from the 67% soft dust.
+          // Crisp bright cores distinguish the stars from the 50% soft dust.
           ctx.fillStyle = dark
             ? (lit > .25 ? '#FFF5D7' : '#FFE8B8')
             : (lit > .25 ? '#275B95' : '#5C8FC0');
