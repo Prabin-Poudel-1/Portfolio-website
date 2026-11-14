@@ -58,6 +58,8 @@ assert(goldSmoke.includes('function makeMistSprite(color: string)'), 'Original a
 assert(goldSmoke.includes("let mist = makeMistSprite('#A78B63')"), 'Original golden amber base restored');
 assert(goldSmoke.includes("let brightGold = makeMistSprite('#FFE2A0')"), 'Original bright golden core restored');
 assert(goldSmoke.includes('ctx.drawImage(brightGold,'), 'Original near-pointer golden illumination restored');
+assert(goldSmoke.includes('const centerX = width * (mobile ? .54 : .59);'), 'Golden cloud is right-aligned on desktop');
+assert(goldSmoke.includes('const centerY = height * (mobile ? .42 : .50);'), 'Golden cloud vertical placement updated');
 assert(goldSmoke.includes('const turn = influence * (pointer.down ? 48 : 24);'), 'Original cursor-driven swirl restored');
 assert(goldSmoke.includes('ctx.createRadialGradient('), 'Original golden cursor halo restored');
 assert(goldSmoke.includes('const stop = paused ? () => {} : animateHero(hero, draw)'), 'Original gold field uses shared pause');
@@ -66,6 +68,12 @@ assert(dust.includes("getContext('webgl'"), 'Light mode GPU dust remains');
 assert(dust.includes('gl.drawArrays(gl.POINTS'), 'Light dust is GPU rendered');
 assert(dust.includes('p.x = p.x * 1.28'), 'Wider light dust preserved');
 assert(dust.includes('size = mix(.9 + aDetail.x * 1.9'), 'Fine light particles preserved');
+assert(dust.includes('vec3 color = mix(uNeutral, uGold, light * .82);'), 'Warm gold at rest blends toward cursor response');
+assert(dust.includes('color = mix(color, uFlare, pow(vLight, 2.4) * .78);'), 'Light-blue flares appear near pointer');
+assert(css.includes('--sculpture-base: #8C806B;'), 'Light theme warm dust base');
+assert(css.includes('--sculpture-gold: #D2B06A;'), 'Light theme subdued gold');
+assert(css.includes('--sculpture-flare: #8EC5FF;'), 'Light theme blue proximity highlights');
+assert(css.includes('--sculpture-flare: #FFE4A3;'), 'Dark theme accent unchanged');
 assert(dust.includes('point += tangent * field * swirl'), 'Cursor-responsive WebGL particle flow preserved');
 assert(dust.includes('const stop = paused ? () => {} : animateHero(hero, draw)'), 'Light dust uses shared pause');
 assert(css.includes('z-index: 0; pointer-events: none'), 'Particle canvas does not obstruct interaction');
@@ -83,3 +91,5 @@ assert(cursor.includes('document.removeEventListener("pointermove", move, true)'
 console.log('PASS: hero-only gold cursor, continuous hover trail, original rest-of-site cursor and reduced-motion fallback.');
 
 
+
+console.log('PASS: right-positioned original golden cloud; light-theme golden dust and blue cursor highlights; dark palette and project atlas retained.');
