@@ -17,10 +17,39 @@ uniform float uTime;
 uniform float uScale;
 uniform float uDpr;
 uniform float uDark;
+uniform float uForm;
+uniform float uBlend;
+varying float vStar;
+varying float vTwinkle;
 varying float vLight;
 varying float vDepth;
 varying float vHaze;
 varying float vOpacity;
+const float TAU = 6.28318530718;
+// Four soft shapes: nebula, infinity, three-arm spiral, and five-petal bloom.
+vec2 formPosition(float form, vec2 pos, vec4 detail, float time) {
+  float angle = atan(pos.y, pos.x);
+  float radius = clamp(length(pos) / 1.35, .06, 1.);
+  if (form < .5) return pos;
+  if (form < 1.5) {
+    float phase = angle + time * .035;
+    float ring = .48 + radius * .55;
+    return vec2(
+      sin(phase) * ring * 1.02 + sin(detail.y * 41. + time * .13) * .065,
+      sin(2. * phase) * ring * .55 + cos(detail.y * 31. + time * .13) * .065
+    );
+  }
+  if (form < 2.5) {
+    float arm = floor(detail.x * 3.);
+    float spiral = arm * TAU / 3. + radius * 4.9 - time * .13;
+    float dist = .13 + radius * .87;
+    return vec2(cos(spiral), sin(spiral)) * dist
+      + vec2(sin(detail.y * 47.), cos(detail.y * 31.)) * .06;
+  }
+  float petals = .55 + .35 * cos(5. * angle - time * .05);
+  return vec2(cos(angle), sin(angle)) * petals * (.23 + radius * .84)
+    + vec2(sin(detail.y * 31.), cos(detail.y * 43.)) * .055;
+}
 void main() {
   vec3 p = aPosition;
   // Only the light theme becomes a wider, free-floating field of fine dust.
@@ -33,6 +62,9 @@ void main() {
   }
   p.x += .048 * sin(p.y * 7.2 + uTime * .26 + aDetail.y * 5.);
   p.y += .048 * cos(p.x * 5.8 - uTime * .22 + aDetail.y * 5.);
+  vec2 fromForm = formPosition(uForm, p.xy, aDetail, uTime);
+  vec2 toForm = formPosition(mod(uForm + 1., 4.), p.xy, aDetail, uTime);
+  p.xy = mix(fromForm, toForm, uBlend);
   float c = cos(uTime * .054), s = sin(uTime * .054);
   p = vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z);
   float depth = 1.32 / (1.65 - p.z * .23);
@@ -52,12 +84,19 @@ void main() {
   gl_Position = vec4(clip.x, -clip.y, 0., 1.);
   vLight = influence;
   vDepth = .40 + smoothstep(-.9, .9, p.z) * .60;
-  vHaze = aDetail.z;
+  // Attribute z: 2 = star, 0/1 = fine or hazy dust.
+  vStar = step(1.5, aDetail.z);
+  vHaze = mod(aDetail.z, 2.);
   vOpacity = aDetail.w;
+  float blink = .58 + .42 * sin(
+    uTime * (2.1 + aDetail.x * 1.3) + aDetail.y * 43. + aPosition.z * 11.
+  );
+  vTwinkle = .15 + .85 * blink * blink;
   float size = mix(1.2 + aDetail.x * 2.4, 13. + aDetail.x * 21., vHaze);
   if (uDark < .5) {
-    // Smaller point sprites prevent a muddy fog on the ivory background.
-    size = mix(.9 + aDetail.x * 1.9, 4.2 + aDetail.x * 5.8, vHaze);
+    float dustSize = mix(.9 + aDetail.x * 1.9, 4.2 + aDetail.x * 5.8, vHaze);
+    float starSize = 4.4 + aDetail.x * 6.8;
+    size = mix(dustSize, starSize, vStar);
   }
   gl_PointSize = min(64., size * uDpr * (.70 + depth * .45));
 }`;
@@ -67,6 +106,8 @@ uniform vec3 uNeutral;
 uniform vec3 uGold;
 uniform vec3 uFlare;
 uniform float uDark;
+varying float vStar;
+varying float vTwinkle;
 varying float vLight;
 varying float vDepth;
 varying float vHaze;
@@ -77,18 +118,21 @@ void main() {
   if (r2 > 1.) discard;
   float kernel = exp(-r2 * 3.7);
   float fog = exp(-r2 * 2.9);
-  float light = pow(vLight, 1.12);
-  // Warm, restrained gold at rest; cursor proximity turns nearby dust light blue.
-  vec3 color = mix(uNeutral, uGold, light * .82);
-  color = mix(color, uFlare, pow(vLight, 2.4) * .78);
-  color *= mix(.5, 1.22, vDepth);
+  float hover = smoothstep(.04, .92, vLight);
+  // Subtle pale blue at rest; a richer blue develops near the pointer.
+  vec3 color = mix(uNeutral, uGold, mix(.24, .78, vStar));
+  color = mix(color, uFlare, hover * mix(.72, .84, vStar));
+  color *= mix(.64, 1.03, vDepth);
   float alpha = mix(kernel * .59, fog * .13, vHaze) * vOpacity;
   if (uDark < .5) {
-    // Fine, high-definition dust specks rather than broad translucent smoke.
     float fleck = pow(max(0., 1. - r2), 4.8);
-    alpha = mix(fleck * .88, exp(-r2 * 5.) * .21, vHaze) * vOpacity * .81;
+    float dustAlpha = mix(fleck * .83, exp(-r2 * 5.) * .18, vHaze) * vOpacity * .80;
+    float starCore = pow(max(0., 1. - r2), 9.);
+    float starHalo = exp(-r2 * 7.);
+    float starAlpha = (starCore * .90 + starHalo * .20)
+      * vOpacity * (.24 + vTwinkle * .76);
+    alpha = mix(dustAlpha, starAlpha, vStar) * (1. + hover * .48);
   }
-  alpha *= 1. + light * (uDark > .5 ? 1.55 : .95);
   gl_FragColor = vec4(color, alpha);
 }`;
 function channel(hex: string, backup: string): [number, number, number] {
@@ -110,7 +154,8 @@ function cloud(count: number) {
     data[k + 2] = .48 * Math.sin(t * 1.76 + .75) + .17 * Math.cos(t * 3.2) + b * 1.7 + r * 1.2;
     data[k + 3] = Math.random();
     data[k + 4] = Math.random();
-    data[k + 5] = Math.random() < .15 ? 1 : 0;
+    // Exactly 33% stars (rounded to an integer); the remaining 67% are dust.
+    data[k + 5] = i < Math.round(count * .33) ? 2 : (Math.random() < .15 ? 1 : 0);
     data[k + 6] = .38 + Math.random() * .62;
   }
   return data;
@@ -162,7 +207,8 @@ export function LightDust({ paused }: { paused: boolean }) {
       resolution: uniform('uResolution'), origin: uniform('uOrigin'),
       pointer: uniform('uPointer'), active: uniform('uActive'),
       press: uniform('uPress'), motion: uniform('uMotion'),
-      speed: uniform('uSpeed'), time: uniform('uTime'), scale: uniform('uScale'),
+      speed: uniform('uSpeed'), time: uniform('uTime'),
+      form: uniform('uForm'), blend: uniform('uBlend'), scale: uniform('uScale'),
       dpr: uniform('uDpr'), neutral: uniform('uNeutral'),
       gold: uniform('uGold'), flare: uniform('uFlare'), dark: uniform('uDark'),
     };
@@ -179,9 +225,9 @@ export function LightDust({ paused }: { paused: boolean }) {
     const palette = () => {
       dark = document.documentElement.dataset.theme !== 'light';
       const css = getComputedStyle(hero);
-      neutral = channel(css.getPropertyValue('--sculpture-base'), dark ? '#C4C5C8' : '#64626A');
-      gold = channel(css.getPropertyValue('--sculpture-gold'), dark ? '#E3BC7B' : '#B57B2F');
-      flare = channel(css.getPropertyValue('--sculpture-flare'), dark ? '#FFE4A3' : '#E7AB4B');
+      neutral = channel(css.getPropertyValue('--sculpture-base'), dark ? '#C4C5C8' : '#899AA9');
+      gold = channel(css.getPropertyValue('--sculpture-gold'), dark ? '#E3BC7B' : '#A3CDEA');
+      flare = channel(css.getPropertyValue('--sculpture-flare'), dark ? '#FFE4A3' : '#3B6FA8');
     };
     const resize = () => {
       bounds = hero.getBoundingClientRect();
@@ -238,13 +284,20 @@ export function LightDust({ paused }: { paused: boolean }) {
       gl.useProgram(program);
       gl.blendFunc(gl.SRC_ALPHA, dark ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
       gl.uniform2f(U.resolution, width, height);
-      gl.uniform2f(U.origin, width * (width < 700 ? .51 : .465), height * (width < 700 ? .47 : .51));
+      gl.uniform2f(U.origin, width * (width < 700 ? .57 : .69), height * (width < 700 ? .42 : .50));
       gl.uniform2f(U.pointer, pointer.x, pointer.y);
       gl.uniform1f(U.active, pointer.active);
       gl.uniform1f(U.press, pointer.pressed ? 1 : 0);
       gl.uniform2f(U.motion, pointer.directionX, pointer.directionY);
       gl.uniform1f(U.speed, pointer.speed);
       gl.uniform1f(U.time, time);
+      // Match the dark formation schedule: hold 8 seconds, morph for 6.
+      const stage = (time % 56) / 14;
+      const form = Math.floor(stage);
+      const linear = Math.max(0, Math.min(1, ((stage - form) * 14 - 8) / 6));
+      const blend = linear * linear * linear * (linear * (linear * 6 - 15) + 10);
+      gl.uniform1f(U.form, form);
+      gl.uniform1f(U.blend, blend);
       gl.uniform1f(U.scale, Math.min(width * (width < 700 ? .33 : .205), height * .35, 310));
       gl.uniform1f(U.dpr, dpr);
       gl.uniform3fv(U.neutral, neutral);
