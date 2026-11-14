@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 const css = readFileSync('theme.css', 'utf8');
-for (const token of ['--ink-0: #0F1420', '--text: #E8ECF3', '--accent: #60A5FA', '--paper-0: #F7F6F2', '--paper-1: #FFFFFF', '--text: #12171F', '--editorial: #B45309', '--accent: #15803D', '--particle: #60A5FA', '--particle: #B45309']) assert(css.includes(token), token);
+for (const token of ['--ink-0: #0D1117', '--text: #F6F1E8', '--accent: #3B82F6', '--paper-0: #F6F1E8', '--paper-1: #FFFCF7', '--text: #1F232B', '--editorial: #315DCC', '--particle: #3B82F6', '--particle-secondary: #7C8CFF', '--particle-glow: #DCEBFF']) assert(css.includes(token), token);
 const listeners = new Map(), frames = new Map();
 let id = 0, intersection, motionChange, disconnected = false, draws = 0;
 const reduced = { matches: false, addEventListener: (_, fn) => { motionChange = fn; }, removeEventListener: () => { motionChange = undefined; } };
@@ -33,13 +33,17 @@ assert(css.includes('pointer-events: none'));
 const diagram=readFileSync('src/components/SystemDiagram.tsx','utf8');
 assert(diagram.includes('cycle >= 6'));
 assert(!diagram.slice(diagram.indexOf('const stop'),diagram.indexOf('const node')).includes('playSound'));
-console.log('PASS: exact theme tokens; hero loop offscreen, visibility, reduced-motion and cleanup; single hero field; silent automatic node cycle. Browser visual checks remain separate.');
+console.log('PASS: graphite/ivory/blue theme tokens; hero loop offscreen, visibility, reduced-motion and cleanup; single hero field; silent automatic node cycle. Browser visual checks remain separate.');
 
 const flow = readFileSync('src/components/HeroFlow.tsx', 'utf8');
 assert(flow.includes("getPropertyValue('--particle')"));
 assert(flow.includes('ctx.lineWidth = 1.3'));
 assert(flow.includes('.60 + influence'));
 assert(flow.includes('const TRAIL_POINTS = 34'));
+assert(flow.includes('const drawRibbon = (time: number) => {'));
+assert(flow.includes('drawRibbon(time);'));
+assert(flow.includes('pointer.inside'));
+assert(flow.includes("getPropertyValue('--particle-secondary')"));
 assert(flow.includes('new Float32Array(TRAIL_POINTS * 2)'));
 assert(flow.includes('(p.head + 1) % TRAIL_POINTS'));
 assert(flow.includes('(p.head - k + TRAIL_POINTS) % TRAIL_POINTS'));
@@ -69,4 +73,4 @@ for (let head = 0; head < samples; head++) {
   }
   assert.equal(new Set(edges).size, samples - 1);
 }
-console.log('PASS: dedicated particle palettes, 1.3px strokes, .60 leading opacity, 34-sample circular trails; exact doubled counts (200 mobile / 576 max desktop); 3× dt-scaled movement.');
+console.log('PASS: cursor-reactive luminous ribbons and dedicated particle palettes, 1.3px strokes, .60 leading opacity, 34-sample circular trails; exact doubled counts (200 mobile / 576 max desktop); 3× dt-scaled movement.');
