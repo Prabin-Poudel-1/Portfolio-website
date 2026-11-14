@@ -60,10 +60,10 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     let ratio = 1;
     let dark = true;
     let particles: MistParticle[] = [];
-    let mist = makeMistSprite('#F6F1E8');
-    let highlight = makeMistSprite('#7C8CFF');
-    let ink = '#F6F1E8';
-    let accent = '#3B82F6';
+    let mist = makeMistSprite('#A78B63');
+    let highlight = makeMistSprite('#D7AE6D');
+    let brightGold = makeMistSprite('#FFE2A0');
+    let dustColor = '#E1C999';
     let bounds = hero.getBoundingClientRect();
 
     const pointer = {
@@ -74,11 +74,15 @@ export function HeroFlow({ paused }: { paused: boolean }) {
     const updateColors = () => {
       const style = getComputedStyle(hero);
       dark = document.documentElement.dataset.theme !== 'light';
-      ink = style.getPropertyValue('--text').trim() || (dark ? '#F6F1E8' : '#1F232B');
-      accent = style.getPropertyValue('--particle').trim() || '#3B82F6';
-      const secondary = style.getPropertyValue('--particle-secondary').trim() || '#7C8CFF';
-      mist = makeMistSprite(ink);
-      highlight = makeMistSprite(secondary);
+      // A warm golden mist is intentionally independent of blue UI accents.
+      // Dark: illuminated honey / champagne. Light: antique gold on ivory.
+      const warm = style.getPropertyValue('--smoke-ambient').trim() || (dark ? '#A78B63' : '#988367');
+      const gold = style.getPropertyValue('--smoke-gold').trim() || (dark ? '#D7AE6D' : '#AC772B');
+      const flare = style.getPropertyValue('--smoke-flare').trim() || (dark ? '#FFE2A0' : '#D79A39');
+      dustColor = flare;
+      mist = makeMistSprite(warm);
+      highlight = makeMistSprite(gold);
+      brightGold = makeMistSprite(flare);
       ctx.clearRect(0, 0, width, height);
     };
 
@@ -137,12 +141,14 @@ export function HeroFlow({ paused }: { paused: boolean }) {
       pointer.speed *= Math.exp(-dt * 4.5);
 
       const mobile = width < 700;
-      const centerX = width * (mobile ? .59 : .73);
-      const centerY = height * (mobile ? .47 : .48);
-      const spreadX = Math.min(width * (mobile ? .40 : .31), 385);
-      const spreadY = Math.min(height * .39, 305);
+      // Shift toward the gap between the heading and engineering diagram.
+      // The foreground layer ensures the cloud isn't swallowed by that panel.
+      const centerX = width * (mobile ? .52 : .53);
+      const centerY = height * (mobile ? .47 : .52);
+      const spreadX = Math.min(width * (mobile ? .45 : .34), 460);
+      const spreadY = Math.min(height * .42, 340);
       const settle = 1 - Math.exp(-dt * (pointer.inside ? 8 : 3.5));
-      const cursorRadius = pointer.down ? 260 : 195;
+      const cursorRadius = pointer.down ? 300 : 255;
       ctx.globalCompositeOperation = dark ? 'screen' : 'source-over';
 
       for (const p of particles) {
@@ -162,11 +168,12 @@ export function HeroFlow({ paused }: { paused: boolean }) {
           const dx = anchorX - pointer.x;
           const dy = anchorY - pointer.y;
           const distance = Math.hypot(dx, dy);
-          influence = Math.pow(Math.max(0, 1 - distance / cursorRadius), 2);
-          const turn = influence * (pointer.down ? 155 : 75);
+          influence = Math.pow(Math.max(0, 1 - distance / cursorRadius), 1.45);
+          // A gentle swirl allows the gold to illuminate instead of fleeing.
+          const turn = influence * (pointer.down ? 48 : 24);
           const safe = Math.max(16, distance);
-          targetX += (-dy / safe) * turn + pointer.vx * influence * 34;
-          targetY += (dx / safe) * turn + pointer.vy * influence * 34;
+          targetX += (-dy / safe) * turn + pointer.vx * influence * 12;
+          targetY += (dx / safe) * turn + pointer.vy * influence * 12;
         }
         if (!p.ready) {
           p.x = anchorX;
@@ -177,21 +184,42 @@ export function HeroFlow({ paused }: { paused: boolean }) {
         p.y += (targetY - p.y) * settle;
 
         // Soft translucent dots overlap into a cloud, instead of tracing neon lines.
-        const sprite = p.kind < .12 ? highlight : mist;
-        const spotSize = (12 + p.size * 30) * (.55 + p.depth * .9);
-        const lit = Math.min(1, influence * (1 + pointer.speed * .3));
-        ctx.globalAlpha = (dark ? .19 : .12) * (.35 + p.depth * .7) * (1 + lit * .42);
+        const sprite = p.kind < .26 ? highlight : mist;
+        const spotSize = (14 + p.size * 34) * (.55 + p.depth * .9);
+        const lit = Math.min(1, influence * (1 + pointer.speed * .25));
+        ctx.globalAlpha = (dark ? .29 : .18) * (.35 + p.depth * .7) * (1 + lit * .48);
         ctx.drawImage(sprite, p.x - spotSize / 2, p.y - spotSize / 2, spotSize, spotSize);
 
-        // A sparse crisp layer makes the haze feel particulate at close range.
+        // Golden light blooms *on* the existing cloud near the cursor.
+        if (lit > .03) {
+          const glowSize = spotSize * (1.10 + lit * .60);
+          ctx.globalAlpha = (dark ? .53 : .38) * lit;
+          ctx.drawImage(brightGold, p.x - glowSize / 2, p.y - glowSize / 2, glowSize, glowSize);
+        }
+
+        // Sparse sharp details distinguish warm dust from an empty blur.
         if (p.kind > .955) {
           const size = .55 + p.depth * 1.3;
-          ctx.fillStyle = p.kind > .985 ? accent : ink;
-          ctx.globalAlpha = (dark ? .26 : .24) + lit * .24;
+          ctx.fillStyle = lit > .08 ? dustColor : (dark ? '#DBC8A7' : '#79694F');
+          ctx.globalAlpha = (dark ? .43 : .30) + lit * .45;
           ctx.fillRect(p.x, p.y, size, size);
         }
       }
       ctx.globalCompositeOperation = 'source-over';
+      // A subtle localized golden aura tracks the pointer without hiding content.
+      if (pointer.inside) {
+        const haloRadius = pointer.down ? 170 : 125;
+        const halo = ctx.createRadialGradient(
+          pointer.x, pointer.y, 3,
+          pointer.x, pointer.y, haloRadius,
+        );
+        halo.addColorStop(0, hexRGBA(dustColor, dark ? .13 : .075));
+        halo.addColorStop(.5, hexRGBA(dustColor, dark ? .055 : .035));
+        halo.addColorStop(1, hexRGBA(dustColor, 0));
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = halo;
+        ctx.fillRect(pointer.x - haloRadius, pointer.y - haloRadius, haloRadius * 2, haloRadius * 2);
+      }
       ctx.globalAlpha = 1;
     };
 
