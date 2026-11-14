@@ -111,7 +111,6 @@ export function SystemDiagram({ paused, onPause }: { paused: boolean; onPause: (
       aria-label="Explore my engineering domains"
     >
       <div className="map-label">
-        <span>FIELD NOTES / CONNECTED SYSTEMS</span>
         <button className="hero-motion-toggle" type="button" aria-pressed={paused} onClick={onPause}
           aria-label={paused ? "Resume hero motion" : "Pause hero motion"}>{paused ? "▶" : "Ⅱ"} Motion</button>
       </div>
@@ -121,8 +120,6 @@ export function SystemDiagram({ paused, onPause }: { paused: boolean; onPause: (
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <circle cx="48" cy="48" r="35" />
-          <circle cx="48" cy="48" r="22" />
           {nodes.map((n, i) => (
             <path
               key={n.code}
@@ -162,20 +159,15 @@ export function SystemDiagram({ paused, onPause }: { paused: boolean; onPause: (
       </div>
       <div className="node-inspector">
         <span className="sr-only">Selected domain {active + 1} of 5.</span>
-        <span className="inspector-number">{node.code}</span>
         {nodes.map((detail, i) => (
           <div key={detail.code} className={"inspector-content" + (i === active ? " is-active" : "")}
             style={{ visibility: i === active ? "visible" : "hidden" }} aria-hidden={i !== active}>
-            <p className="eyebrow">{detail.name}</p>
             <h2>{detail.project}</h2>
             <p>{detail.text}</p>
             <a href={detail.url} tabIndex={i === active ? 0 : -1}>Explore project ↗</a>
           </div>
         ))}
       </div>
-      <p className="map-instruction">
-        SELECT A NODE TO EXPLORE · CONCEPTUAL PROJECT MAP
-      </p>
     </aside>
   );
 }
