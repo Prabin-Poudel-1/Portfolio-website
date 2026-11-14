@@ -626,6 +626,32 @@
 .custom-cursor[data-dragging="true"] .cursor-ring::before { width: 26px; height: 26px; margin: -13px; opacity: .9; }
 .cursor-label { padding: 20px 0 0 23px; color: var(--accent); font: 9px ui-monospace, monospace; letter-spacing: .1em; white-space: nowrap; text-shadow: 0 1px 2px var(--bg); }
 .cursor-comet { width: 320px; height: 320px; }
+/* One restrained GPU-translated glow follows the existing cursor loop.
+   Dark-mode only; pointer events never intercepted. */
+.cursor-aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle,
+    var(--cursor-glow, rgba(167, 139, 250, .27)) 0%,
+    rgba(167, 139, 250, .10) 30%,
+    transparent 69%);
+  filter: blur(9px);
+  mix-blend-mode: screen;
+  will-change: transform;
+  transition: opacity 200ms ease;
+}
+:root:not([data-theme="light"]) .custom-cursor[data-visible="true"] .cursor-aura {
+  opacity: .9;
+}
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {
+  .cursor-aura { display: none !important; }
+}
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   html.custom-cursor-active, html.custom-cursor-active * { cursor: none !important; }
   html.custom-cursor-active :is(input, textarea, [contenteditable]:not([contenteditable="false"])) { cursor: text !important; }
