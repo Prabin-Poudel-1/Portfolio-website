@@ -1,0 +1,22 @@
+name: Validate Portfolio Refinements
+on:
+  push:
+    branches:
+      - feat/ivory-graphite-luminous-streamlines
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/check-hero.mjs
+      - run: npx --no-install tsx scripts/check-evolution.ts
+      - run: node scripts/check.mjs && node scripts/check-sound.mjs && npx --no-install tsx scripts/check-demos.ts && npx --no-install tsx scripts/check-correction.ts && node scripts/check-production.mjs && npx --no-install tsx scripts/check-typewriter.ts
+      - run: git diff --check
