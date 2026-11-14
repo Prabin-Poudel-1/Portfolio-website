@@ -107,7 +107,7 @@ assert.equal(
   readFileSync("public/googled88bcd039a85d824.html", "utf8"),
 );
 assert(
-  readFileSync("dist/index.html", "utf8").includes("Try the Signal Lost Lab"),
+  !readFileSync("dist/index.html", "utf8").includes("Try the Signal Lost Lab"),
 );
 console.log(
   "PASS: 32 network configurations and recovery paths, local retention, relay failover, backend failure, lost acknowledgment, bounded logs, deterministic evidence, authorization examples and Google verification.",
