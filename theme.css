@@ -34,6 +34,12 @@
   --radius-md: 16px;
   --cursor-glow: rgba(167, 139, 250, .27);
   --cursor-glow-soft: rgba(167, 139, 250, .10);
+  /* Particle colors are separate from the current master UI accents. */
+  --smoke-ambient: #A78B63;
+  --smoke-gold: #D7AE6D;
+  --smoke-flare: #FFE2A0;
+  --sculpture-gold: #E3BC7B;
+  --sculpture-flare: #FFE4A3;
   /* Dark-mode frosted-glass surfaces; no hero canvas is rendered. */
   --glass-surface: rgba(18, 20, 29, .63);
   --glass-strong: rgba(18, 20, 29, .80);
@@ -76,6 +82,11 @@
   --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --cursor-glow: rgba(29, 78, 216, .18);
   --cursor-glow-soft: rgba(29, 78, 216, .065);
+  --smoke-ambient: #809BB5;
+  --smoke-gold: #77ACDA;
+  --smoke-flare: #356BA5;
+  --sculpture-gold: #A3CDEA;
+  --sculpture-flare: #3B6FA8;
 }
 body {
   background: var(--bg);
@@ -937,3 +948,91 @@ pre {
   .header .nav-wrap .nav-actions .theme-switch { min-width: 42px; }
   .header .nav-wrap .theme-switch-label { display: none; }
 }
+
+
+/* Integration: keep the newer master layout/header; restore the decorative hero canvas. */
+.home > :not(.hero-flow) { position: relative; z-index: 1; }
+.hero-flow { position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; border-radius: inherit; }
+:root:not([data-theme="light"]) .hero-flow { mix-blend-mode: screen; }
+@media (prefers-reduced-motion: reduce) { .hero-flow { display: none; } }
+
+/* Project atlas layout: move the complete, interactive domain map below the hero. */
+.home {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  min-height: clamp(690px, 88svh, 880px);
+}
+.home-content {
+  width: min(100%, 600px);
+  align-self: center;
+}
+.portfolio-atlas {
+  display: grid;
+  grid-template-columns: minmax(220px, .72fr) minmax(0, 1.28fr);
+  gap: clamp(24px, 5vw, 72px);
+  align-items: center;
+  padding: 52px 0 64px;
+  margin-bottom: 46px;
+  border-bottom: 1px solid var(--border);
+}
+.portfolio-atlas-intro {
+  max-width: 390px;
+  align-self: center;
+}
+.portfolio-atlas-intro h3 {
+  margin: 15px 0 20px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(29px, 3.4vw, 46px);
+  font-weight: 650;
+  letter-spacing: -.052em;
+  line-height: 1.12;
+}
+.portfolio-atlas-intro > p:last-child {
+  color: var(--muted);
+  max-width: 34ch;
+  font-size: 14px;
+  line-height: 1.85;
+}
+#portfolio .portfolio-atlas .engineering-map {
+  min-width: 0;
+  width: 100%;
+  max-width: 720px;
+  justify-self: end;
+  box-sizing: border-box;
+  box-shadow: 10px 10px 0 var(--accent-soft);
+}
+@media (max-width: 860px) {
+  .home {
+    min-height: 680px;
+    grid-template-rows: auto 1fr auto;
+  }
+  .portfolio-atlas { grid-template-columns: 1fr; gap: 24px; padding: 36px 0 48px; }
+  .portfolio-atlas-intro { max-width: 610px; }
+  .portfolio-atlas-intro > p:last-child { max-width: 55ch; }
+  #portfolio .portfolio-atlas .engineering-map { justify-self: center; max-width: 680px; }
+}
+@media (max-width: 540px) {
+  .home { min-height: 690px; }
+  .portfolio-atlas { padding-top: 26px; margin-bottom: 32px; }
+  .portfolio-atlas-intro h3 { font-size: 30px; }
+}
+
+/* Master cursor glow stays at .585 opacity; tint the cursor only in hero. */
+.custom-cursor[data-zone="hero"] .cursor-dot::before {
+  background: var(--smoke-flare);
+  box-shadow: 0 0 9px 2px var(--smoke-gold);
+}
+.custom-cursor[data-zone="hero"] .cursor-ring::before {
+  border-color: var(--smoke-gold);
+  opacity: .87;
+}
+.custom-cursor[data-zone="hero"] .cursor-aura {
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--smoke-flare) 24%, transparent) 0%,
+    color-mix(in srgb, var(--smoke-gold) 7%, transparent) 30%,
+    transparent 69%);
+}
+.custom-cursor[data-zone="hero"] .cursor-label { color: var(--smoke-gold); }
+

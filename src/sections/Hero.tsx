@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { SystemDiagram } from "../components/SystemDiagram";
+import React from "react";
+import { HeroFlow } from "../components/HeroFlow";
 import { HeroInterests } from "../components/HeroInterests";
-export function Hero() {
-  const [motionPaused, setMotionPaused] = useState(false);
+export function Hero({ motionPaused }: { motionPaused: boolean }) {
   return (
     <section className="home section-wrap" id="home">
+      <HeroFlow paused={motionPaused} />
       <div className="hero-topline">
         <p className="availability">
           <span />
@@ -38,7 +38,6 @@ export function Hero() {
           </a>
         </div>
       </div>
-      <SystemDiagram paused={motionPaused} onPause={() => setMotionPaused(value => !value)} />
       <div className="hero-bottom">
         <div className="identity-note">
           <img

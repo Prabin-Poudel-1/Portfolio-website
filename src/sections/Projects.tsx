@@ -5,7 +5,8 @@ import { ProjectArchive } from "./ProjectArchive";
 import { DemoPanel } from "../components/DemoPanel";
 import { swipeDirection } from "../demos/model";
 import { playSound } from "../utils/sound.js";
-export function Projects() {
+import { SystemDiagram } from "../components/SystemDiagram";
+export function Projects({ motionPaused, onMotionToggle }: { motionPaused: boolean; onMotionToggle: () => void }) {
   const [index, setIndex] = useState(0),
     [enhanced, setEnhanced] = useState(false);
   const [demo, setDemo] = useState(false);
@@ -84,6 +85,24 @@ export function Projects() {
           <br />
           <span className="accent">Explore the connections.</span>
         </h2>
+      </div>
+      <div className="portfolio-atlas">
+        <div className="portfolio-atlas-intro">
+          <p className="eyebrow">Field notes / project atlas</p>
+          <h3>Connected disciplines. Real projects.</h3>
+          <p>
+            Explore the interactive engineering map. Select a node to inspect its
+            domain and focus the related project in the collection below.
+          </p>
+        </div>
+        <SystemDiagram
+          paused={motionPaused}
+          onPause={onMotionToggle}
+          onProjectSelect={(projectId) => {
+            const match = projects.findIndex(p => p.id === projectId);
+            if (match >= 0) select(match);
+          }}
+        />
       </div>
       <div
         ref={root}
