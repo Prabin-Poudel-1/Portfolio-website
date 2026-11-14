@@ -5,6 +5,7 @@ const nodes = [
   {
     name: "AI & security",
     project: "Sentinel AI",
+    projectId: "sentinel-ai",
     text: "Independent authorization between an AI agent and its tools. Rust, Cedar policies, and explicit human approvals.",
     url: "sentinel-ai.html",
     x: 52,
@@ -14,6 +15,7 @@ const nodes = [
   {
     name: "Emergency communication",
     project: "Rescuer Sathi",
+    projectId: "rescuer-sathi",
     text: "Encrypted local SOS requests, nearby store-and-forward relay, and on-device AI in an Android prototype.",
     url: "rescuer-sathi.html",
     x: 78,
@@ -23,6 +25,7 @@ const nodes = [
   {
     name: "Web applications",
     project: "Chitwan Plus",
+    projectId: "chitwan-plus",
     text: "Interest-led travel planning with maps, itinerary previews, and Gemini assistance.",
     url: "#project-chitwan-plus",
     x: 54,
@@ -32,6 +35,7 @@ const nodes = [
   {
     name: "Software engineering",
     project: "Chitwan Care",
+    projectId: "chitwan-care",
     text: "Connecting image capture and on-device detection to location-linked environmental reports and cleanup workflows.",
     url: "chitwan-care.html",
     x: 19,
@@ -41,6 +45,7 @@ const nodes = [
   {
     name: "Satellite intelligence",
     project: "Rakshak Satellite Intelligence",
+    projectId: "rakshak",
     text: "Experimental Narayani satellite evidence with provenance and map inspection. Geographic QA limitations remain; no validated flood detection is claimed.",
     url: "#project-rakshak",
     x: 18,
@@ -48,7 +53,7 @@ const nodes = [
     code: "05",
   },
 ];
-export function SystemDiagram({ paused, onPause }: { paused: boolean; onPause: () => void }) {
+export function SystemDiagram({ paused, onPause, onProjectSelect }: { paused: boolean; onPause: () => void; onProjectSelect?: (projectId: string) => void }) {
   const [active, setActive] = useState(0);
   const root = useRef<HTMLElement>(null);
   const orbitTime = useRef(0);
@@ -146,6 +151,7 @@ export function SystemDiagram({ paused, onPause }: { paused: boolean; onPause: (
             aria-pressed={active === i}
             onClick={() => {
               manual(i);
+              onProjectSelect?.(n.projectId);
               playSound("select");
             }}
             onFocus={() => manual(i)}
