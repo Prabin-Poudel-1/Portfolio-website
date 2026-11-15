@@ -48,8 +48,8 @@ export function Header() {
     };
   }, []);
   function changeTheme() {
-    playSound("select");
     const next = theme === "dark" ? "light" : "dark";
+    playSound(next === "light" ? "themeLight" : "themeDark");
     setTheme(next);
     document.documentElement.dataset.theme = next;
     try {
