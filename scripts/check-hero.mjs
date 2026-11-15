@@ -83,7 +83,38 @@ const flow = readFileSync('src/components/HeroFlow.tsx', 'utf8');
 const smoke = readFileSync('src/components/GoldenSmoke.tsx', 'utf8');
 assert(app.includes('<Hero motionPaused={motionPaused} />'), 'Hero and Projects share motion controls');
 assert(app.includes('onMotionToggle={() => setMotionPaused'), 'Shared motion toggle preserved');
-assert(flow.includes('return <GoldenSmoke paused={paused} />;'), 'Both themes use the shared particle renderer');
+assert(flow.includes("import('./GoldenSmoke')"), 'Particle renderer has a dynamic import');
+assert(!/import\s+.*\sfrom\s+['"]\.\/GoldenSmoke['"]/.test(flow), 'No eager particle import');
+assert(flow.includes('default: module.GoldenSmoke'), 'Both themes use the existing renderer');
+// Exercise the real wrapper with hook/JSX stubs: SSR and ineligible clients must
+// never render the lazy type. A desktop media change mounts it and forwards pause.
+let eligible = false, serverRender = true, lazyMounts = 0, mediaNotify;
+const lazyType = {}, suspenseType = {};
+const flowCode = ts.transpileModule(flow.replace(/^import .*;$/gm, '').replace('export function', 'function'), {
+  compilerOptions: { target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.React },
+}).outputText;
+const wrapper = new Function('lazy', 'Suspense', 'useSyncExternalStore', 'window', 'React', flowCode + ';return {render:HeroFlow,subscribe};')(
+  () => lazyType, suspenseType,
+  (_subscribe, snapshot, serverSnapshot) => serverRender ? serverSnapshot() : snapshot(),
+  { matchMedia(query) {
+    assert.equal(query, '(min-width: 768px) and (prefers-reduced-motion: no-preference)');
+    return { matches: eligible, addEventListener: (_, fn) => { mediaNotify = fn; }, removeEventListener: () => { mediaNotify = undefined; } };
+  } },
+  { createElement(type, props, child) { if (type === lazyType) lazyMounts++; return { type, props, child }; } },
+);
+assert.equal(wrapper.render({paused:false}), null, 'SSR emits no particle subtree');
+serverRender = false;
+assert.equal(wrapper.render({paused:false}), null, 'Phone/reduced-motion hydration emits no particle subtree');
+assert.equal(lazyMounts, 0, 'Ineligible clients never mount the lazy renderer');
+let changes = 0; const unsubscribeFlow = wrapper.subscribe(() => changes++);
+eligible = true; mediaNotify();
+const loaded = wrapper.render({paused:true});
+assert.equal(loaded.type, suspenseType); assert.equal(loaded.props.fallback, null);
+assert.equal(loaded.child.type, lazyType); assert.equal(loaded.child.props.paused, true);
+eligible = false; mediaNotify(); assert.equal(wrapper.render({paused:false}), null);
+assert.equal(changes, 2); unsubscribeFlow(); assert.equal(mediaNotify, undefined);
+serverRender = true; eligible = true;
+assert.equal(wrapper.render({paused:false}), null, 'Desktop initial hydration uses the same server snapshot');
 assert(projectPage.includes('className="portfolio-atlas"'), 'Project atlas moved below the hero');
 assert(projectPage.includes('if (match >= 0) select(match)'), 'Atlas selection changes gallery slide');
 assert(!hero.includes('<SystemDiagram'), 'Removed original map from Hero');
