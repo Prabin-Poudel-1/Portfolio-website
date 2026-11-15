@@ -3,6 +3,10 @@
 const SILENCE = 0.00001;
 const ACTION_GAP_MS = 115;
 const HOVER_GAP_MS = 650;
+// Raise perceived loudness without changing individual cue character.
+// Peak summed layers stay below 0.35 even at 100% volume, including the 10.5% echo send.
+const MASTER_GAIN = 2.4;
+const VOLUME_EXPONENT = 1.2;
 
 let enabled = false;
 let volume = 0.55;
@@ -28,8 +32,8 @@ const CUES = {
   project: {
     notes: [
       [146.83, 110, 0, 0.27, 0.060, 'sine'],
-      [293.66, 329.63, 0.080, 0.20, 0.024, 'triangle'],
-      [440, 493.88, 0.138, 0.165, 0.013, 'sine'],
+      [293.66, 329.63, 0.080, 0.20, 0.032, 'triangle'],
+      [440, 493.88, 0.138, 0.165, 0.020, 'sine'],
     ],
     air: [0.045, 0.165, 0.009, 1100],
     echo: true,
@@ -145,8 +149,9 @@ function envelope(audio, target, start, duration, peak) {
 function startVoice(audio, cue, name) {
   const now = audio.currentTime;
   const bus = audio.createGain();
-  // Perceptual volume taper makes 20–50% settings easier to control.
-  bus.gain.setValueAtTime(Math.pow(volume, 1.5), now);
+  // A perceptual taper preserves precision at low settings and restores presence
+  // on laptop speakers at the existing 55% default. No auto-unmute or autoplay.
+  bus.gain.setValueAtTime(MASTER_GAIN * Math.pow(volume, VOLUME_EXPONENT), now);
   bus.connect(audio.destination);
   const sources = [];
   let active = 0;
