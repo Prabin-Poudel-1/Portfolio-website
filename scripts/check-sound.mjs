@@ -9,6 +9,7 @@ const records = {
   buffers: [],
   frequencies: [],
   peaks: [],
+  gainSetValues: [],
   sourcesStopped: 0,
   suspended: 0,
   resumed: 0,
@@ -17,7 +18,7 @@ const records = {
 function param(kind, initial = 0.00001) {
   return {
     value: initial,
-    setValueAtTime(v) { this.value = v; if (kind === 'frequency') records.frequencies.push(v); },
+    setValueAtTime(v) { this.value = v; if (kind === 'frequency') records.frequencies.push(v); if (kind === 'gain') records.gainSetValues.push(v); },
     linearRampToValueAtTime(v) { this.value = v; if (kind === 'gain') records.peaks.push(v); },
     exponentialRampToValueAtTime(v) { this.value = v; if (kind === 'frequency') records.frequencies.push(v); },
     setTargetAtTime(v) { this.value = v; },
@@ -100,6 +101,10 @@ run('playSound("project")');
 assert.equal(records.oscillators.length, 3);
 assert.equal(records.buffers.length, 1);
 assert.equal(records.noiseBuffers, 1);
+const defaultMasterGain = 2.4 * Math.pow(.55, 1.2);
+assert(records.gainSetValues.some(v => Math.abs(v - defaultMasterGain) < 1e-10),
+  'Default 55% slider setting uses boosted perceptual output');
+assert(defaultMasterGain > 1, 'Mid-level sound output is substantially louder than before');
 assert(records.frequencies.includes(110));
 assert(records.frequencies.includes(493.88));
 assert.equal(stored.get('portfolio-sound'), 'on');
@@ -159,6 +164,16 @@ clock += 200;
 run('playSound("hover")');
 assert.equal(records.oscillators.length, beforeHover + 1, 'Hover independently throttled');
 assert.equal(run('setVolume(Number.NaN)'), .55);
+
+// Full-volume ceiling remains conservatively bounded across all sound layers,
+// including the loudest project cue and its 10.5% shared echo send.
+const maxProjectLayerSum = .060 + .032 + .020 + .009;
+assert(maxProjectLayerSum * 2.4 * 1.105 < .35, 'Single-cue peak headroom');
+clock += 700;
+run('setVolume(1);playSound("project")');
+assert(records.gainSetValues.some(v => Math.abs(v - 2.4) < 1e-10),
+  'Master gain reaches boosted maximum while preserving slider control');
+assert.equal(run('setVolume(0)'), 0);
 
 console.log('PASS sound: opt-in, silent/hidden behavior, shared filtered noise, distinct cues, output gain bounds, action/hover throttles, volume persistence, and theme tones. Listening tests still required.');
 assert(readFileSync('src/styles/interactions.css', 'utf8').includes('prefers-reduced-motion: reduce'));
