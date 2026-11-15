@@ -147,7 +147,7 @@ for (const kind of ['hover', 'select', 'project', 'open', 'close', 'success', 's
   if (kind === 'hover') run('setVolume(.55)');
   run("playSound('" + kind + "')");
 }
-assert.equal(records.oscillators.length, 24);
+assert.equal(records.oscillators.length, 25, 'Nine cue profiles after six prior oscillator voices');
 assert.equal(records.noiseBuffers, 1, 'Noise buffer is shared across transitions');
 assert(records.peaks.every(v => v <= .065), 'All oscillator gains capped');
 assert(records.frequencies.every(f => f >= 98 && f <= 660), 'Frequency bounds');
