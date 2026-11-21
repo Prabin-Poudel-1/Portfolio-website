@@ -149,7 +149,7 @@ export function Projects({ motionPaused, onMotionToggle }: { motionPaused: boole
       >
         <div className="cinema-meta">
           <span className="cinema-counter">
-            {String(index + 1).padStart(2, "0")} <i>/ 07</i>
+            {String(index + 1).padStart(2, "0")} <i>/ {String(projects.length).padStart(2, "0")}</i>
           </span>
           <span>{item.category}</span>
         </div>
@@ -157,7 +157,7 @@ export function Projects({ motionPaused, onMotionToggle }: { motionPaused: boole
           className={"cinema-stage scene-" + item.id}
           role="group"
           aria-roledescription="slide"
-          aria-label={`${index + 1} of 7: ${item.name}`}
+          aria-label={`${index + 1} of ${projects.length}: ${item.name}`}
         >
           <div className="cinema-image">
             {item.image ? (
@@ -165,8 +165,8 @@ export function Projects({ motionPaused, onMotionToggle }: { motionPaused: boole
                 key={item.image}
                 src={item.image}
                 alt={item.alt}
-                width={item.id === "rescuer-sathi" ? 720 : 1100}
-                height={item.id === "rescuer-sathi" ? 1612 : 733}
+                width={item.id === "rescuer-sathi" ? 720 : item.id === "ghostcursor" ? 1672 : 1100}
+                height={item.id === "rescuer-sathi" ? 1612 : item.id === "ghostcursor" ? 941 : 733}
                 loading="lazy"
               />
             ) : (
@@ -271,7 +271,7 @@ export function Projects({ motionPaused, onMotionToggle }: { motionPaused: boole
           </button>
         </div>
         <p className="sr-only" role="status">
-          Project {index + 1} of 7: {item.name}
+          Project {index + 1} of {projects.length}: {item.name}
         </p>
       </div>
       <noscript>

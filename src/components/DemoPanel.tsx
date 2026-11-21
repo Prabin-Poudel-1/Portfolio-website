@@ -14,6 +14,7 @@ const Relay = lazy(() => import("../demos/Relay"));
 const Authorization = lazy(() => import("../demos/Authorization"));
 const Geospatial = lazy(() => import("../demos/Geospatial"));
 const Previews = lazy(() => import("../demos/Previews"));
+const GhostCursor = lazy(() => import("../demos/GhostCursor"));
 class DemoBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }
@@ -88,7 +89,9 @@ export function DemoPanel({
             </p>
           }
         >
-          {id === "rescuer-sathi" ? (
+          {id === "ghostcursor" ? (
+            <GhostCursor />
+          ) : id === "rescuer-sathi" ? (
             <Relay />
           ) : id === "sentinel-ai" ? (
             <Authorization />

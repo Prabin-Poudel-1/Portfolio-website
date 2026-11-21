@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title description">
+<title id="title">GhostCursor — private browser collaboration</title>
+<desc id="description">Designed project illustration, not a live screenshot. Two matching dark browser views share a lavender sticky note and a remote pointer, connected by encrypted WebRTC.</desc>
+<defs>
+  <linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#11101d"/><stop offset="1" stop-color="#17152c"/></linearGradient>
+  <linearGradient id="purple" x1="0" x2="1" y1="0" y2=".2"><stop stop-color="#eee9ff"/><stop offset=".65" stop-color="#b89bff"/><stop offset="1" stop-color="#8368e9"/></linearGradient>
+  <linearGradient id="note" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ebd6ff"/><stop offset="1" stop-color="#bfa3ff"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-35%" width="160%" height="180%"><feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#05030d" flood-opacity=".7"/></filter>
+  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="9"/></filter>
+  <pattern id="mesh" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#b6a1fe" stroke-opacity=".055"/></pattern>
+</defs>
+<rect width="1200" height="675" fill="url(#background)"/>
+<rect width="1200" height="675" fill="url(#mesh)"/>
+<circle cx="592" cy="350" r="280" fill="#493074" opacity=".13" filter="url(#glow)"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<g fill="url(#purple)" transform="translate(108 55)"><path d="M0 0L0 43L12 32L24 51L32 46L20 28L41 28Z" stroke="#b89bff" stroke-width="3"/></g>
+<text x="165" y="103" font-size="61" letter-spacing="-3" fill="#f2f0ff" font-weight="bold">Ghost<tspan fill="#b89bff">Cursor</tspan></text>
+<text x="112" y="141" font-size="18" fill="#aaa2bd">Live cursors, synchronized notes, and laser pointers over WebRTC.</text>
+<rect x="112" y="161" width="207" height="36" rx="18" stroke="#54467d" fill="#1b1b32"/>
+<text x="130" y="184" font-size="14" fill="#d9cefa">Peer-to-peer collaboration</text>
+<rect x="334" y="161" width="141" height="36" rx="18" stroke="#54467d" fill="#1b1b32"/>
+<text x="352" y="184" font-size="14" fill="#d9cefa">Encrypted session</text>
+<rect x="490" y="161" width="123" height="36" rx="18" stroke="#54467d" fill="#1b1b32"/>
+<text x="510" y="184" font-size="14" fill="#d9cefa">Privacy-first</text>
+</g>
+<path d="M135 242Q600 139 1065 242" fill="none" stroke="#b89bff" stroke-opacity=".4" stroke-width="2" stroke-dasharray="3 11"/>
+<path d="M135 561Q600 660 1065 561" fill="none" stroke="#b89bff" stroke-opacity=".4" stroke-width="2" stroke-dasharray="3 11"/>
+<g filter="url(#shadow)">
+ <rect x="62" y="246" width="494" height="346" rx="16" fill="#161526" stroke="#7964bd" stroke-width="2"/>
+ <rect x="644" y="246" width="494" height="346" rx="16" fill="#161526" stroke="#7964bd" stroke-width="2"/>
+</g>
+<g font-family="Arial, Helvetica, sans-serif">
+<path d="M78 246H540Q556 246 556 262V299H62V262Q62 246 78 246Z" fill="#222039"/>
+<path d="M660 246H1122Q1138 246 1138 262V299H644V262Q644 246 660 246Z" fill="#222039"/>
+<g fill="#f28b90"><circle cx="82" cy="266" r="5"/><circle cx="663" cy="266" r="5"/></g>
+<g fill="#f1c564"><circle cx="99" cy="266" r="5"/><circle cx="680" cy="266" r="5"/></g>
+<g fill="#67c98c"><circle cx="116" cy="266" r="5"/><circle cx="697" cy="266" r="5"/></g>
+<g fill="#d3cde7" font-size="14"><text x="142" y="272">Browser A / Alex</text><text x="725" y="272">Browser B / Sam</text></g>
+<g fill="#a4a0bb" font-size="11"><text x="88" y="286">same page / same room</text><text x="669" y="286">same page / same room</text></g>
+<rect x="79" y="314" width="461" height="261" rx="7" fill="#141727"/>
+<rect x="660" y="314" width="461" height="261" rx="7" fill="#141727"/>
+<g fill="#a7a2c2" font-size="10" letter-spacing="2.1"><text x="98" y="338">FIELD NOTES / PROJECT ATLAS</text><text x="679" y="338">FIELD NOTES / PROJECT ATLAS</text></g>
+<g fill="url(#purple)" font-size="34" font-weight="bold" letter-spacing="-1"><text x="98" y="386">Explore the</text><text x="98" y="422">connections.</text><text x="679" y="386">Explore the</text><text x="679" y="422">connections.</text></g>
+<g fill="#a6a5c1" font-size="12"><text x="100" y="470">Explore an engineering system</text><text x="100" y="489">through interactive field notes.</text><text x="680" y="470">Explore an engineering system</text><text x="680" y="489">through interactive field notes.</text></g>
+<rect x="275" y="362" width="230" height="118" rx="8" fill="#e2cbff" opacity=".19" filter="url(#glow)"/>
+<rect x="856" y="362" width="230" height="118" rx="8" fill="#e2cbff" opacity=".19" filter="url(#glow)"/>
+<g filter="url(#shadow)">
+<rect x="290" y="393" width="215" height="112" rx="10" fill="url(#note)"/>
+<rect x="872" y="393" width="215" height="112" rx="10" fill="url(#note)"/>
+</g>
+<g fill="#21192f">
+<text x="309" y="418" font-size="15" font-weight="bold">SHARED NOTE</text>
+<text x="890" y="418" font-size="15" font-weight="bold">SHARED NOTE</text>
+<text x="309" y="448" font-size="16">Review this component.</text><text x="890" y="448" font-size="16">Review this component.</text>
+<text x="309" y="471" font-size="14">Synced between peers.</text><text x="890" y="471" font-size="14">Synced between peers.</text>
+</g>
+<g stroke="#ae85ff" fill="none"><path d="M260 398L290 416" stroke-width="2"/><path d="M842 398L872 416" stroke-width="2"/><circle cx="260" cy="398" r="5" fill="#ae85ff"/><circle cx="842" cy="398" r="5" fill="#ae85ff"/></g>
+<g transform="translate(236 376)"><path d="M0 0V34L10 26L19 40L26 36L17 21H31Z" fill="#e9dcff" stroke="#241a42" stroke-width="3"/><rect x="29" y="5" width="41" height="24" rx="12" fill="#a788f7"/><text x="39" y="21" font-size="12" fill="#23183d">Alex</text></g>
+<g transform="translate(819 376)"><path d="M0 0V34L10 26L19 40L26 36L17 21H31Z" fill="#e9dcff" stroke="#241a42" stroke-width="3"/><rect x="29" y="5" width="41" height="24" rx="12" fill="#a788f7"/><text x="39" y="21" font-size="12" fill="#23183d">Sam</text></g>
+<g stroke="#b89bff" fill="none" stroke-width="2"><path d="M556 409H570"/><path d="M630 409H644"/></g>
+<g fill="#bd9cff"><circle cx="556" cy="409" r="4"/><circle cx="644" cy="409" r="4"/></g>
+<rect x="570" y="379" width="60" height="60" rx="13" fill="#26213f" stroke="#ab91ff" stroke-width="2"/>
+<g fill="#d9ceff" font-size="11" text-anchor="middle"><text x="600" y="402">WEB</text><text x="600" y="416">RTC</text></g>
+<rect x="62" y="610" width="1076" height="1" fill="#554576"/>
+<g font-family="Arial, Helvetica, sans-serif" fill="#b4acd0" font-size="14">
+<text x="75" y="642">LIVE CURSORS</text><text x="305" y="642" fill="#b89bff">SYNCED NOTES</text><text x="561" y="642">LASER POINTERS</text><text x="814" y="642">REAL-TIME COLLABORATION</text>
+</g>
+</svg>

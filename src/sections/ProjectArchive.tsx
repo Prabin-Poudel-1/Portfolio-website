@@ -119,6 +119,46 @@ export function ProjectArchive() {
             </div>
           </div>
         </article>
+        <article className="project-card featured ghostcursor-feature" id="project-ghostcursor">
+          <div className="project-visual">
+            <img
+              src="assets/projects/ghostcursor.webp"
+              width="1672"
+              height="941"
+              loading="lazy"
+              alt="Conceptual artwork showing two GhostCursor browser windows with matching shared notes"
+            />
+            <span className="art-label">Conceptual product artwork</span>
+          </div>
+          <div className="project-details">
+            <p className="eyebrow">03 / Browser Systems · Real-time Collaboration</p>
+            <h3>GhostCursor</h3>
+            <p className="project-subtitle">Browse together. Point anywhere.</p>
+            <p>
+              A privacy-first browser extension with encrypted WebRTC cursors,
+              click ripples, laser drawings and session-only, element-anchored
+              sticky notes. Chromium and Firefox share the same protocol.
+            </p>
+            <p className="project-highlight">
+              Phase 3 report documents 106 unit tests and 9 browser integration tests. Chromium and Firefox exchanged events over locally signaled WebRTC. Public cross-network connectivity and browser-store publication remain unverified.
+            </p>
+            <ul className="tags">
+              <li>TypeScript</li><li>WebRTC</li><li>Manifest V3</li>
+              <li>Firefox</li><li>Playwright</li>
+            </ul>
+            <div className="project-actions">
+              <a className="button" href="?demo=ghostcursor#portfolio">
+                Explore interactive lab ↗
+              </a>
+              <a className="text-link" href="https://github.com/Prabin-Poudel-1/ghost-curser/tree/feature/ghostcursor-phase3" target="_blank" rel="noopener noreferrer">
+                Phase 3 source ↗
+              </a>
+              <a className="text-link" href="https://github.com/Prabin-Poudel-1/ghost-curser/blob/feature/ghostcursor-phase3/docs/VERIFICATION.md" target="_blank" rel="noopener noreferrer">
+                Test evidence ↗
+              </a>
+            </div>
+          </div>
+        </article>
         <article className="project-card featured" id="project-chitwan-care">
           <div className="project-visual">
             <img
@@ -131,7 +171,7 @@ export function ProjectArchive() {
             <span className="art-label">Concept artwork</span>
           </div>
           <div className="project-details">
-            <p className="eyebrow">03 / Environmental reporting</p>
+            <p className="eyebrow">04 / Environmental reporting</p>
             <h3>Chitwan Care</h3>
             <p className="project-subtitle">
               AI-Assisted Waste Detection &amp; Environmental Reporting
@@ -177,7 +217,7 @@ export function ProjectArchive() {
             <span className="art-label">Concept artwork</span>
           </div>
           <div className="project-details">
-            <p className="eyebrow">04 / Web application</p>
+            <p className="eyebrow">05 / Web application</p>
             <h3>Smart University Management System</h3>
             <p className="project-subtitle">A connected campus workspace</p>
             <p>
@@ -214,7 +254,7 @@ export function ProjectArchive() {
             <span className="art-label">Concept artwork</span>
           </div>
           <div className="project-details">
-            <p className="eyebrow">05 / Travel planning prototype</p>
+            <p className="eyebrow">06 / Travel planning prototype</p>
             <h3>Chitwan Plus</h3>
             <p className="project-subtitle">Interest-led travel planning</p>
             <p>

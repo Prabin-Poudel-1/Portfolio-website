@@ -39,8 +39,8 @@ type MistParticle = {
 const TAU = Math.PI * 2;
 const DESKTOP_COUNT = 1800;
 
-// Existing dwell: 6 seconds. Exactly 2.5x longer; morphs remain four seconds.
-const FORM_HOLD = 6 * 2.5;
+// Five seconds on each shape plus its four-second morph.
+const FORM_HOLD = 5;
 const MORPH_SECONDS = 4;
 const FORM_SECONDS = FORM_HOLD + MORPH_SECONDS;
 const FORM_COUNT = 8;
