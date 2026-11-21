@@ -44,7 +44,7 @@ assert.equal(swipeDirection(-100, 10), 1);
 assert.equal(swipeDirection(100, 10), -1);
 assert.equal(swipeDirection(60, 100), 0);
 assert.equal(swipeDirection(20, 0), 0);
-assert.equal(projects.length, 7);
+assert.equal(projects.length, 8);
 for (const p of projects) {
   if (p.image) assert(existsSync("dist/" + p.image));
   if (p.url.endsWith(".html")) assert(existsSync("dist/" + p.url));
@@ -55,7 +55,7 @@ assert(readFileSync("dist/404.html", "utf8").includes('content="noindex"'));
 assert(readFileSync("dist/sitemap.xml", "utf8").includes("rescuer-sathi.html"));
 assert(readFileSync("dist/robots.txt", "utf8").includes("Sitemap:"));
 console.log(
-  `PASS: offline relay/reconnect, ${combinations} policy combinations, 192 evidence cells, directional swipe thresholds, seven project assets/routes and SEO output.`,
+  `PASS: offline relay/reconnect, ${combinations} policy combinations, 192 evidence cells, directional swipe thresholds, eight project assets/routes and SEO output.`,
 );
 
 assert.equal(
