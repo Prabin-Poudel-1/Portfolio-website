@@ -39,7 +39,8 @@ export default function GhostCursor() {
   function selectElement(index: number) {
     setTarget(index);
     setEventId(id => id + 1);
-    if (tool === "note") setNoteTarget(index);
+    // Selecting a target does not move an already shared note.
+    // Its anchor updates only when Share locally is submitted.
     setEventText(tool === "cursor" ? `Alex points to ${targets[index].label}.` :
       tool === "click" ? `A click ripple appears on ${targets[index].label}.` :
       tool === "laser" ? `A temporary laser crosses ${targets[index].label}.` :
