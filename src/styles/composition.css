@@ -799,3 +799,164 @@
   align-items: center;
   min-height: 32px;
 }
+
+
+/* Atlas / six stable, aligned domain cards. The hub remains unobstructed. */
+#portfolio .portfolio-atlas .engineering-map {
+  overflow: hidden;
+}
+#portfolio .portfolio-atlas .map-label {
+  justify-content: space-between;
+  gap: 12px;
+}
+#portfolio .portfolio-atlas .atlas-label {
+  font: 600 10px/1.4 ui-monospace, SFMono-Regular, monospace;
+  color: var(--muted);
+  letter-spacing: .09em;
+}
+#portfolio .portfolio-atlas .atlas-label span {
+  color: var(--accent);
+  padding: 0 5px;
+}
+#portfolio .portfolio-atlas .network-stage {
+  height: 344px;
+  margin-top: 14px;
+  isolation: isolate;
+}
+#portfolio .portfolio-atlas .network-stage > svg {
+  pointer-events: none;
+  z-index: 0;
+}
+#portfolio .portfolio-atlas .network-core {
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+}
+#portfolio .portfolio-atlas .domain-node {
+  width: clamp(144px, 16vw, 186px);
+  min-height: 62px;
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr);
+  align-items: center;
+  text-align: left;
+  gap: 9px;
+  padding: 10px 12px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  transform: translate(-50%, -50%);
+  transition: border-color .2s, background-color .2s, box-shadow .2s;
+  z-index: 2;
+}
+#portfolio .portfolio-atlas .node-symbol {
+  width: 35px;
+  height: 35px;
+  font-size: 19px;
+  color: var(--accent);
+  background: var(--bg);
+  border-radius: 10px;
+  flex: none;
+}
+#portfolio .portfolio-atlas .node-name {
+  display: block;
+  min-width: 0;
+  max-width: unset;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 650 11px/1.35 var(--font-body, system-ui, sans-serif);
+  text-wrap: balance;
+  overflow-wrap: normal;
+  letter-spacing: -.01em;
+}
+#portfolio .portfolio-atlas .domain-node:hover,
+#portfolio .portfolio-atlas .domain-node:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+#portfolio .portfolio-atlas .domain-node[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,0,0,.12);
+}
+#portfolio .portfolio-atlas .domain-node[aria-pressed="true"] .node-symbol {
+  color: var(--accent-ink, var(--bg));
+  background: var(--accent);
+  transform: none;
+}
+#portfolio .portfolio-atlas .node-inspector {
+  min-height: 160px;
+  padding-top: 18px;
+}
+#portfolio .portfolio-atlas .node-inspector .node-inspector-meta {
+  font: 600 10px/1.5 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+#portfolio .portfolio-atlas .node-inspector h2 {
+  font-size: clamp(20px, 2vw, 25px);
+}
+@media (max-width: 700px) {
+  #portfolio .portfolio-atlas .network-stage {
+    height: 330px;
+  }
+  #portfolio .portfolio-atlas .domain-node {
+    width: min(150px, 35%);
+  }
+}
+@media (max-width: 540px) {
+  #portfolio .portfolio-atlas .engineering-map {
+    padding: 12px;
+  }
+  #portfolio .portfolio-atlas .atlas-label {
+    font-size: 8px;
+  }
+  #portfolio .portfolio-atlas .network-stage {
+    height: 338px;
+  }
+  #portfolio .portfolio-atlas .network-core {
+    width: 58px;
+    height: 58px;
+    border-radius: 12px;
+  }
+  #portfolio .portfolio-atlas .network-core > span {
+    font-size: 26px;
+  }
+  #portfolio .portfolio-atlas .domain-node {
+    width: min(116px, 36%);
+    min-height: 68px;
+    padding: 7px;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 6px;
+    border-radius: 9px;
+  }
+  #portfolio .portfolio-atlas .node-symbol {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    border-radius: 7px;
+  }
+  #portfolio .portfolio-atlas .node-name {
+    font-size: 9.5px;
+    line-height: 1.3;
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+  #portfolio .portfolio-atlas .node-inspector {
+    min-height: 188px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #portfolio .portfolio-atlas .domain-node,
+  #portfolio .portfolio-atlas .node-symbol {
+    transition: none;
+  }
+}
