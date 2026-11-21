@@ -124,7 +124,7 @@ export function ProjectArchive() {
             <img
               src="assets/projects/ghostcursor.svg"
               width="1200"
-              height="760"
+              height="675"
               loading="lazy"
               alt="Schematic depiction of two GhostCursor browser workspaces with a shared pointer and annotation"
             />
