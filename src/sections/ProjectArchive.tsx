@@ -122,13 +122,13 @@ export function ProjectArchive() {
         <article className="project-card featured ghostcursor-feature" id="project-ghostcursor">
           <div className="project-visual">
             <img
-              src="assets/projects/ghostcursor.svg"
-              width="1200"
-              height="675"
+              src="assets/projects/ghostcursor.webp"
+              width="1672"
+              height="941"
               loading="lazy"
-              alt="Schematic depiction of two GhostCursor browser workspaces with a shared pointer and annotation"
+              alt="Conceptual artwork showing two GhostCursor browser windows with matching shared notes"
             />
-            <span className="art-label">Illustrative architecture cover · not an actual browser capture</span>
+            <span className="art-label">Conceptual product artwork</span>
           </div>
           <div className="project-details">
             <p className="eyebrow">03 / Browser Systems · Real-time Collaboration</p>
@@ -140,7 +140,7 @@ export function ProjectArchive() {
               sticky notes. Chromium and Firefox share the same protocol.
             </p>
             <p className="project-highlight">
-              Phase 3 prototype · 106 unit tests · 9 browser tests · CI verified
+              Phase 3 report documents 106 unit tests and 9 browser integration tests. Chromium and Firefox exchanged events over locally signaled WebRTC. Public cross-network connectivity and browser-store publication remain unverified.
             </p>
             <ul className="tags">
               <li>TypeScript</li><li>WebRTC</li><li>Manifest V3</li>

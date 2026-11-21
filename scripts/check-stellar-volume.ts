@@ -15,7 +15,7 @@ const count = 2250;
 let maxMotion = 0;
 for (let form = 0; form < 9; form++) for (let i = 0; i < count; i++) {
   const p = api.create(i, i % 5 < 3);
-  for (const time of [0, 2.2, 15, 19, 170.99]) {
+  for (const time of [0, 2.2, 5, 9, 80.99]) {
     api.form(form, p, p.angle, .7, time, a);
     api.form(form, p, p.angle, .7, time + .001, b);
     assert(a.every(n => Number.isFinite(n) && Math.abs(n) < 2));
@@ -33,7 +33,7 @@ function morph(time: number, particle: any, out: Float64Array) {
   const blend = frame[2];
   for (let k = 0; k < 4; k++) out[k] = left[k] + (right[k] - left[k]) * blend;
 }
-for (let boundary = 19; boundary <= 171; boundary += 19) for (let i = 0; i < 100; i++) {
+for (let boundary = 9; boundary <= 81; boundary += 9) for (let i = 0; i < 100; i++) {
   const p = api.create(i, i % 5 < 3);
   morph(boundary - .001, p, a); morph(boundary + .001, p, b);
   for (let k = 0; k < 4; k++) assert(Math.abs(a[k] - b[k]) < .002);
@@ -122,15 +122,15 @@ try {
   if (originalDocument) Object.defineProperty(globalThis, 'document', { configurable: true, value: originalDocument });
   else Reflect.deleteProperty(globalThis, 'document');
 }
-// Intro is one-shot; every subsequent dwell is 15 seconds and morph is 4 seconds.
+// Intro is one-shot; every subsequent dwell is 5 seconds and morph is 4 seconds.
 const frame = new Float64Array(3);
-for (const time of [0, 14.999]) { api.frame(time, frame); assert.deepEqual([...frame], [8, 0, 0]); }
-api.frame(17, frame); assert(Math.abs(frame[2] - .5) < 1e-9);
-api.frame(19, frame); assert.deepEqual([...frame], [0, 1, 0]);
-api.frame(34, frame); assert.equal(frame[2], 0);
-api.frame(38, frame); assert.deepEqual([...frame], [1, 2, 0]);
-api.frame(171, frame); assert.deepEqual([...frame], [0, 1, 0]);
-for (let time = 19; time < 600; time += .25) { api.frame(time, frame); assert(frame[0] < 8 && frame[1] < 8); }
+for (const time of [0, 5]) { api.frame(time, frame); assert.deepEqual([...frame], [8, 0, 0]); }
+api.frame(7, frame); assert(Math.abs(frame[2] - .5) < 1e-9);
+api.frame(9, frame); assert.deepEqual([...frame], [0, 1, 0]);
+api.frame(14, frame); assert.equal(frame[2], 0);
+api.frame(18, frame); assert.deepEqual([...frame], [1, 2, 0]);
+api.frame(81, frame); assert.deepEqual([...frame], [0, 1, 0]);
+for (let time = 9; time < 600; time += .25) { api.frame(time, frame); assert(frame[0] < 8 && frame[1] < 8); }
 // Reference-space landmarks: compact overlapping fingertips, front thumbs,
 // contact seam and divergent wrists. No mirrored open-palm finger fan.
 const landmarks = [[706,240], [824,240], [720,354], [797,380], [730,525], [798,535],
@@ -233,4 +233,4 @@ assert.equal(desktop.type.name, 'DesktopSculpture'); clock.current = 50;
 media.matches = false; notify?.(); assert.equal(component.render({ paused: false }), null);
 media.matches = true; notify?.(); assert.equal(component.render({ paused: false }).props.elapsedRef.current, 50);
 assert.equal(notifications, 3); unsubscribe(); assert.equal(notify, undefined);
-console.log('PASS: 101,250 geometry samples; reference anatomy/seam; deterministic shimmer and production draw alpha; nebula/text opacity; one-shot intro; 15s dwell/4s morph; spring recovery; phone/desktop gate and clock; fallback/resource cleanup; density diffusion. Browser shader compilation and GPU timings were not tested.');
+console.log('PASS: 101,250 geometry samples; reference anatomy/seam; deterministic shimmer and production draw alpha; nebula/text opacity; one-shot intro; 5s dwell/4s morph; spring recovery; phone/desktop gate and clock; fallback/resource cleanup; density diffusion. Browser shader compilation and GPU timings were not tested.');

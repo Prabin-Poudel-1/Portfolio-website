@@ -53,7 +53,7 @@ export const engineeringNotes: Record<
     },
     {
       label: "Architecture & implementation",
-      text: "TypeScript Manifest V3 extension with browser-specific networking hosts, Trystero encrypted WebRTC DataChannels, HMAC page topics, bounded event schemas, and a Shadow DOM overlay. Chromium uses an offscreen document; Firefox uses a visible session tab.",
+      text: "TypeScript Manifest V3 extension with browser-specific networking hosts, Trystero encrypted WebRTC DataChannels, HMAC page topics, message validation and rate limiting, and a Shadow DOM overlay built with Vite. Session-only notes use DOM anchors, synchronize for late joiners, and are removed on session cleanup. Chromium uses an offscreen document; Firefox uses a visible session tab.",
     },
     {
       label: "Privacy & operational boundaries",

@@ -45,7 +45,7 @@ assert.equal(sentinel.url, "sentinel-ai.html");
 assert.equal(sentinel.live, "https://sentinel.poudelprabin.com.np");
 assert.equal(projects.length, 8);
 assert(projects.some(p => p.id === "ghostcursor" && p.image && p.repo.includes("ghost-curser")));
-assert(existsSync("dist/assets/projects/ghostcursor.svg"));
+assert(existsSync("dist/assets/projects/ghostcursor.webp"));
 const html = readFileSync("dist/sentinel-ai.html", "utf8");
 for (const word of [
   "sentinel-flow",

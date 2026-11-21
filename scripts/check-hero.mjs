@@ -126,7 +126,7 @@ assert(smoke.includes('const starCount = Math.round(oldStarCount * 1.5);'), 'Sta
 assert(smoke.includes('const dustCount = count - oldStarCount;'), 'Original dust amount retained');
 assert(smoke.includes('(min-width: 768px)'), 'Phone viewports do not mount the renderer');
 assert(smoke.includes('return enabled ? <DesktopSculpture'), 'Viewport gate precedes renderer allocation');
-assert(smoke.includes('const FORM_HOLD = 6 * 2.5;'), 'Dwell increases exactly 2.5x');
+assert(smoke.includes('const FORM_HOLD = 5;'), 'Five-second hold leaves four seconds to morph in each nine-second cycle');
 assert(smoke.includes('const MORPH_SECONDS = 4;'), 'Morph duration unchanged');
 assert(smoke.includes('const DESKTOP_COUNT = 1800;'), '1,800 baseline full desktop particles');
 assert(smoke.includes('const stop = paused ? () => {} : animateHero(hero, draw)'), 'Reduced-motion/pause loop stays intact');

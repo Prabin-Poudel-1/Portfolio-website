@@ -801,7 +801,7 @@
 }
 
 
-/* Atlas / six stable, aligned domain cards. The hub remains unobstructed. */
+/* Atlas / six orbiting domains around a stationary hub. */
 #portfolio .portfolio-atlas .engineering-map {
   overflow: hidden;
 }
@@ -836,59 +836,17 @@
   border-radius: 16px;
 }
 #portfolio .portfolio-atlas .domain-node {
-  width: clamp(144px, 16vw, 186px);
-  min-height: 62px;
-  display: grid;
-  grid-template-columns: 35px minmax(0, 1fr);
-  align-items: center;
-  text-align: left;
-  gap: 9px;
-  padding: 10px 12px;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
-  transform: translate(-50%, -50%);
-  transition: border-color .2s, background-color .2s, box-shadow .2s;
+  width: min(128px, 29%);
+  min-height: 52px;
+  gap: 3px;
+  text-align: center;
   z-index: 2;
 }
-#portfolio .portfolio-atlas .node-symbol {
-  width: 35px;
-  height: 35px;
-  font-size: 19px;
-  color: var(--accent);
-  background: var(--bg);
-  border-radius: 10px;
-  flex: none;
-}
 #portfolio .portfolio-atlas .node-name {
-  display: block;
-  min-width: 0;
-  max-width: unset;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: 650 11px/1.35 var(--font-body, system-ui, sans-serif);
+  font-size: 11px;
+  line-height: 1.25;
   text-wrap: balance;
-  overflow-wrap: normal;
-  letter-spacing: -.01em;
-}
-#portfolio .portfolio-atlas .domain-node:hover,
-#portfolio .portfolio-atlas .domain-node:focus-visible {
-  border-color: var(--accent);
-  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 15%, transparent);
-}
-#portfolio .portfolio-atlas .domain-node[aria-pressed="true"] {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
-  box-shadow: 0 0 0 1px var(--accent), 0 4px 16px rgba(0,0,0,.12);
-}
-#portfolio .portfolio-atlas .domain-node[aria-pressed="true"] .node-symbol {
-  color: var(--accent-ink, var(--bg));
-  background: var(--accent);
-  transform: none;
+  border-radius: 4px;
 }
 #portfolio .portfolio-atlas .node-inspector {
   min-height: 160px;
@@ -908,9 +866,7 @@
   #portfolio .portfolio-atlas .network-stage {
     height: 330px;
   }
-  #portfolio .portfolio-atlas .domain-node {
-    width: min(150px, 35%);
-  }
+
 }
 @media (max-width: 540px) {
   #portfolio .portfolio-atlas .engineering-map {
@@ -920,7 +876,7 @@
     font-size: 8px;
   }
   #portfolio .portfolio-atlas .network-stage {
-    height: 338px;
+    height: 404px;
   }
   #portfolio .portfolio-atlas .network-core {
     width: 58px;
@@ -929,14 +885,6 @@
   }
   #portfolio .portfolio-atlas .network-core > span {
     font-size: 26px;
-  }
-  #portfolio .portfolio-atlas .domain-node {
-    width: min(116px, 36%);
-    min-height: 68px;
-    padding: 7px;
-    grid-template-columns: 28px minmax(0, 1fr);
-    gap: 6px;
-    border-radius: 9px;
   }
   #portfolio .portfolio-atlas .node-symbol {
     width: 28px;
