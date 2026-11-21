@@ -31,6 +31,21 @@ export const projects = [
     repo: "https://github.com/Prabin-Poudel-1/rescuer-sathi",
   },
   {
+    id: "ghostcursor",
+    name: "GhostCursor",
+    category: "Real-time collaboration / browser systems",
+    subtitle: "Browse together. Point anywhere.",
+    description:
+      "Privacy-first Chromium and Firefox extension for live peer-to-peer cursors, click ripples, laser drawings, and element-anchored notes over encrypted WebRTC.",
+    image: "assets/projects/ghostcursor.svg",
+    alt: "Schematic illustration of GhostCursor collaboration between two browsers; not a product screenshot",
+    label: "Schematic cover · see real browser captures in the demo",
+    color: "#b8f4ce",
+    stack: ["TypeScript", "WebRTC", "Manifest V3", "Firefox", "Playwright"],
+    url: "",
+    repo: "https://github.com/Prabin-Poudel-1/ghost-curser/tree/feature/ghostcursor-phase3",
+  },
+  {
     id: "rakshak",
     name: "Rakshak Satellite Intelligence",
     category: "Satellite intelligence",
