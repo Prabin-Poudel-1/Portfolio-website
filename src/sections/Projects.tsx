@@ -165,8 +165,8 @@ export function Projects({ motionPaused, onMotionToggle }: { motionPaused: boole
                 key={item.image}
                 src={item.image}
                 alt={item.alt}
-                width={item.id === "rescuer-sathi" ? 720 : 1100}
-                height={item.id === "rescuer-sathi" ? 1612 : 733}
+                width={item.id === "rescuer-sathi" ? 720 : item.id === "ghostcursor" ? 1200 : 1100}
+                height={item.id === "rescuer-sathi" ? 1612 : item.id === "ghostcursor" ? 675 : 733}
                 loading="lazy"
               />
             ) : (
