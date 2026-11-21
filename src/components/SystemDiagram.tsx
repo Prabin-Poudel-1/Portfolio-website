@@ -3,6 +3,17 @@ import { animateHero } from "../utils/heroMotion";
 import { playSound } from "../utils/sound.js";
 const nodes = [
   {
+    name: "Browser collaboration",
+    project: "GhostCursor",
+    projectId: "ghostcursor",
+    text: "Private, page-scoped peer-to-peer cursors and annotations across Chromium and Firefox, with tested WebRTC interoperability.",
+    url: "?demo=ghostcursor#portfolio",
+    x: 83,
+    y: 16,
+    code: "06",
+  },
+
+  {
     name: "AI & security",
     project: "Sentinel AI",
     projectId: "sentinel-ai",
@@ -86,7 +97,7 @@ export function SystemDiagram({ paused, onPause, onProjectSelect }: { paused: bo
         buttons[i].style.transform = `translate(calc(-50% + ${x - width * n.x / 100}px), calc(-50% + ${dy}px))`;
         const sx = x / width * 100, sy = (y + geometry[i].symbolOffset) / height * 100;
         wires[i].setAttribute('d', `M48 48 L${sx} ${sy}`);
-        const travel = (time * .13 + i / 5) % 1;
+        const travel = (time * .13 + i / nodes.length) % 1;
         signals[i].setAttribute('cx', String(48 + (sx - 48) * travel));
         signals[i].setAttribute('cy', String(48 + (sy - 48) * travel));
         signals[i].style.opacity = String(Math.sin(travel * Math.PI) * .5);
@@ -157,13 +168,13 @@ export function SystemDiagram({ paused, onPause, onProjectSelect }: { paused: bo
             onFocus={() => manual(i)}
             onMouseEnter={() => manual(i)}
           >
-            <span className="node-symbol">{["⌘", "↗", "◇", "⌁", "⊕"][i]}</span>
+            <span className="node-symbol">{["⌁", "⌘", "↗", "◇", "⌁", "⊕"][i]}</span>
             <span className="node-name">{n.name}</span>
           </button>
         ))}
       </div>
       <div className="node-inspector">
-        <span className="sr-only">Selected domain {active + 1} of 5.</span>
+        <span className="sr-only">Selected domain {active + 1} of {nodes.length}.</span>
         {nodes.map((detail, i) => (
           <div key={detail.code} className={"inspector-content" + (i === active ? " is-active" : "")}
             style={{ visibility: i === active ? "visible" : "hidden" }} aria-hidden={i !== active}>
