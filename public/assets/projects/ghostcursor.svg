@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+<title id="title">GhostCursor — two connected browser workspaces</title>
+<desc id="desc">A conceptual split-browser illustration with synchronized cursors and a sticky note, not an actual browser screenshot.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0c151e"/><stop offset="1" stop-color="#20353c"/></linearGradient>
+ <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1b3037"/><stop offset="1" stop-color="#0e1b25"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="17" stdDeviation="21" flood-opacity=".26"/></filter>
+ <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" stroke="#93c5ba" opacity=".085" fill="none"/></pattern>
+</defs>
+<rect width="1200" height="760" fill="url(#bg)"/>
+<rect width="1200" height="760" fill="url(#grid)"/>
+<text x="76" y="83" fill="#B8F4CE" font-size="20" font-family="Arial,sans-serif" letter-spacing="5">GHOSTCURSOR / COLLABORATIVE BROWSING</text>
+<text x="75" y="138" fill="#EDF8F6" font-size="47" font-weight="700" font-family="Arial,sans-serif" letter-spacing="-2">Two windows. One conversation.</text>
+<text x="79" y="172" fill="#A8C4C6" font-size="18" font-family="Arial,sans-serif">Encrypted peer-to-peer cursors · annotations · browser systems</text>
+<g filter="url(#shadow)">
+<rect x="77" y="223" rx="12" width="493" height="380" fill="#12222a" stroke="#69908d" stroke-width="1.5"/>
+<rect x="630" y="223" rx="12" width="493" height="380" fill="#12222a" stroke="#69908d" stroke-width="1.5"/>
+</g>
+<g font-family="Arial,sans-serif">
+<path d="M89 223H558Q570 223 570 235V267H77V235Q77 223 89 223Z" fill="#273940"/>
+<path d="M642 223H1111Q1123 223 1123 235V267H630V235Q630 223 642 223Z" fill="#273940"/>
+<g fill="#a1b9bb" font-size="13" letter-spacing="1.5">
+<text x="120" y="252">BROWSER A / ALEX</text><text x="672" y="252">BROWSER B / SAM</text>
+</g>
+<g fill="#b8f4ce"><circle cx="103" cy="247" r="5"/><circle cx="656" cy="247" r="5"/></g>
+<rect x="96" y="286" width="456" height="297" rx="6" fill="url(#pane)"/>
+<rect x="648" y="286" width="456" height="297" rx="6" fill="url(#pane)"/>
+<g fill="#b9d2ce" font-size="13"><text x="122" y="320">COMMON GROUND</text><text x="676" y="320">COMMON GROUND</text></g>
+<g fill="#effaf5" font-size="37" font-weight="bold"><text x="121" y="390">Ideas worth</text><text x="121" y="432">pointing at.</text><text x="675" y="390">Ideas worth</text><text x="675" y="432">pointing at.</text></g>
+<g fill="#a4c4c5" font-size="14"><text x="124" y="459">A shared context for every detail.</text><text x="678" y="459">A shared context for every detail.</text></g>
+<rect x="302" y="478" width="212" height="80" rx="5" fill="#36524d" stroke="#65938c"/>
+<rect x="857" y="478" width="212" height="80" rx="5" fill="#36524d" stroke="#65938c"/>
+<g fill="#e4f5e9" font-size="14" font-weight="bold"><text x="317" y="506">Review this component</text><text x="872" y="506">Review this component</text></g>
+<g fill="#b4d0ca" font-size="11"><text x="317" y="529">Shared annotation / v0.3</text><text x="872" y="529">Shared annotation / v0.3</text></g>
+<g transform="translate(386 447)"><path d="M0 0V47L14 36L28 59L39 53L25 29H47Z" fill="#B8F4CE" stroke="#10212a" stroke-width="4"/><rect x="25" y="43" width="51" height="24" rx="4" fill="#B8F4CE"/><text x="37" y="59" fill="#18322f" font-size="12" font-weight="bold">Alex</text></g>
+<g transform="translate(942 447)"><path d="M0 0V47L14 36L28 59L39 53L25 29H47Z" fill="#B8F4CE" stroke="#10212a" stroke-width="4"/><rect x="25" y="43" width="51" height="24" rx="4" fill="#B8F4CE"/><text x="37" y="59" fill="#18322f" font-size="12" font-weight="bold">Alex</text></g>
+<circle cx="601" cy="411" r="39" fill="#B8F4CE" opacity=".08"/><circle cx="601" cy="411" r="25" stroke="#B8F4CE" fill="none" stroke-width="2"/><path d="M586 411H616M601 396V426" stroke="#B8F4CE" stroke-width="3"/><path d="M567 411H550M635 411H652" stroke="#B8F4CE" stroke-dasharray="4 4" stroke-width="2"/>
+<text x="80" y="668" fill="#B8F4CE" font-size="21" font-weight="bold" font-family="Arial,sans-serif">BROWSE TOGETHER. POINT ANYWHERE.</text>
+<text x="80" y="704" fill="#a5c4c2" font-size="14" font-family="Arial,sans-serif">CONCEPTUAL COVER — VIEW THE PROJECT LAB FOR ACTUAL ENGINEERING EVIDENCE</text>
+</svg>
