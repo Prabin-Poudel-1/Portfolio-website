@@ -46,6 +46,28 @@ export const engineeringNotes: Record<
       text: "An audit should preserve the request inputs and the reason for the decision, not just a green or red result.",
     },
   ],
+  ghostcursor: [
+    {
+      label: "Problem & product",
+      text: "Screen sharing is excessive when teammates only need a shared pointer, temporary emphasis, or a comment pinned to a page element. GhostCursor enables explicit, page-scoped browser collaboration.",
+    },
+    {
+      label: "Architecture & implementation",
+      text: "TypeScript Manifest V3 extension with browser-specific networking hosts, Trystero encrypted WebRTC DataChannels, HMAC page topics, bounded event schemas, and a Shadow DOM overlay. Chromium uses an offscreen document; Firefox uses a visible session tab.",
+    },
+    {
+      label: "Privacy & operational boundaries",
+      text: "No persistent host access, browsing-history collection, or cloud database. Intentional annotations travel to peers; relays, STUN, and peers can still observe network metadata such as IP addresses. Invitations are bearer secrets.",
+    },
+    {
+      label: "Verified engineering evidence",
+      text: "The Phase 3 report records 106 unit tests and 9 browser tests, including genuine locally signaled Firefox–Chromium WebRTC communication. The public CI workflow passed on the feature branch. Public cross-network operation and app-store publication remain unverified.",
+    },
+    {
+      label: "What this page demonstrates",
+      text: "The paired browser lab is illustrative local React state; it does not load the extension, connect to WebRTC, transmit a note, or imply a live peer. Open the linked repository for actual browser captures and verification artifacts.",
+    },
+  ],
   rakshak: [
     {
       label: "Problem & constraints",
