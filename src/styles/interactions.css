@@ -58,7 +58,8 @@
   object-fit: cover;
   display: block;
 }
-.scene-sentinel-ai .cinema-image img {
+.scene-sentinel-ai .cinema-image img,
+.scene-ghostcursor .cinema-image img {
   object-fit: contain;
 }
 .scene-rescuer-sathi .cinema-image img {
